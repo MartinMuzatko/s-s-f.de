@@ -1,0 +1,43 @@
+{
+  "name": "s-s-f.de",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "autoprefixer": "^6.5.0",
+    "babel": "^6.5.2",
+    "babel-core": "^6.17.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015-riot": "^1.1.0",
+    "browser-sync": "^2.17.0",
+    "browser-sync-webpack-plugin": "^1.1.3",
+    "css-loader": "^0.25.0",
+    "eslint": "^3.7.1",
+    "eslint-loader": "^1.5.0",
+    "html-loader": "^0.4.4",
+    "less": "^2.7.1",
+    "less-loader": "^2.2.3",
+    "postcss": "^5.2.4",
+    "postcss-loader": "^0.13.0",
+    "riot": "^2.6.2",
+    "riot-loader": "^1.0.0",
+    "source-map-loader": "^0.1.5",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.16.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MartinMuzatko/s-s-f.de.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MartinMuzatko/s-s-f.de/issues"
+  },
+  "homepage": "https://github.com/MartinMuzatko/s-s-f.de#readme"
+}
