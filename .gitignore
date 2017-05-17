@@ -8,6 +8,9 @@ composer.phar
 # NODE
 node_modules/
 
+dist/
+*.bmpr
+todo
 
 # BUILD
 bundle.js
