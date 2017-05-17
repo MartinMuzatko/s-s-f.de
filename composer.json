@@ -1,0 +1,19 @@
+{
+    "name": "martinmuzatko/s-s-f.de",
+    "type": "project",
+    "license": "ISC",
+    "authors": [
+        {
+            "name": "Martin Muzatko",
+            "email": "martin@happy-css.com"
+        },
+        {
+            "name": "Michael Stüber",
+            "email": "pum.amurcat@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {"API\\": "classes/API"}
+    },
+    "require": {}
+}
