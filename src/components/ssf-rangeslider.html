@@ -1,0 +1,29 @@
+<ssf-rangeslider>
+    <div ref="slider"></div>
+    <script>
+        import noUiSlider from 'nouislider'
+        import extend from 'extend'
+        this.value = parseFloat(this.opts.initialValue) || 0
+        this.on('mount', ()=>{
+            this.options = {
+                start: this.value,
+                connect: [true, false],
+                range: {
+                    min: 0,
+                    max: 50,
+                },
+                pips: {
+                    mode: 'count',
+                    density: 5,
+                    values: 8
+                }
+            }
+            extend(true, this.options, this.opts.options)
+            noUiSlider.create(this.refs.slider,this.options)
+            this.refs.slider.noUiSlider.on('update', value=>{
+                this.value = parseFloat(value)
+                this.trigger('change', value)
+            })
+        })
+    </script>
+</ssf-rangeslider>

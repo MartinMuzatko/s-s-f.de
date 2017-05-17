@@ -1,0 +1,20 @@
+<ssf-species-select>
+    <label for="species">species</label>
+    <ssf-suggestioninput suggestions={suggestions}></ssf-suggestioninput>
+    <script>
+        import '../ssf-suggestioninput.html'
+        this.getSpecies = async function() {
+            let response = await fetch('http://localhost:8888/s-s-f.de/api/users/getSpecies')
+            let data = await response.json()
+            return data
+        }
+        this.on('mount', ()=>{
+            this.getSpecies().then(
+                (data) => {
+                    this.suggestions = data
+                    this.tags.ssfSuggestioninput.update()
+                }
+            )
+        })
+    </script>
+</ssf-species-select>

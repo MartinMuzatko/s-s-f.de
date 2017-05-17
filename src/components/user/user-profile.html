@@ -1,0 +1,57 @@
+<user-profile>
+    <a onblur={closeDropdown} onclick={openDropdown} href="#" class="user-profile" layout="row" layout-align="center center">
+        <span class="user-profile__name">{opts.name}</span>
+        <span class="user-profile__select {refs.dropdown.open || 0 ? 'active' : '' }">▾</span>
+        <img class="user-profile__avatar" src="{opts.avatar}" alt="{opts.name}">
+    </a>
+    <ssf-dropdown ref="dropdown">
+        <div class="dropdown__group">
+            <a class="dropdown__item" href="{api.url}user/{api.user}">Profil anzeigen</a>
+            <a class="dropdown__item" href="{api.url}user/edit">Profil bearbeiten</a>
+            <a class="dropdown__item" href="{api.url}admin">Admin</a>
+        </div>
+        <a class="dropdown__item" href="{api.url}user/logout">Logout</a>
+    </ssf-dropdown>
+    <script>
+        import '../ssf-dropdown.html'
+        openDropdown(event) {
+            event.preventDefault()
+            this.refs.dropdown.trigger('toggle')
+        }
+        closeDropdown() {
+            this.refs.dropdown.trigger('close')
+        }
+    </script>
+    <style type="text/less">
+        @import "src/less/variables.less";
+        :scope {
+            position: relative;
+        }
+        .user-profile {
+            cursor: pointer;
+            color: @color-light;
+            margin-right: .5em;
+            &__avatar {
+                left: 100%;
+                width: 32px;
+                height: 32px;
+                border-radius: 100%;
+                border: 1px solid @color-primary;
+            }
+            &__select {
+                transition: all .5s ease;
+                transform: rotate(0deg);
+                &.active {
+                    transform: rotate(180deg);
+                }
+            }
+
+            &__name {
+                color: @color-light;
+            }
+            * + * {
+                margin-left: .5em;
+            }
+        }
+    </style>
+</user-profile>

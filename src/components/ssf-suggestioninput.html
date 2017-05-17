@@ -1,0 +1,32 @@
+<ssf-suggestioninput>
+    <input type="text" oninput={suggest} onfocus={suggest} onblur={hideSuggestions}>
+    <div>
+        <div each={field in suggestedData}>
+            {field}
+        </div>
+    </div>
+    <script>
+        import regeneratorRuntime from "regenerator-runtime"
+        this.suggestedData = []
+        this.suggestions = this.opts.suggestions
+
+        this.on('mount,update',()=>{
+            this.suggestions = this.opts.suggestions
+        })
+
+        suggest(e) {
+            let value = e.currentTarget.value
+            if (value.length) {
+                this.suggestedData = this.suggestions.filter((item)=>{
+                    return ~item.toLowerCase().indexOf(value.toLowerCase())
+                })
+            } else {
+                this.suggestedData = []
+            }
+        }
+
+        hideSuggestions() {
+
+        }
+    </script>
+</ssf-suggestioninput>

@@ -1,0 +1,34 @@
+<event-duration-editor>
+    <h2>Dauer des Events</h2>
+    <div layout="row" layout-align="space-between end">
+        <fieldset flex="100" flex-gt-sm="33">
+            <p>Datum</p>
+            <ssf-datepicker options={rangeOptions}></ssf-datepicker>
+        </fieldset>
+        <fieldset flex="100" flex-gt-sm="33">
+            <p>Start Zeit</p>
+            <ssf-datepicker options={timeOptions}></ssf-datepicker>
+        </fieldset>
+        <fieldset flex="100" flex-gt-sm="33">
+            <p>End Zeit</p>
+            <ssf-datepicker options={timeOptions}></ssf-datepicker>
+        </fieldset>
+    </div>
+    <script>
+        import '../ssf-datepicker.html'
+        this.rangeOptions = {
+            mode: 'range',
+            allowInput: true,
+            locale : {
+                firstDayOfWeek: 1,
+            }
+        }
+        this.timeOptions = {
+            allowInput: true,
+            enableTime: true,
+            noCalendar: true,
+            time_24hr: true,
+            defaultHour: 14,
+        }
+    </script>
+</event-duration-editor>

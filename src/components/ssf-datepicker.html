@@ -1,0 +1,21 @@
+<ssf-datepicker>
+    <input ref="datepicker">
+    <script>
+        import extend from 'extend'
+        import Flatpickr from 'flatpickr'
+        this.on('mount', ()=>{
+            this.options = {
+                onChange: (selectedDates)=>{
+                    this.trigger('picked', selectedDates)
+                },
+                onOpen: function(selectedDates){
+                    if (this.hourElement && this.minuteElement) {
+                        this.setDate(`${this.hourElement.value}:${this.minuteElement.value}`)
+                    }
+                }
+            }
+            extend(true, this.options, this.opts.options)
+            this.datepicker = new Flatpickr(this.refs.datepicker, this.options)
+        })
+    </script>
+</ssf-datepicker>

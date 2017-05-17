@@ -1,0 +1,23 @@
+<event-create>
+    <form onsubmit={submit} method="POST" action="">
+        <fieldset>
+            <label for="title">Titel</label>
+            <input name="title" type="text">
+        </fieldset>
+        <event-duration-editor></event-duration-editor>
+        <event-tickets-editor></event-tickets-editor>
+        <event-items-editor></event-items-editor>
+        <input type="submit" class="button button-dark" name="" value="Event erstellen">
+    </form>
+    <script>
+        import './event-duration-editor.html'
+        import './event-tickets-editor.html'
+        import './event-items-editor.html'
+
+        submit(e) {
+            var data = new FormData(e.currentTarget)
+            console.log(data);
+        }
+
+    </script>
+</event-create>

@@ -1,0 +1,27 @@
+<event-ticket-price-slider>
+    <ssf-rangeslider ref="slider" options={options}></ssf-rangeslider>
+    <script>
+        import extend from 'extend'
+        import wNumb from 'wnumb'
+        import '../ssf-rangeslider.html'
+        this.options = {
+            start: 5,
+            tooltips: wNumb({decimals: 2, mark: ',', suffix: ' €'}),
+            range: {
+                min: 0,
+                max: 100,
+            },
+            pips : {
+                values: 5
+            },
+            step: .5,
+        }
+        extend(true, this.options, this.opts.options)
+
+        this.on('mount', ()=>{
+            this.refs.slider.on('change', (value)=>{
+                this.trigger('change', value)
+            })
+        })
+    </script>
+</event-ticket-price-slider>

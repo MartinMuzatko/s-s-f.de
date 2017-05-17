@@ -1,0 +1,55 @@
+<ssf-dropdown>
+    <div class="items dropdown {open ? 'dropdown--open' : '' }">
+        <yield>
+    </div>
+    <script>
+        this.open = false || this.opts.open
+        this.on('open', ()=>{
+            this.open = true
+            this.update()
+        })
+        this.on('close', ()=>{
+            this.open = false
+            this.update()
+        })
+        this.on('toggle', ()=>{
+            this.open = !this.open
+            this.update()
+        })
+    </script>
+    <style type="text/less">
+        @import "src/less/variables.less";
+        :scope {
+            position: absolute;
+            right: 0;
+        }
+        .dropdown {
+            transition: all .5s ease;
+            background: @color-light;
+            border-radius: .5em;
+            overflow: hidden;
+            pointer-events: none;
+            box-shadow: 0 0 .1em @color-dark-shadow;
+            opacity: 0;
+            &--open {
+                opacity: 1;
+                pointer-events: all;
+            }
+            &__item {
+                transition: all .25s ease;
+                padding: .5em 1em;
+                display: block;
+                color: @color-dark;
+                white-space: nowrap;
+                &:hover {
+                    background: @color-dark;
+                    color: @color-primary;
+                }
+            }
+            &__group {
+                border-top: 1px solid gray;
+                border-bottom: 1px solid gray;
+            }
+        }
+    </style>
+</ssf-dropdown>

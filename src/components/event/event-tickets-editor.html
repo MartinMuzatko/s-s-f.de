@@ -1,0 +1,46 @@
+<event-tickets-editor>
+    <div layout="row" layout-align="space-between start">
+        <div flex="100" flex-gt-md="45">
+            <h2>Plätze</h2>
+            <input type="hidden" name="contingent" value={contingent}>
+            <event-ticket-limit-slider ref="contingent"></event-ticket-limit-slider>
+        </div>
+        <div flex="100" flex-gt-md="45">
+            <h2>Eintrittskosten</h2>
+            <input type="hidden" name="price" value={price}>
+            <event-ticket-price-slider ref="price"></event-ticket-price-slider>
+        </div>
+    </div>
+    <div layout="column" layout-align="center center">
+        <h3>Einnahmen Gesamt</h3>
+        <p>{moneyFormat.to(this.contingent*this.price)}</p>
+    </div>
+    <br>
+    <script>
+        import './event-ticket-price-slider.html'
+        import './event-ticket-limit-slider.html'
+        import wNumb from 'wnumb'
+        // import '../ssf-rangeslider.html'
+        this.contingent = 20
+        this.price = 10
+
+        this.moneyFormat = wNumb({
+            mark: ',',
+            thousand: '.',
+            suffix: ' €',
+            decimals : 2
+        })
+
+        this.on('mount', ()=>{
+
+            this.refs.contingent.on('change', (event)=>{
+                this.contingent = parseInt(event)
+                this.update()
+            })
+            this.refs.price.on('change', (event)=>{
+                this.price = parseFloat(event)
+                this.update()
+            })
+        })
+    </script>
+</event-tickets-editor>

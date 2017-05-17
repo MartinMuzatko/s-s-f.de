@@ -1,0 +1,265 @@
+/* ========================================
+BASE
+* Contains HTML default elements (b,i,u,table...)
+* Does not contain classes, ids
+* Can implement mixins
+======================================== */
+
+*
+{
+    box-sizing: border-box;
+}
+
+/*  ========================================
+BLOCK ELEMENTS
+======================================== */
+body, html
+{
+    background-image: url('../images/bg.png');
+    background-size: 20% auto;
+    background-color: @color-light;
+    min-width: 320px;
+    font-family: "Times New Roman";
+    font-weight: 300;
+    line-height: 1.55rem;
+    color: @color-dark;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    font-size: 16px;
+    @media screen and (min-width: @breakpoint-sm) {
+        font-size: 16px;
+    }
+    @media screen and (min-width: @breakpoint-md) {
+        font-size: 17px;
+    }
+    @media screen and (min-width: @breakpoint-lg) {
+        font-size: 18px;
+    }
+}
+
+input {
+    font-family: @font-body;
+}
+
+iframe {
+    border: none;
+}
+
+h1, h2, h3, h4, h5, h6
+{
+    margin: 1em 0;
+    line-height: 1.25em;
+    text-transform: none;
+    font-family: @font-heading;
+    font-weight: 700;
+}
+
+h2,h3,h4 {
+    font-weight: 400;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin: 0;
+}
+
+h2 {
+    font-size: 1.75em;
+}
+
+h3 {
+    font-size: 1.5em;
+}
+
+h2:first-child {
+    margin-top: 0;
+}
+
+h4 {
+    font-size: 1rem;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+main img {
+    max-width: 100%;
+    height: auto;
+}
+
+ul ul {
+    margin-left: 2em;
+}
+
+ul {
+    padding: 0;
+    li {
+        list-style: none;
+        margin: 1em 0;
+        &:before {
+            padding-right: .5em;
+            content: "❯";
+            color: @color-primary;
+        }
+    }
+}
+
+p code {
+    color: @color-primary;
+    padding: .25em;
+    border-radius: .5em;
+    background-color: hsla(0, 0%, 70%, .5);
+
+}
+
+figure {
+	margin: 0;
+	img {
+		display: block;
+	}
+	figcaption {
+		margin: 0;
+		padding: .5em;
+		background: @color-primary;
+		color: @color-light;
+	}
+}
+
+a {
+    text-decoration: none;
+    color: @color-primary;
+}
+
+.code {
+    background: @color-dark;
+    border-radius: .2em .2em 0 0;
+    font-family: @font-heading;
+    color: @color-light;
+    padding: .5em 0 .5em 1em;
+    + pre {
+        border-radius: 0 0 .2em .2em;
+    }
+}
+
+pre[class*=language-] {
+    margin: 0;
+    margin: 0;
+    font-size: 1rem;
+
+    code {
+        display: block;
+        width: 100%;
+    }
+}
+
+table {
+    margin: 1em 0 2em 0;
+    border-spacing: 0;
+    width: 100%;
+
+    thead {
+        background: darken(@color-light, 5%);
+    }
+
+    th {
+        font-family: @font-body, sans-serif;
+        font-weight: normal;
+        text-align: left;
+        background: darken(@color-light, 5%);
+        vertical-align: top;
+    }
+
+    tr {
+        th,
+        td {
+            vertical-align: top;
+            padding: .75em .75em .25em .5em;
+            border-bottom: 1px solid darken(@color-light, 10%);
+        }
+    }
+}
+
+
+/*  ========================================
+TEXTUAL/CONTENT ELEMENTS
+======================================== */
+
+hr {
+    margin: 1em 0;
+    border: none;
+    width: 100%;
+    height: .1rem;
+    background-color: lighten(@color-dark, 50%);
+}
+
+p, li {
+    font-size: 1.35rem;
+    padding: 0;
+    margin: 1em 0;
+    line-height: 1.55;
+    word-wrap: break-word;
+}
+
+ul {
+    list-style: square;
+}
+
+ul,ol {
+    padding: 0 0 0 1em;
+    margin-bottom: 0;
+}
+
+ol
+{
+    list-style-type: decimal;
+    ol {
+        list-style-type: lower-alpha;
+    }
+}
+
+b, strong {
+    font-weight: 700;
+}
+
+/*  ========================================
+FORM ELEMENTS
+======================================== */
+
+fieldset
+{
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+input {
+    width: auto;
+    border: 1px solid @color-primary;
+    border-radius: .2em;
+    font-size: 1em;
+    line-height: 1;
+    padding: .5em;
+    transition: all @duration-action ease;
+    position: relative;
+}
+
+label {
+    display: block;
+    margin: 0;
+    ~ * {
+        margin-top: 1em;
+    }
+    input {
+        display: block;
+    }
+}
+
+input[type="submit"] {
+    margin-top: 1em;
+}

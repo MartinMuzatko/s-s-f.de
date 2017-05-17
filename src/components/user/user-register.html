@@ -1,0 +1,53 @@
+<user-register>
+    <div layout="row" layout-align="space-between center">
+        <div class="" layout="row" layout-align="center center" flex="100" flex-gt-sm="50">
+            <img src="http://localhost:3000/s-s-f.de/site/assets/files/1/logo.0x160.png" alt="">
+        </div>
+        <div layout="row" layout-align="center center" flex="100" flex-gt-sm="50">
+            <div class="g-signin2" data-onsuccess="onSignIn"></div>
+        </div>
+    </div>
+    <form action="" method="post">
+        <label for="username">username</label>
+        <input type="text" required name="username" value="{opts.postdata.username}">
+        <ssf-species-select></ssf-species-select>
+        <input type="text" required name="species" value="{opts.postdata.species}">
+        <label for="firstname">firstname</label>
+        <input type="text" required name="firstname" value="{opts.postdata.firstname}">
+        <label for="lastname">lastname</label>
+        <input type="text" required name="lastname" value="{opts.postdata.lastname}">
+        <label for="password">password</label>
+        <input type="password" required name="password" value="{opts.postdata.password}">
+        <label for="password_repeat">password_repeat</label>
+        <input type="password" required name="password_repeat" value="{opts.postdata.password_repeat}">
+        <label for="email">email</label>
+        <input type="email" name="email" value="{opts.postdata.email}">
+        <div layout="row">
+            <label for="street">street</label>
+            <input type="text" required name="street" value="{opts.postdata.street}">
+            <label for="zip">zip</label>
+            <input type="text" required name="zip" value="{opts.postdata.zip}">
+            <label for="city">city</label>
+            <input type="text" required name="city" value="{opts.postdata.city}">
+            <label for="country">country</label>
+            <input type="text" required name="country" value="{opts.postdata.country}">
+        </div>
+        <label for="birthday">birthday</label>
+        <input type="date" name="birthday" value="{opts.postdata.birthday}">
+
+        <input type="submit" value="Register">
+    </form>
+    <script>
+        import '../user/ssf-species-select.html'
+
+        onSignIn(googleUser) {
+            var profile = googleUser.getBasicProfile();
+            //https://www.googleapis.com/auth/userinfo.profile
+            console.log(profile);
+        }
+
+        this.on('mount', ()=>{
+        })
+
+    </script>
+</user-register>

@@ -1,0 +1,27 @@
+<event-ticket-limit-slider>
+    <ssf-rangeslider ref="slider" options={options}></ssf-rangeslider>
+    <script>
+        import wNumb from 'wnumb'
+        import extend from 'extend'
+        import '../ssf-rangeslider.html'
+        this.options = {
+            start: 40,
+            tooltips: wNumb({decimals: 0, suffix: ' Plätze'}),
+            range: {
+                min: 10,
+                max: 250,
+            },
+            step: 1,
+            pips: {
+                values: 9
+            }
+        }
+        extend(true, this.options, this.opts.options)
+
+        this.on('mount', ()=>{
+            this.refs.slider.on('change', (value)=>{
+                this.trigger('change', value)
+            })
+        })
+    </script>
+</event-ticket-limit-slider>

@@ -1,0 +1,40 @@
+/*
+c-navigation(@type)
+
+Creates a Navigation
+
+@type 	-
+
+Styleguide Navigation - Mixin
+*/
+
+.c-navigation(@type: none) {
+
+    & when (@type = none) {
+        // Put default styling here
+        background-image: linear-gradient(
+            to top,
+            @color-dark 40%,
+            lighten(@color-dark, 10%) 80%,
+            lighten(@color-dark, 10%) 90%
+        );
+        border-bottom: 2px solid @color-primary;
+        background-color: @color-dark;
+        .navigation__item {
+            border-bottom: none;
+            display: flex;
+            border-radius: 0;
+            border-left: 1px solid gray;
+            &:last-child {
+                border-right: 1px solid gray;
+
+            }
+        }
+
+    }
+
+    & when not (@type = none) {
+        // Put specific styling here
+    }
+
+}

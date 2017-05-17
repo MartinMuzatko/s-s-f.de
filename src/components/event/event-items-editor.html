@@ -1,0 +1,70 @@
+<event-items-editor>
+    <h2>Items</h2>
+    <div layout="row">
+        <div flex="100" flex-gt-sm="33" each={item,index in items}>
+            <div onclick={removeItem}>&times;</div>
+            <fieldset layout="row">
+                <label for="name">Name:</label> <input type="text" name="name" value={item.name}>
+            </fieldset>
+            <fieldset layout="row">
+                <label for="price">Preis:</label> <input type="text" name="price" value={item.price}>
+            </fieldset>
+            <label for="price">Optionen?</label> <input type="checkbox" {checked: item.optionsActive} onchange={checkOptions}>
+            <div if={item.optionsActive}>
+                <div each={option in item.options}>
+                    <input type="text">
+                </div>
+                <div onclick={addOption}>+</div>
+            </div>
+        </div>
+        <div class="items__add" onclick={addItem}>+</div>
+    </div>
+    <script>
+        this.items = [
+            {
+                name: 'Badge',
+                price: 2,
+                options: [],
+                optionsActive: false
+            }
+        ]
+        addItem() {
+            this.items.push({
+                name: 'Tshirt',
+                price: 15,
+                options: [],
+                optionsActive: false
+            })
+        }
+
+        removeItem(e) {
+            console.log(e.item);
+            this.items.splice(e.item.index, 1)
+        }
+
+        checkOptions(e) {
+            console.log(e.item);
+            e.item.item.optionsActive = !e.item.item.optionsActive
+            this.update()
+        }
+
+        addOption(e) {
+            e.item.item.options.push('')
+            this.update()
+        }
+    </script>
+    <style type="text/less">
+        @import "src/less/variables.less";
+        .items__add {
+            padding: 0 4em;
+            min-height: 5em;
+            border: 1px solid @color-primary;
+            border-radius: .25em;
+            text-align: center;
+            display: flex;
+            align-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+    </style>
+</event-items-editor>

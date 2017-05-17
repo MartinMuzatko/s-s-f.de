@@ -1,0 +1,62 @@
+/* ========================================
+MIXINS
+* General Use Mixins to ease up reoccuring styles
+* No Components!
+======================================== */
+
+
+.padding-vertical(@amount: 2em) {
+    padding-top: @amount;
+    padding-bottom: @amount;
+}
+
+.padding-horizontal(@amount: 5%) {
+    padding-left: @amount;
+    padding-right: @amount;
+}
+
+.shadow(@size: .5em, @color: @color-dark-shadow) {
+    box-shadow: 0 0 @size @color;
+}
+
+.darkenBackground {
+    position: relative;
+    > * {
+        position: relative;
+    }
+    &::before {
+        content: '';
+        position: absolute;
+        background-color: @color-dark-shadow;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+    }
+}
+
+
+.responsiveWidth(@width) {
+    @media screen and (min-width: @breakpoint-sm) {
+        width: calc(@breakpoint-sm * (min(1, min(@width + .2, 1))) ~'- 1rem');
+    }
+    @media screen and (min-width: @breakpoint-md) {
+        width: calc(@breakpoint-md * (min(1, min(@width + .05, 1))) ~'- 1rem');
+    }
+    @media screen and (min-width: @breakpoint-lg) {
+        width: calc(@breakpoint-lg * @width ~'- 1rem');
+    }
+}
+
+.responsiveHeight(@height) {
+    min-height: @height * .5;
+    @media screen and (min-width: @breakpoint-sm) {
+        min-height: @height * .7;
+    }
+    @media screen and (min-width: @breakpoint-md) {
+        min-height: @height * .85;
+    }
+    @media screen and (min-width: @breakpoint-lg) {
+        min-height: @height;
+    }
+}
