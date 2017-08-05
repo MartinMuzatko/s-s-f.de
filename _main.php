@@ -84,10 +84,10 @@ $content = ob_get_clean();
                         <a class="button" href="<?=$child->url?>"><?=$child->title?></a>
                     <? endforeach;?>
                 </nav>
-            <? endif; ?>
+            <? endif; ?> -->
         </header>
         <!-- <a href="" class="button button-dark">Miau</a> -->
-        <main>
+        <main class="site__content">
             <article>
                 <h1><?=$page->title?></h1>
                 <br>
@@ -95,8 +95,8 @@ $content = ob_get_clean();
             </article>
             <a href="<?=$page->editUrl?>">Edit <?=$page->title?></a>
         </main>
-        <footer>
-
+        <footer class="site__footer">
+            SSF - Südstaaten Furs &copy; 2017
         </footer>
     </div>
     <? if(!$user->isLoggedin()): ?>

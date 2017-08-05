@@ -26,6 +26,21 @@
     line-height: 80px;
 }
 
+.site__content {
+    padding: 2em 1em;
+    border-radius: 0 0 .1em .1em;
+    box-shadow: 0 0 .2em @color-dark-shadow;
+    // border: 1px solid @color-primary-light;
+    background-color: lighten(fadeout(desaturate(@color-primary-light, 30%), 40%), 15%);
+}
+
+.site__footer {
+    box-shadow: 0 0 .2em @color-dark-shadow;
+    color: @color-light;
+    background-color: @color-dark;
+    padding: 2em 1em;
+}
+
 .noUi-connect {
     background-color: @color-primary;
 }
