@@ -1,0 +1,134 @@
+<ssf-step-indicator>
+    <ol>
+        <li each={step in steps} class={active: step.active}>
+            <a href="#{step.route}">{step.name}</a>
+        </li>
+    </ol>
+    <style type="text/less">
+        @import "src/less/variables.less";
+        ol {
+            width: 100%;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        	counter-reset: list;
+            list-style: none;
+        }
+        ol a::before {
+        	content: counter(list)'.';
+        	counter-increment: list;
+        	margin-left: 0.3em;
+        	margin-right: 0.6em;
+        }
+        li {
+            width: 100%;
+            border: 1px solid @color-primary;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            background-color: @color-light;
+            & ~ li {
+                border-left-width: 0;
+            }
+            &.active {
+                background-color: @color-primary;
+            }
+            a {
+                display: block;
+                width: 100%;
+                padding: .25em .5em .25em 0;
+                color: @color-dark;
+            }
+        }
+    </style>
+    <script>
+        import route from 'riot-route'
+
+        this.activate = (step) => {
+            if (~this.steps.indexOf(step)) {
+                this.steps.map(item=>item.active = false)
+                step.active = true
+                this.trigger('switch', step)
+                this.update()
+            }
+        }
+
+        this.getActive = () => {
+            return this.steps.find(item=>item.active)
+        }
+
+        this.getNextStep = () => {
+            let currentStep = this.getActive()
+            let currentStepIndex = this.steps.indexOf(currentStep)
+            return this.steps[currentStepIndex+1]
+        }
+
+        this.getPreviousStep = () => {
+            let currentStep = this.getActive()
+            let currentStepIndex = this.steps.indexOf(currentStep)
+            return this.steps[currentStepIndex-1]
+        }
+
+        this.next = () => {
+            if (!this.isLastStep()) {
+                this.activate(this.getNextStep().name)
+            }
+        }
+
+        this.previous = () => {
+            if (!this.isFirstStep()) {
+                this.activate(this.getPreviousStep().name)
+            }
+        }
+
+        this.isLastStep = () => {
+            let currentStep = this.getActive()
+            return this.steps[this.steps.length-1].name == currentStep.name
+        }
+
+        this.isFirstStep = () => {
+            let currentStep = this.getActive()
+            return this.steps[0].name == currentStep.name
+        }
+
+        this.on('next', this.next)
+        this.on('previous', this.previous)
+
+        this.on('switch', (step)=>{
+            route(step.route)
+        })
+
+        activateItem(e) {
+            this.activate(e.item.step)
+        }
+
+        this.on('mount', ()=>{
+            this.steps = this.setSteps(opts.steps)
+            if (opts.active) {
+                this.activate(opts.active)
+            } else {
+                this.activate(opts.steps[0])
+            }
+
+            this.steps.map(step=>{
+                route(step.route, (name)=>{
+                    if (this.getActive().route != step.route) {
+                        this.activate(step)
+                    }
+                    this.trigger('switched', step)
+                    this.update()
+                })
+            })
+
+            route.start(true)
+            this.update()
+        })
+
+        this.setSteps = (steps) => {
+            return steps.map(step=>{
+                step.active = false
+                return step
+            })
+        }
+    </script>
+</ssf-step-indicator>
