@@ -1,15 +1,71 @@
 <event-edit-general>
-    <fieldset>
-        <label for="title">Titel</label>
-        <input name="title" type="text">
-    </fieldset>
-    <fieldset>
-        <p>In einem Satz: Worum geht es bei diesem Event?</p>
-        <label for="summary">Zusammenfassung</label>
-        <input name="summary" type="text">
-    </fieldset>
-    <event-duration-editor></event-duration-editor>
+    <div class="field-group">
+        <label for="title">
+            Titel
+            <input required ref="title" name="title" type="text">
+        </label>
+    </div>
+    <div class="field-group">
+        <p>Kurztext für die Übersicht</p>
+        <label for="summary">
+            Zusammenfassung
+            <input size="30" ref="summary" name="summary" type="text">
+        </label>
+    </div>
+    <div layout="row">
+        <div flex="40">
+            <div class="field-group">
+                <label for="street">
+                    Strasse
+                    <input oninput={updateMap} ref="street" name="street" type="text">
+                </label>
+            </div>
+            <div class="field-group">
+                <label for="city">
+                    Ort
+                    <input oninput={updateMap} ref="city" name="city" type="text">
+                </label>
+            </div>
+            <div class="field-group">
+                <label for="zip">
+                    PLZ
+                    <input oninput={updateMap} ref="zip" name="zip" type="text">
+                </label>
+            </div>
+        </div>
+        <div flex="60">
+            <ssf-map ref="map" zoom="12"></ssf-map>
+        </div>
+    </div>
+    <event-duration-editor ref="duration"></event-duration-editor>
+	<event-tickets-editor ref="tickets"></event-tickets-editor>
     <script>
+		import './event-tickets-editor.html'
         import './event-duration-editor.html'
+        import '../ssf-map.html'
+        import debounce from 'debounce'
+
+        this.debouncedUpdate = debounce(()=>{
+            let address = `${this.refs.street.value} ${this.refs.city.value} ${this.refs.zip.value}`
+            this.refs.map.geocodeAddress(address)
+        }, 500)
+        updateMap(e) {
+            this.debouncedUpdate()
+        }
+        this.on('mount', ()=>{
+            this.refs.map.on('droppedMarker', (event)=>{
+                console.log(event);
+                try {
+                    let address = event.results[0].formatted_address.split(',')
+                    this.refs.street.value = address[0]
+                    this.refs.zip.value = address[1].trim().split(' ')[0]
+                    this.refs.city.value = address[1].trim().split(' ')[1]
+                } catch (e) {
+
+                }
+                this.update()
+
+            })
+        })
     </script>
 </event-edit-general>

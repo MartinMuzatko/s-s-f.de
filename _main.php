@@ -111,14 +111,24 @@ $content = ob_get_clean();
         </script>
     <? endif; ?>
     <script>
-        window.api = <?=json_encode(
+        window.api = {}
+        Object.assign(window.api, <?=json_encode(
             [
                 "user" => $user->name,
                 "url" => $config->urls->root
             ]
-        )?>
+        )?>)
     </script>
     <script src="<?=$config->urls->templates?>dist/main.js"></script>
+    <script>
+        function googleSignIn(googleUser) {
+            api.google.trigger('signIn', googleUser)
+        }
+        function initMap(map) {
+            api.google.trigger('mapInit', map)
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=<?=$homepage->googleMapsAPIKey?>&callback=initMap" async defer></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 </body>
 </html>

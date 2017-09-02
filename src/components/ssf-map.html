@@ -1,0 +1,73 @@
+<ssf-map>
+    <div class="map" ref="map"></div>
+    <script>
+        this.on('mount', ()=>{
+            this.latLng = [48.7758, 9.1829] || opts.latLng
+            this.zoom = 10 || opts.zoom
+            // this.markerZoom = 15 || opts.markerZoom
+            this.markers = []
+            window.api.google.on('mapInit', this.setupMap)
+        })
+        this.setupMap = (map) => {
+            this.geocoder = new google.maps.Geocoder()
+            var latlng = new google.maps.LatLng(...this.latLng)
+            var mapOptions = {
+                zoom: this.zoom,
+                center: latlng
+            }
+            this.map = new google.maps.Map(this.refs.map, mapOptions)
+            window.x = this.map
+        }
+        this.geocodeAddress = (address) => {
+            this.geocoder.geocode({address}, (results,status)=>{
+                if (status == 'OK') {
+                    this.map.setCenter(results[0].geometry.location)
+                    console.log(results[0]);
+                    // this.map.setZoom(15)
+                    this.resetMarkers()
+                    let marker = new google.maps.Marker({
+                        map: this.map,
+                        draggable: true,
+                        animation: google.maps.Animation.DROP,
+                        position: results[0].geometry.location
+                    })
+                    marker.addListener('dragend', (event)=>{
+                        this.reverseGeocodeAddress(event.latLng, (results)=>{
+                            this.trigger('droppedMarker', {marker, results, event})
+                        })
+                    })
+                    this.markers.push(marker)
+                } else {
+                    //alert('Geocode was not successful for the following reason: ' + status);
+                }
+            })
+        }
+
+        this.reverseGeocodeAddress = (position, callback) => {
+            console.log(position);
+            this.geocoder.geocode({'location': position}, (results, status) => {
+                console.log(status);
+                if (status === 'OK') {
+                    if (results[0]) {
+                        callback(results)
+                    }
+                }
+            })
+        }
+
+        this.resetMarkers = () => {
+            this.markers.map(marker=>marker.setMap(null))
+        }
+    </script>
+    <style scoped>
+        :scope {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .map {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</ssf-map>
