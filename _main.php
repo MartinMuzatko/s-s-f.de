@@ -58,18 +58,18 @@ $content = ob_get_clean();
                 </div>
                 <div layout="row" layout-align="center center" class="navigation--item">
                     <?if($user->isLoggedin()):?>
-                        <user-profile name="<?=$user->name?>" avatar="<?=$user->avatar->first->size(128,128)->url?>">
+                        <user-profile-dropdown name="<?=$user->name?>" avatar="<?=$user->avatar->url?>">
                             <div>
-                                <?=$user->name?> <a ref="logout" href="<?=$pages->get('/user/logout')->url?>">logout</a>
+                                <?=$user->name?> <a ref="logout" href="<?=$pages->get('/users/logout')->url?>">logout</a>
                             </div>
-                        </user-profile>
+                        </user-profile-dropdown>
                     <?else:?>
-                        <a class="button navigation__item" href="<?=$pages->get('/user/login')->url?>"><?=$pages->get('/user/login')->title?></a>|
-                        <a class="button navigation__item" href="<?=$pages->get('/user/register')->url?>"><?=$pages->get('/user/register')->title?></a>
+                        <a class="button navigation__item" href="<?=$pages->get('/users/login')->url?>"><?=$pages->get('/users/login')->title?></a>|
+                        <a class="button navigation__item" href="<?=$pages->get('/users/register')->url?>"><?=$pages->get('/users/register')->title?></a>
                     <?endif?>
                 </div>
             </nav>
-            <? if($page != $homepage && $page->children->count): ?>
+            <!-- <? if($page != $homepage && $page->children->count): ?>
                 Children:
                 <nav class="site__nav">
                     <? foreach($page->children as $child):?>
