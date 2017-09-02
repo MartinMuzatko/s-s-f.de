@@ -1,0 +1,172 @@
+<ssf-dialog>
+    <div if={dialog.isVisible} class="modal__backdrop fade {show : dialog.isVisible}" onclick={close}></div>
+    <div class="modal fade {show : dialog.isVisible}" tabindex="-1" role="dialog">
+        <div class="modal__dialog" role="document">
+            <div class="modal__content">
+                <header class="modal__header">
+                    <h5 class="modal__title">{dialog.heading}</h5>
+                    <button type="button" class="close" onclick={close} aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </header>
+                <div class="modal__body">
+                    <yield>
+                </div>
+                <footer class="modal__footer">
+                    <button each="{ dialog.buttons }" type="button" class="button { 'button--' + type }" onclick="{ action }" style="{ style }">
+        				{ text }
+        			</button>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+	<script>
+        this.dialog = { isVisible: false}
+		this.on('mount', () => {
+            Object.assign(this.dialog, opts.dialog)
+		})
+
+		this.close = () => {
+            document.body.style.overflow = 'visible'
+			this.dialog.isVisible = false
+			this.trigger('closed')
+		}
+
+		this.open = () => {
+            document.body.style.overflow = 'hidden'
+			this.dialog.isVisible = true
+            this.trigger('opened')
+		}
+	</script>
+
+    <style type="text/less">
+        @import "src/less/variables.less";
+
+        .fade.show {
+            opacity: 1;
+            display: block;
+        }
+
+        .modal__open {
+            overflow: hidden;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1050;
+            display: none;
+            overflow: hidden;
+            outline: 0;
+        }
+
+        .modal.fade .modal__dialog {
+            transition: transform .3s ease-out;
+            transform: translate(0, -25%);
+        }
+
+        .modal.show .modal__dialog {
+            transform: translate(0, 0);
+        }
+
+        .modal__open .modal {
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .modal__dialog {
+            position: relative;
+            width: auto;
+            margin: 1em;
+        }
+
+        .modal__content {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid rgba(0, 0, 0, .2);
+            border-radius: .3rem;
+            outline: 0;
+        }
+
+        .modal__backdrop {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1040;
+            background-color: @color-dark;
+        }
+
+        .modal__backdrop.fade {
+            opacity: 0;
+        }
+
+        .modal__backdrop.show {
+            opacity: 0.5;
+        }
+
+        .modal__header {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .modal__header .close {
+            margin-left: auto;
+        }
+
+        .modal__title {
+            margin-bottom: 0;
+            line-height: 1.5;
+        }
+
+        .modal__body {
+            position: relative;
+            flex: 1 1 auto;
+            padding: 1em;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+
+        .modal__footer {
+            display: flex;
+            justify-content: flex-end;
+            padding: 1em;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .modal__footer > :not(:first-child) {
+            margin-left: .25rem;
+        }
+
+        .modal__footer > :not(:last-child) {
+            margin-right: .25rem;
+        }
+
+        @media (min-width: @breakpoint-md) {
+            .modal__dialog {
+                max-width: @breakpoint-md - 5em;
+                margin: 30px auto;
+            }
+            .modal__sm {
+                max-width: 300px;
+            }
+        }
+
+        @media (min-width: @breakpoint-lg) {
+            .modal__lg {
+                max-width: 800px;
+            }
+        }
+	</style>
+
+</ssf-dialog>
