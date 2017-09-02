@@ -1,0 +1,16 @@
+<event-list-short>
+    <ssf-expander heading="Aktuelle Events" max-items="3" action-label-expanded="Weniger Events" action-label-reduced="Mehr Events">
+        <yield to="items">
+            <event-list-item each={item in parent.items}></event-list-item>
+        </yield>
+        <yield to="more">
+            10 sind zu wenig? <a href="#">Hier findest du mehr</a>
+        </yield>
+    </ssf-expander>
+    <script>
+        import '../ssf-expander.html'
+        import './event-list-item.html'
+
+        this.items = [1,2,3,4,5,6,7,8,9,10]
+    </script>
+</event-list-short>
