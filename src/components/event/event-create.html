@@ -1,57 +1,18 @@
 <event-create>
-    <ssf-step-indicator ref="stepIndicator" steps={steps}></ssf-step-indicator>
-    <form onsubmit={submit} method="POST" action="">
-        <div show={currentRoute == step.route} each={step in steps} data-is={'event-edit-'+step.route}></div>
-        <div if={refs.stepIndicator.steps} class="form-legend" layout="row" layout-align="space-between">
-            <a href="#{refs.stepIndicator.getPreviousStep().route}" flex-start if={!refs.stepIndicator.isFirstStep()} class="button">Voriger Schritt</a>
-            <a href="#{refs.stepIndicator.getNextStep().route}" flex-end if={!refs.stepIndicator.isLastStep()} class="button">Nächster Schritt</a>
-            <input flex-end if={refs.stepIndicator.isLastStep()} type="submit" class="button" name="" value="Event erstellen">
-        </div>
-    </form>
+    <event-editor ref="editor"></event-editor>
     <script>
-        import route from 'riot-route'
-        import './event-edit-general.html'
-        import './event-edit-budget.html'
-        import './event-edit-roles.html'
-        import './event-edit-contents.html'
-        import '../ssf-step-indicator.html'
-
-
-        this.steps = [
-            {
-                name: 'Generell',
-                route: 'general'
-            },
-            {
-                name: 'Budget',
-                route: 'budget'
-            },
-            {
-                name: 'Rollen',
-                route: 'roles'
-            },
-            {
-                name: 'Inhalte',
-                route: 'contents'
-            }
-        ]
-
-        this.currentRoute = this.steps[0].route
+        import './event-editor.html'
 
         this.on('mount', ()=>{
-            console.log(route);
-            route.start(true)
-            this.refs.stepIndicator.on('switch', (item)=>{
-                this.currentRoute = item.route
-                this.update()
+            this.refs.editor.on('submit', (data)=>{
+                this.createEvent(data)
             })
         })
 
-        submit(e) {
-            console.log(this)
-            e.preventDefault()
-            var data = new FormData(e.currentTarget)
-            console.log(data)
+        this.createEvent = async (data) => {
+            var response = await fetch('/s-s-f.de/api/events/', {method: 'POST', body: JSON.stringify(data)})
+            var x = await response.text()
+            console.log(x);
         }
 
     </script>

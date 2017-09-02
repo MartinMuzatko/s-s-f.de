@@ -1,0 +1,74 @@
+<event-editor>
+
+    <ssf-step-indicator ref="stepIndicator" steps={steps}></ssf-step-indicator>
+    <form onsubmit={submit} method="POST" action="">
+        <div show={currentRoute == step.route} ref="{step.route}" each={step in steps} data-is={'event-edit-'+step.route}></div>
+        <div if={refs.stepIndicator.steps} class="form-legend" layout="row" layout-align="space-between">
+            <a href="#{refs.stepIndicator.getPreviousStep().route}" flex-start if={!refs.stepIndicator.isFirstStep()} class="button">Voriger Schritt</a>
+            <a href="#{refs.stepIndicator.getNextStep().route}" flex-end if={!refs.stepIndicator.isLastStep()} class="button">Nächster Schritt</a>
+            <input flex-end if={refs.stepIndicator.isLastStep()} type="submit" class="button" name="" value="Event erstellen">
+        </div>
+    </form>
+    <script>
+        import route from 'riot-route'
+        import './event-edit-general.html'
+        import './event-edit-registration.html'
+        import './event-edit-contents.html'
+        import '../ssf-step-indicator.html'
+
+
+        this.steps = [
+            {
+                name: 'Generell',
+                route: 'general'
+            },
+            {
+                name: 'Registrierung',
+                route: 'registration'
+            },
+            {
+                name: 'Inhalte',
+                route: 'contents'
+            }
+        ]
+
+        this.currentRoute = this.steps[0].route
+
+        this.on('mount', ()=>{
+            window.addEventListener('beforeunload', function () {
+                return true
+            })
+
+
+            route.start(true)
+            this.refs.stepIndicator.on('switch', (item)=>{
+                this.currentRoute = item.route
+                this.update()
+            })
+        })
+
+        submit(e) {
+            var data = {
+                startDate : this.refs.general.tags['event-duration-editor'].refs.date.date,
+                endDate : this.refs.general.tags['event-duration-editor'].refs.date.date,
+                title : this.refs.general.refs.title.value,
+                summary : this.refs.general.refs.summary.value,
+                street : this.refs.general.refs.street.value,
+                city : this.refs.general.refs.city.value,
+                zip : this.refs.general.refs.zip.value,
+                roles: [],
+                items: [this.refs.registration.refs.items.items],
+                ticketLimit : this.refs.general.refs.tickets.limit,
+                sellPrice: this.refs.general.refs.tickets.price,
+            }
+            console.log(data);
+            e.preventDefault()
+            this.trigger('submit', data)
+            // var data = new FormData(e.currentTarget)
+            // console.log(data)
+        }
+
+
+
+    </script>
+</event-editor>

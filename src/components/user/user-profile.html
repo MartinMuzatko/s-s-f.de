@@ -1,57 +1,71 @@
 <user-profile>
-    <a onblur={closeDropdown} onclick={openDropdown} href="#" class="user-profile" layout="row" layout-align="center center">
-        <span class="user-profile__name">{opts.name}</span>
-        <span class="user-profile__select {refs.dropdown.open || 0 ? 'active' : '' }">▾</span>
-        <img class="user-profile__avatar" src="{opts.avatar}" alt="{opts.name}">
-    </a>
-    <ssf-dropdown ref="dropdown">
-        <div class="dropdown__group">
-            <a class="dropdown__item" href="{api.url}user/{api.user}">Profil anzeigen</a>
-            <a class="dropdown__item" href="{api.url}user/edit">Profil bearbeiten</a>
-            <a class="dropdown__item" href="{api.url}admin">Admin</a>
+    <div class="user-profile {opts.clubNumber.length ? 'user-profile--club-member' : ''}">
+        <a href="{opts.link}" title="zum Profil von {opts.username}">
+            <h3 class="user-profile__name">{opts.username}</h3>
+            <img class="user-profile__avatar" src="{opts.avatar}" alt="">
+        </a>
+        <div each={event in events}>
+            {event}
         </div>
-        <a class="dropdown__item" href="{api.url}user/logout">Logout</a>
-    </ssf-dropdown>
+        <div class="actions">
+            Nachricht | Edit
+        </div>
+    </div>
     <script>
-        import '../ssf-dropdown.html'
-        openDropdown(event) {
-            event.preventDefault()
-            this.refs.dropdown.trigger('toggle')
-        }
-        closeDropdown() {
-            this.refs.dropdown.trigger('close')
-        }
+        this.events = opts.events.split(',')
     </script>
     <style type="text/less">
         @import "src/less/variables.less";
-        :scope {
-            position: relative;
-        }
         .user-profile {
-            cursor: pointer;
-            color: @color-light;
-            margin-right: .5em;
-            &__avatar {
-                left: 100%;
-                width: 32px;
-                height: 32px;
-                border-radius: 100%;
-                border: 1px solid @color-primary;
+            background-color: @color-primary-light-shadow;
+            position: relative;
+            box-shadow: 0 0 .25em fadeout(@color-dark-shadow, 20%);
+            padding: .5em;
+            padding-bottom: 2em;
+            border-radius: .25em;
+            min-height: 8em;
+            margin: 1em;
+            margin-top: 3em;
+            &--club-member {
+                background-color: @color-member-light-shadow;
             }
-            &__select {
-                transition: all .5s ease;
-                transform: rotate(0deg);
-                &.active {
-                    transform: rotate(180deg);
+            &__name {
+                margin: 0;
+                position: relative;
+                z-index: 1;
+                color: @color-dark;
+                overflow: hidden;
+                padding-bottom: .5rem;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                &:after {
+                    position: absolute;
+                    left: 0;
+                    top: calc(~"100% - .1rem");
+                    content: "";
+                    width: 90%;
+                    height: 1px;
+                    background: linear-gradient(to right, #000, transparent);
                 }
             }
-
-            &__name {
-                color: @color-light;
+            &__avatar {
+                position: absolute;
+                right: 1em;
+                bottom: 100%;
+                transform: translateY(50%);
+                border-radius: 100%;
+                border: 1px solid @color-primary;
+                box-shadow: 0 0 .25em @color-dark-shadow;
             }
-            * + * {
-                margin-left: .5em;
-            }
+        }
+        .actions {
+            background-color: darken(@color-primary-light-shadow, 20%);
+            color: @color-dark;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            left: 0;
+            padding: .25em;
         }
     </style>
 </user-profile>

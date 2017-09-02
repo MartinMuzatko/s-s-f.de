@@ -1,0 +1,13 @@
+<user-club-list>
+    <ssf-expander heading="Vereinsmitglieder" max-items="Infinity">
+        <yield to="items">
+            <user-club-list-item each={item in parent.items}></user-club-list-item>
+        </yield>
+    </ssf-expander>
+    <script>
+        import '../ssf-expander.html'
+        import './user-club-list-item.html'
+
+        this.items = [1,2,3,4]
+    </script>
+</user-club-list>

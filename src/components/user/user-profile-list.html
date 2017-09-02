@@ -1,0 +1,29 @@
+<user-profile-list>
+    <input type="text" oninput={filter}>
+    <p>Filtering {activeItems.length}</p>
+    <yield>
+    <script>
+        filter(e) {
+            var filter = e.target.value
+            this.activeItems = []
+            this.items.map(item=>{
+                if (filter == '*') {
+                    item.root.style.display = 'block'
+                    this.activeItems.push(item)
+                    return
+                }
+                if (item.opts.username.toLowerCase().indexOf(filter.toLowerCase()) != 0 && filter.length) {
+                    item.root.style.display = 'none'
+                } else {
+                    item.root.style.display = 'block'
+                    this.activeItems.push(item)
+                }
+            })
+        }
+
+        this.on('mount', ()=>{
+            this.items = Object.values(this.tags)[0]
+            this.activeItems = this.items
+        })
+    </script>
+</user-profile-list>

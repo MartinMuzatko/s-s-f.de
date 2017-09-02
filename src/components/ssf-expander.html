@@ -1,0 +1,72 @@
+<ssf-expander>
+    <div class="expander">
+        <h3 class="expander__heading">{opts.heading}</h3>
+        <div class="expander__container" ref="container">
+            <yield from="items" />
+        </div>
+        <div if={isExpanded && this.items.length > this.expandedMaxItems}>
+            <yield from="more" />
+        </div>
+        <div class="expander__actions" if={maxItems < expandedMaxItems}>
+            <div onclick={toggle} class="button button--dark">{isExpanded ? opts.actionLabelExpanded : opts.actionLabelReduced }</div>
+        </div>
+    </div>
+    <p></p>
+    <script>
+        toggle(event) {
+            this.isExpanded ? this.reduce() : this.expand()
+            this.isExpanded = !this.isExpanded
+        }
+
+        this.expand = ()=>{
+            // slide maybe someday
+            // var height = this.refs.container.getBoundingClientRect().height
+            // this.refs.container.style.height = height+'px'
+            this.items.map((item, index)=>{
+                if (index <= parseInt(this.expandedMaxItems)) {
+                    item.root.style.display = this.initialDisplay
+                }
+            })
+            // setTimeout(()=>{
+            //     this.refs.container.style.height = '600px'
+            // }, 100);
+        }
+
+        this.reduce = ()=>{
+            this.items.map((item, index)=>{
+                this.initialDisplay = getComputedStyle(item.root).display
+                if (index >= parseInt(this.maxItems)) {
+                    item.root.style.display = 'none'
+                }
+            })
+        }
+
+        this.expandedMaxItems = opts.expandedMaxItems || 10
+        this.maxItems = opts.maxItems || 3
+        this.on('mount', ()=>{
+            this.initialDisplay = 'block'
+            this.isExpanded = false
+            this.items = Object.values(this.tags)[0]
+            this.reduce()
+        })
+    </script>
+    <style type="text/less">
+        @import "src/less/variables.less";
+        .expander {
+            margin-bottom: 1em;
+            border-radius: 1em;
+            overflow: hidden;
+            &__heading, &__actions {
+                margin: 0;
+                padding: .5em 1em;
+                background-color: darken(@color-primary-light-shadow, 20%);
+                color: @color-dark;
+            }
+            &__container {
+                overflow: hidden;
+                transition: all .5s ease;
+                background-color: darken(@color-primary-light-shadow, 5%);
+            }
+        }
+    </style>
+</ssf-expander>
