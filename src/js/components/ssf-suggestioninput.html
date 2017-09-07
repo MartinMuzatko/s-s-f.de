@@ -1,0 +1,43 @@
+<ssf-suggestioninput>
+    <input type="text" ref="input" oninput={needSuggestions} onblur={hideSuggestions}>
+    <div>
+        <div each={field in suggestedData} onclick={setInput}>
+            {field}
+        </div>
+    </div>
+    <script>
+        this.suggestedData = []
+        this.suggestions = this.opts.suggestions || []
+
+        this.on('mount,update',()=>{
+            this.suggestions = this.opts.suggestions
+        })
+
+        this.suggest = (suggestions) => {
+            console.log(suggestions);
+            this.suggestions = suggestions || []
+            let value = this.refs.input.value
+            if (value.length) {
+                this.suggestedData = this.suggestions.filter((item)=>{
+                    return ~item.toLowerCase().indexOf(value.toLowerCase())
+                })
+            } else {
+                this.suggestedData = []
+            }
+            this.update()
+        }
+
+        needSuggestions() {
+            this.trigger('suggest', this.refs.input.value)
+        }
+
+        setInput(e) {
+            this.refs.input.value = e.item.field
+            this.hideSuggestions()
+        }
+
+        hideSuggestions() {
+
+        }
+    </script>
+</ssf-suggestioninput>

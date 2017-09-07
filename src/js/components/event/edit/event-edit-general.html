@@ -1,13 +1,19 @@
 <event-edit-general>
     <div class="field-group">
-        <label for="title">
+        <label>
             Titel
             <input required ref="title" name="title" type="text">
         </label>
     </div>
     <div class="field-group">
+        <label>
+            Logo
+            <input ref="logo" name="logo" type="file">
+        </label>
+    </div>
+    <div class="field-group">
         <p>Kurztext für die Übersicht</p>
-        <label for="summary">
+        <label>
             Zusammenfassung
             <input size="30" ref="summary" name="summary" type="text">
         </label>
@@ -15,19 +21,19 @@
     <div layout="row">
         <div flex="40">
             <div class="field-group">
-                <label for="street">
+                <label>
                     Strasse
                     <input oninput={updateMap} ref="street" name="street" type="text">
                 </label>
             </div>
             <div class="field-group">
-                <label for="city">
+                <label>
                     Ort
                     <input oninput={updateMap} ref="city" name="city" type="text">
                 </label>
             </div>
             <div class="field-group">
-                <label for="zip">
+                <label>
                     PLZ
                     <input oninput={updateMap} ref="zip" name="zip" type="text">
                 </label>
@@ -38,11 +44,9 @@
         </div>
     </div>
     <event-duration-editor ref="duration"></event-duration-editor>
-	<event-tickets-editor ref="tickets"></event-tickets-editor>
     <script>
-		import './event-tickets-editor.html'
         import './event-duration-editor.html'
-        import '../ssf-map.html'
+        import '../../ssf-map.html'
         import debounce from 'debounce'
 
         this.debouncedUpdate = debounce(()=>{

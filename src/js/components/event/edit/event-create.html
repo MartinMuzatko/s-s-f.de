@@ -1,13 +1,26 @@
 <event-create>
-    <event-editor ref="editor"></event-editor>
+    <h1 class="heading {'heading--menu' : !isIntroVisible}"><yield from="heading" /></h1>
+    <div show={isIntroVisible} ref="intro">
+        <yield from="accept" />
+        <a onclick={hideIntro} class="button">
+            <yield from="accept-button" />
+        </a>
+    </div>
+    <event-editor inactive="{!isIntroVisible}" ref="editor"></event-editor>
     <script>
         import './event-editor.html'
+
+        this.isIntroVisible = true
 
         this.on('mount', ()=>{
             this.refs.editor.on('submit', (data)=>{
                 this.createEvent(data)
             })
         })
+
+        hideIntro(e) {
+            this.isIntroVisible = false
+        }
 
         this.createEvent = async (data) => {
             var response = await fetch('/s-s-f.de/api/events/', {method: 'POST', body: JSON.stringify(data)})

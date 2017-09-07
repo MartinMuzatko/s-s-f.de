@@ -1,20 +1,28 @@
 <event-editor>
+    <div class={'editor-inactive' : opts.inactive}>
+        <ssf-step-indicator ref="stepIndicator" steps={steps}></ssf-step-indicator>
+        <form onsubmit={submit} method="POST" action="">
+            <div show={currentRoute == step.route} ref="{step.route}" each={step in steps} data-is={'event-edit-'+step.route}></div>
+            <div if={refs.stepIndicator.steps} class="form-legend" layout="row" layout-align="space-between">
+                <a href="#{refs.stepIndicator.getPreviousStep().route}" flex-start if={!refs.stepIndicator.isFirstStep()} class="button">Voriger Schritt</a>
+                <a href="#{refs.stepIndicator.getNextStep().route}" flex-end if={!refs.stepIndicator.isLastStep()} class="button">Nächster Schritt</a>
+                <input flex-end if={refs.stepIndicator.isLastStep()} type="submit" class="button" name="" value="Event erstellen">
+            </div>
+        </form>
+    </div>
+    <style scoped>
+        .editor-inactive {
+            opacity: .33;
+            pointer-events: none;
+        }
 
-    <ssf-step-indicator ref="stepIndicator" steps={steps}></ssf-step-indicator>
-    <form onsubmit={submit} method="POST" action="">
-        <div show={currentRoute == step.route} ref="{step.route}" each={step in steps} data-is={'event-edit-'+step.route}></div>
-        <div if={refs.stepIndicator.steps} class="form-legend" layout="row" layout-align="space-between">
-            <a href="#{refs.stepIndicator.getPreviousStep().route}" flex-start if={!refs.stepIndicator.isFirstStep()} class="button">Voriger Schritt</a>
-            <a href="#{refs.stepIndicator.getNextStep().route}" flex-end if={!refs.stepIndicator.isLastStep()} class="button">Nächster Schritt</a>
-            <input flex-end if={refs.stepIndicator.isLastStep()} type="submit" class="button" name="" value="Event erstellen">
-        </div>
-    </form>
+    </style>
     <script>
         import route from 'riot-route'
         import './event-edit-general.html'
         import './event-edit-registration.html'
-        import './event-edit-contents.html'
-        import '../ssf-step-indicator.html'
+        import './event-edit-pages.html'
+        import '../../ssf-step-indicator.html'
 
 
         this.steps = [
@@ -27,8 +35,8 @@
                 route: 'registration'
             },
             {
-                name: 'Inhalte',
-                route: 'contents'
+                name: 'Seiten',
+                route: 'pages'
             }
         ]
 

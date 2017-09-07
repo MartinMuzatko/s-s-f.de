@@ -1,0 +1,37 @@
+<ssf-editor>
+    <div if={(opts.inline == '')} ref="editor" contenteditable="true"></div>
+    <textarea if={!(opts.inline == '')} ref="editor"></textarea>
+    <script>
+        // Import TinyMCE
+        import tinymce from 'tinymce/tinymce'
+
+        // A theme is also required
+        import 'tinymce/themes/modern/theme'
+
+        import 'tinymce/skins/lightgray/skin.min.css'
+        import 'tinymce/skins/lightgray/content.min.css'
+
+        // Any plugins you want to use has to be imported
+        // import 'tinymce/plugins/paste'
+        // import 'tinymce/plugins/link'
+        // import 'tinymce/plugins/image'
+        // import 'tinymce/plugins/imagetools'
+
+        this.on('mount', ()=>{
+			tinymce.init({
+				target: this.refs.editor,
+				inline: opts.inline == '' || false,
+				menu: {},
+				toolbar:
+					'bold italic underline strikethrough | '+
+					'alignleft aligncenter alignright alignjustify | '+
+					'formatselect | bullist numlist | outdent indent | blockquote, undo, redo',
+				plugins: [],
+				setup: (editor) => {
+                    this.editor = editor
+                    this.trigger('ready', editor)
+                }
+			})
+		})
+    </script>
+</ssf-editor>

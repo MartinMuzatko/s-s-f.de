@@ -1,0 +1,81 @@
+<ssf-toggle>
+    <label>
+        {opts.label}
+        <div class="switch">
+            <input onchange={toggleCheckbox} ref="switch" type="checkbox" {checked: checked}>
+            <span class="slider"></span>
+        </div>
+        {opts.description}
+    </label>
+
+    <script>
+    this.on('mount', () => {
+        console.log(opts.checked);
+        this.checked = (opts.checked == '' || true) ? true : false
+    })
+
+    toggleCheckbox(e) {
+        this.checked = this.refs.switch.checked
+        this.trigger('toggle', this.checked)
+    }
+
+    this.toggle = () => {
+        this.refs.switch.checked = !this.refs.switch.checked
+        this.checked = this.refs.switch.checked
+        this.trigger('toggle', this.checked)
+    }
+
+    </script>
+
+    <style type="text/less">
+        @import "src/less/variables.less";
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            font-size: 1em;
+            padding: .25em;
+            width: 3em;
+            height: 1.5em;
+        }
+
+        /* Hide default HTML checkbox */
+        .switch input {display:none;}
+
+        /* The slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 1em;
+            width: 1em;
+            transition: .4s;
+            background-color: white;
+            margin: .25em;
+        }
+
+        input:checked + .slider {
+            background-color: @color-primary;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px @color-primary;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(1.5em);
+        }
+
+    </style>
+
+</ssf-toggle>

@@ -1,11 +1,13 @@
 <ssf-datepicker>
-    <input ref="datepicker">
+    <input name="{opts.name}" ref="datepicker">
     <script>
         import extend from 'extend'
-        import Flatpickr from 'flatpickr'
+        import flatpickr from 'flatpickr'
+        this.date = 0
         this.on('mount', ()=>{
             this.options = {
                 onChange: (selectedDates)=>{
+                    this.date = selectedDates
                     this.trigger('picked', selectedDates)
                 },
                 onOpen: function(selectedDates){
@@ -15,7 +17,7 @@
                 }
             }
             extend(true, this.options, this.opts.options)
-            this.datepicker = new Flatpickr(this.refs.datepicker, this.options)
+            this.datepicker = new flatpickr(this.refs.datepicker, this.options)
         })
     </script>
 </ssf-datepicker>

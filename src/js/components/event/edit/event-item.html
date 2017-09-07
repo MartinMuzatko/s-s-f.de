@@ -1,0 +1,48 @@
+<event-item>
+    <div layout="row" layout-align="space-between start">
+        <h3 class="item__heading">{item.name}</h3>
+        <div class="actions" flex-end>
+            <yield from="actions" />
+        </div>
+    </div>
+    <yield from="content" />
+    <ssf-dialog ref="dialog" item={item} dialog={dialog}>
+        <yield from="editor" />
+    </ssf-dialog>
+    <script>
+        import '../../ssf-dialog.html'
+
+        this.on('mount', ()=>{
+            this.item = opts.item
+        })
+
+        this.dialog = {
+            isvisible: true,
+            dismissable: true,
+            heading: opts.editItemLabel || 'Item bearbeiten',
+            buttons: [{
+                text: 'Ok',
+                type: 'dark',
+                action: function () { this.close() }
+            }]
+        }
+
+        editItem(e) {
+            this.refs.dialog.open()
+        }
+    </script>
+    <style scoped type="text/less">
+        @import "src/less/variables.less";
+        :scope {
+            padding: .5em;
+            margin-bottom: 1em;
+            background-color: fadeout(@color-dark-shadow, 40%);
+            background-color: @color-primary-light-shadow;
+            overflow: hidden;
+            &__heading {
+                margin: 0;
+                margin-bottom: .5em;
+            }
+        }
+    </style>
+</event-item>

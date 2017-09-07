@@ -2,8 +2,8 @@
     <div layout="row" layout-align="space-between start">
         <div flex="100" flex-gt-md="45">
             <h2>Plätze</h2>
-            <input type="hidden" name="contingent" value={contingent}>
-            <event-ticket-limit-slider ref="contingent"></event-ticket-limit-slider>
+            <input type="hidden" name="limit" value={limit}>
+            <event-ticket-limit-slider ref="limit"></event-ticket-limit-slider>
         </div>
         <div flex="100" flex-gt-md="45">
             <h2>Eintrittskosten</h2>
@@ -12,16 +12,16 @@
         </div>
     </div>
     <div layout="column" layout-align="center center">
-        <h3>Einnahmen Gesamt</h3>
-        <p>{moneyFormat.to(this.contingent*this.price)}</p>
+        <h3>Einnahmen durch Con-Fee</h3>
+        <p>{moneyFormat.to(this.limit*this.price)}</p>
     </div>
     <br>
     <script>
         import './event-ticket-price-slider.html'
         import './event-ticket-limit-slider.html'
         import wNumb from 'wnumb'
-        // import '../ssf-rangeslider.html'
-        this.contingent = 20
+        // import '../../ssf-rangeslider.html'
+        this.limit = 20
         this.price = 10
 
         this.moneyFormat = wNumb({
@@ -33,8 +33,8 @@
 
         this.on('mount', ()=>{
 
-            this.refs.contingent.on('change', (event)=>{
-                this.contingent = parseInt(event)
+            this.refs.limit.on('change', (event)=>{
+                this.limit = parseInt(event)
                 this.update()
             })
             this.refs.price.on('change', (event)=>{

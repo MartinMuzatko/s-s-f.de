@@ -1,5 +1,5 @@
 <event-list-short>
-    <ssf-expander heading="Aktuelle Events" max-items="3" action-label-expanded="Weniger Events" action-label-reduced="Mehr Events">
+    <ssf-expander heading="{opts.heading}" max-items="3" action-label-expanded="Weniger Events" action-label-reduced="Mehr Events">
         <yield to="items">
             <event-list-item each={item in parent.items}></event-list-item>
         </yield>

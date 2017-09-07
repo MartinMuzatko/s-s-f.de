@@ -7,8 +7,12 @@
     <ssf-dropdown ref="dropdown">
         <div class="dropdown__group">
             <a class="dropdown__item" href="{api.url}users/{api.user}">Profil anzeigen</a>
-            <a class="dropdown__item" href="{api.url}users/edit">Profil bearbeiten</a>
+            <a class="dropdown__item" href="{api.url}users/{api.user}">Profil bearbeiten</a>
+            <a class="dropdown__item" href="{api.url}users/{api.user}">Nachrichten</a>
             <a class="dropdown__item" href="{api.url}admin">Admin</a>
+        </div>
+        <div class="dropdown__group">
+            <a class="dropdown__item" href="{api.url}events">Event Management</a>
         </div>
         <a class="dropdown__item" href="{api.url}users/logout">Logout</a>
     </ssf-dropdown>

@@ -1,0 +1,39 @@
+<event-registration-duration>
+    <div layout="row" layout-align="space-between end">
+        <div class="field-group" flex="100" flex-gt-sm="33">
+            <label for="date">
+                Datum Von-Bis
+                <ssf-datepicker name="date" required ref="date" options={rangeOptions}></ssf-datepicker>
+            </label>
+        </div>
+        <div class="field-group" flex="100" flex-gt-sm="33">
+            <label for="date">
+                Start Zeit
+                <ssf-datepicker name="end" ref="startTime" options={timeOptions}></ssf-datepicker>
+            </label>
+        </div>
+        <div class="field-group" flex="100" flex-gt-sm="33">
+            <label for="end">
+                End Zeit
+                <ssf-datepicker name="end" ref="endTime" options={timeOptions}></ssf-datepicker>
+            </label>
+        </div>
+    </div>
+    <script>
+        import '../../ssf-datepicker.html'
+        this.rangeOptions = {
+            mode: 'range',
+            allowInput: true,
+            locale : {
+                firstDayOfWeek: 1,
+            }
+        }
+        this.timeOptions = {
+            allowInput: true,
+            enableTime: true,
+            noCalendar: true,
+            time_24hr: true,
+            defaultHour: 14,
+        }
+    </script>
+</event-registration-duration>

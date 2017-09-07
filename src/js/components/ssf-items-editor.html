@@ -1,0 +1,187 @@
+<ssf-items-editor>
+    <yield from="title" />
+    <h2>Items</h2>
+    <p>Alle Zusatzoptionen die ein Teilnehmer dazu buchen kann.</p>
+    <div layout="row" layout-align="space-between" class="items">
+        <ssf-item-editor
+            edit-item-label="Item Bearbeiten"
+            ref="item"
+            each={item,index in items}
+            item={item}
+            class="item"
+            flex="100" flex-gt-sm="45" flex-gt-md="30">
+            <yield to="actions">
+                <button onclick={editItem}>E</button>
+                <button onclick={parent.removeItem}>&times;</button>
+            </yield>
+            <yield to="content">
+                <p>Verkaufspreis: {item.sellPrice} €</p>
+                <p>Einkaufspreis: {item.buyPrice} €</p>
+            </yield>
+            <yield to="editor">
+                <div layout="row" layout-align="space-between">
+                    <div flex-gt-sm="45">
+                        <fieldset layout="row">
+                            <label for="name">Name:</label>
+                            <input maxlength="25" oninput={parent.parent.editName} type="text" name="name" value={opts.item.name}>
+                        </fieldset>
+                        <fieldset layout="row">
+                            <label for="buyPrice">Einkaufspreis:</label>
+                            <event-item-price-slider onupdate={parent.parent.editBuyPrice} ref="buyPrice" options={{start: opts.item.buyPrice}}></event-item-price-slider>
+                        </fieldset>
+                        <fieldset>
+                            <label for="price">
+                                In Con-fee enthalten?
+                                <small></small>
+                            </label>
+                            <ssf-toggle></ssf-toggle>
+                            <!-- <input type="checkbox" {checked: opts.item.included} onchange={parent.checkIncluded}> -->
+                        </fieldset>
+                        <fieldset layout="row">
+                            <label for="sellPrice">Verkaufspreis:</label>
+                            <event-item-price-slider onupdate={parent.parent.editSellPrice} ref="sellPrice" options={{start: opts.item.sellPrice}}></event-item-price-slider>
+                        </fieldset>
+                    </div>
+                    <div flex-gt-sm="45">
+                        <fieldset>
+                            <label for="price">
+                                Optionen
+                                <small>Zum Beispiel bei T-shirts: S, M, L und XL</small>
+                            </label>
+                            <input type="checkbox" {checked: opts.item.variantsActive} onchange={parent.parent.checkOptions}>
+                        </fieldset>
+                        <div if={opts.item.variantsActive}>
+                            <div each={option in opts.item.variants}>
+                                <input type="text">
+                            </div>
+                            <div onclick={parent.parent.addOption}>+</div>
+                        </div>
+                    </div>
+                </div>
+            </yield>
+        </ssf-item-editor>
+        <div flex="100" flex-gt-sm="45" flex-gt-md="30" class="items__add" onclick={addItem}>
+            +<br>
+            Neues Item anlegen
+        </div>
+        <article flex="100" flex-gt-sm="45" flex-gt-md="30"></article>
+    </div>
+    <script>
+        import '../../ssf-item-editor.html'
+        import '../../ssf-toggle.html'
+        import './event-item-price-slider.html'
+
+        this.items = [
+            {
+                name: 'Badge',
+                sellPrice: 2,
+                buyPrice: 2,
+                variants: [],
+                variantsActive: false,
+                included: false
+            },
+            {
+                name: 'T-Shirt',
+                sellPrice: 16,
+                buyPrice: 16,
+                variants: ['S','M','L','XL','XXL','3XL'],
+                variantsActive: true,
+                included: false
+            },
+            {
+                name: 'Early Bird',
+                sellPrice: 20,
+                buyPrice: 20,
+                variants: [],
+                variantsActive: false,
+                included: false
+            },
+            {
+                name: 'Dead Dog',
+                sellPrice: 20,
+                buyPrice: 20,
+                variants: [],
+                variantsActive: false,
+                included: false
+            },
+            {
+                name: 'Sponsor',
+                sellPrice: 10,
+                buyPrice: 10,
+                variants: [],
+                variantsActive: false,
+                included: false
+            },
+            {
+                name: 'SuperSponsor',
+                sellPrice: 30,
+                buyPrice: 30,
+                variants: [],
+                variantsActive: false,
+                included: false
+            },
+        ]
+
+        addItem() {
+            this.items.push({
+                name: '',
+                sellPrice: 35,
+                buyPrice: 65,
+                variants: [],
+                variantsActive: false,
+                included: false
+            })
+            this.one('updated', ()=>{
+                this.refs['item'][this.items.length - 1].editItem()
+            })
+            this.update()
+        }
+
+        removeItem(e) {
+            e.preventDefault()
+            console.log(e.item.index);
+            this.items.splice(e.item.index, 1)
+            this.update()
+        }
+
+        editName(e) {
+            e.item.item.name = e.target.value
+            this.update()
+        }
+
+        editSellPrice(e) {
+            e.parent.opts.item.sellPrice = e.refs.slider.value
+            this.update()
+        }
+
+        editBuyPrice(e) {
+            e.parent.opts.item.buyPrice = e.refs.slider.value
+            this.update()
+        }
+
+        checkOptions(e) {
+            e.item.item.variantsActive = !e.item.item.variantsActive
+            this.update()
+        }
+
+        addOption(e) {
+            e.item.item.variants.push('')
+            this.update()
+        }
+    </script>
+    <style type="text/less">
+        @import "src/less/variables.less";
+        .items__add {
+            padding: 0 4em;
+            min-height: 5em;
+            border: 1px solid @color-primary;
+            border-radius: .25em;
+            text-align: center;
+            display: flex;
+            align-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 1em;
+        }
+    </style>
+</ssf-items-editor>

@@ -22,20 +22,36 @@
     </div>
 
 	<script>
+        // {
+        //     isVisible: true,
+        //     heading: 'Dialog',
+        //     buttons: [{
+        //         text: 'Ok',
+        //         type: 'dark',
+        //         action: function () { this.close() }
+        //     }]
+        // }
+
+        Object.assign(this, opts)
         this.dialog = { isVisible: false}
 		this.on('mount', () => {
             Object.assign(this.dialog, opts.dialog)
+            if (this.dialog.isVisible) {
+                this.open()
+            }
 		})
 
 		this.close = () => {
             document.body.style.overflow = 'visible'
 			this.dialog.isVisible = false
+            this.update()
 			this.trigger('closed')
 		}
 
 		this.open = () => {
             document.body.style.overflow = 'hidden'
 			this.dialog.isVisible = true
+            this.update()
             this.trigger('opened')
 		}
 	</script>

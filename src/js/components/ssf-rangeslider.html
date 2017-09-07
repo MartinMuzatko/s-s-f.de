@@ -25,5 +25,9 @@
                 this.trigger('change', value)
             })
         })
+
+        this.on('set', (value)=>{
+            this.refs.slider.noUiSlider.set(value)
+        })
     </script>
 </ssf-rangeslider>

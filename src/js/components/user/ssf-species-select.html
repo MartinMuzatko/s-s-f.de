@@ -4,7 +4,7 @@
     <script>
         import '../ssf-suggestioninput.html'
         this.getSpecies = async function() {
-            let response = await fetch('http://localhost:8888/s-s-f.de/api/users/getSpecies')
+            let response = await fetch('/s-s-f.de/api/users/getSpecies')
             let data = await response.json()
             return data
         }

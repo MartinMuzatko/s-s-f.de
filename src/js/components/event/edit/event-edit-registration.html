@@ -1,0 +1,29 @@
+<event-edit-registration>
+	<div class="field-group">
+		<label>
+			Registrierung Aktiv?
+			<ssf-toggle></ssf-toggle>
+		</label>
+	</div>
+	<div class="field-group">
+		<label>
+			Mindestalter
+			<input value="18" size="30" ref="summary" name="summary" type="text">
+		</label>
+	</div>
+	<div class="field-group">
+		<label>
+			Restplätze öffentlich?
+			<ssf-toggle></ssf-toggle>
+		</label>
+	</div>
+	<event-registration-duration></event-registration-duration>
+	<event-items-editor ref="items"></event-items-editor>
+	<event-tickets-editor ref="tickets"></event-tickets-editor>
+	<script>
+		import './event-tickets-editor.html'
+		import '../../ssf-dialog.html'
+		import './event-items-editor.html'
+		import './event-registration-duration.html'
+	</script>
+</event-edit-registration>

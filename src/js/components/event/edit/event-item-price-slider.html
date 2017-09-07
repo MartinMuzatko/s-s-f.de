@@ -1,0 +1,40 @@
+<event-item-price-slider>
+    <input ref="price" oninput={setSliderValue} type="number"> €
+    <ssf-rangeslider ref="slider" options={options}></ssf-rangeslider>
+    <script>
+        import extend from 'extend'
+        import wNumb from 'wnumb'
+        import '../../ssf-rangeslider.html'
+        this.options = {
+            start: 5,
+            // tooltips: wNumb({decimals: 2, mark: ',', suffix: ' €'}),
+            range: {
+                min: 0,
+                max: 100,
+            },
+            pips : {
+                values: 5
+            },
+            step: .5,
+        }
+        extend(true, this.options, this.opts.options)
+
+        this.on('mount', ()=>{
+            this.refs.slider.on('change', (value)=>{
+                this.trigger('change', value)
+                this.refs.price.value = value
+                if (opts.onupdate) opts.onupdate(this)
+            })
+        })
+
+        setSliderValue(e) {
+            this.refs.slider.trigger('set', e.target.value)
+        }
+
+    </script>
+    <style>
+        input[type="number"] {
+            width: 5em;
+        }
+    </style>
+</event-item-price-slider>
