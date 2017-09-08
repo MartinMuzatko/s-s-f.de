@@ -6,7 +6,20 @@
 @color-primary-dark: darken(@color-primary, 20%);
 @color-primary-light: lighten(@color-primary, 20%);
 
+@color-primary-light-shadow: lighten(fadeout(@color-primary-light, 40%), 12.5%);
+
+@color-member: hsl(0, 95%, 58%);
+@color-member-light: lighten(@color-member, 20%);
+@color-member-light-shadow: lighten(fadeout(@color-member-light, 40%), 12.5%);
+
+@color-background: lighten(fadeout(desaturate(@color-primary-light, 30%), 40%), 15%);
+
+@color-secondary: hsl(226, 95%, 58%);
+@color-secondary-dark: darken(@color-secondary, 20%);
+@color-secondary-light: lighten(@color-secondary, 20%);
+
 @color-dark: hsl(0, 0, 15%);
+@color-gray: #444;
 @color-light: hsl(0, 0, 98%);
 @color-dark-shadow: fadeout(@color-dark, 50%);
 @color-light-shadow: fadeout(@color-light, 50%);
@@ -66,6 +79,9 @@
 @width-small: .6;
 @width-medium: .7;
 @width-large: .825;
+
+@radius-small: .25em;
+@radius-medium: .5em;
 
 /*  ========================================
     INDENTATIONS

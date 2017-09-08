@@ -1,0 +1,15 @@
+.avatar {
+    object-fit: contain;
+    object-position: center;
+    &--round {
+        border-radius: 100%;
+    }
+    &--big {
+        border: 10px solid @color-light;
+        box-shadow: 0 0 .125em @color-dark-shadow;
+    }
+    &--small {
+        border: 1px solid @color-primary;
+        box-shadow: 0 0 .25em @color-dark-shadow;
+    }
+}

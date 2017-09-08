@@ -1,0 +1,37 @@
+.dropdown {
+    position: absolute;
+    top: 100%;
+    transition: all .5s ease;
+    background-color: @color-light;
+    border-radius: .1em;
+    overflow: hidden;
+    pointer-events: none;
+    box-shadow: 0 0 .1em @color-dark-shadow;
+    opacity: 0;
+    z-index: @z-index-overlay;
+    &--open {
+        opacity: 1;
+        pointer-events: all;
+    }
+    &--orientation-left {
+        left: 0;
+    }
+    &--orientation-right {
+        right: 0;
+    }
+    &__item {
+        transition: all .25s ease;
+        padding: .5em 1em;
+        display: block;
+        color: @color-dark;
+        white-space: nowrap;
+        &:hover, &--selected {
+            background-color: @color-dark;
+            color: @color-primary;
+        }
+    }
+    &__group {
+        border-top: 1px solid gray;
+        border-bottom: 1px solid gray;
+    }
+}

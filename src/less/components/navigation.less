@@ -21,10 +21,17 @@ Styleguide Navigation - Mixin
         border-bottom: 2px solid @color-primary;
         background-color: @color-dark;
         .navigation__item {
+            color: @color-primary;
             border-bottom: none;
             display: flex;
             border-radius: 0;
-            border-left: 1px solid gray;
+            border-left: 1px solid hsl(0, 0%, 13%);
+            border-right: 1px solid #444;
+
+            font-weight: 700;
+            &:hover {
+                color: lighten(saturate(spin(@color-primary, -20), 20%), 5%);
+            }
             &:last-child {
                 border-right: 1px solid gray;
 

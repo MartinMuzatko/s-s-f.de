@@ -1,0 +1,24 @@
+.user-profile {
+    cursor: pointer;
+    color: @color-light;
+    margin-right: .5em;
+    &__avatar {
+        left: 100%;
+        width: 32px;
+        height: 32px;
+    }
+    &__select {
+        transition: all .5s ease;
+        transform: rotate(0deg);
+        &--active {
+            transform: rotate(180deg);
+        }
+    }
+
+    &__name {
+        color: @color-light;
+    }
+    * + * {
+        margin-left: .5em;
+    }
+}

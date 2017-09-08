@@ -42,6 +42,20 @@ body {
     }
 }
 
+label {
+    display: block;
+}
+
+[contenteditable=true] {
+    margin-top: 3em;
+    border: 1px solid @color-primary;
+    border-radius: @radius-medium;
+    background-color: @color-light;
+    :first-child {
+        margin-top: .25em;
+    }
+}
+
 input {
     font-family: @font-body;
 }
@@ -97,7 +111,7 @@ ul ul {
     margin-left: 2em;
 }
 
-ul {
+.content ul {
     padding: 0;
     li {
         list-style: none;
@@ -133,7 +147,14 @@ figure {
 
 a {
     text-decoration: none;
-    color: @color-primary;
+}
+
+p a {
+    color: @color-secondary;
+    &:hover {
+        text-decoration: underline;
+        text-decoration-skip: edges;
+    }
 }
 
 .code {
@@ -199,7 +220,6 @@ hr {
 }
 
 p, li {
-    font-size: 1.35rem;
     padding: 0;
     margin: 1em 0;
     line-height: 1.55;
@@ -240,26 +260,28 @@ fieldset
 
 input {
     width: auto;
-    border: 1px solid @color-primary;
-    border-radius: .2em;
+    max-width: 100%;
+    border: none;
     font-size: 1em;
-    line-height: 1;
-    padding: .5em;
-    transition: all @duration-action ease;
+    line-height: 1.5;
+    margin: 0;
     position: relative;
 }
 
-label {
-    display: block;
-    margin: 0;
-    ~ * {
-        margin-top: 1em;
-    }
-    input {
-        display: block;
+input[type=text], input[type=number], input[type=password] {
+    padding: .25em .5em;
+    border: 1px solid @color-primary-dark;
+    background-color: @color-light;
+    &:focus {
+        outline: none;
     }
 }
 
-input[type="submit"] {
+input[type=submit] {
     margin-top: 1em;
+    .c-button(@color-dark);
+}
+
+button {
+    border: none;
 }

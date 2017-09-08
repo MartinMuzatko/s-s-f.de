@@ -1,6 +1,14 @@
 // COMPONENT IMPORTS //
 @import "components/button.less";
 @import "components/navigation.less";
+@import "components/avatar.less";
+@import "components/dropdown.less";
+@import "components/event-preview.less";
+@import "components/pagination.less";
+@import "components/profile-info.less";
+@import "components/user-profile.less";
+@import "components/user-profile-card.less";
+@import "components/user-list.less";
 
 // COMPONENT DEFINITIONS //
 
@@ -18,9 +26,9 @@ Markup:
 
 
 .button	 - Button
-.button-primary   - button
-.button-light   - button
-.button-dark   - button
+.button--primary   - button
+.button--light   - button
+.button--dark   - button
 
 
 Styleguide Button - UI
@@ -29,8 +37,12 @@ Styleguide Button - UI
 
 .button {
 	.c-button;
-    &-light { .c-button(@color-light); }
-    &-dark { .c-button(@color-dark); }
+    &--light { .c-button(@color-light); }
+    &--dark { .c-button(@color-dark); }
+    &&--block {
+        display: block;
+        width: 100%;
+    }
 }
 
 /* --------------------------------- *\

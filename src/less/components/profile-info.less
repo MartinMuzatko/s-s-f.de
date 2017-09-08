@@ -1,0 +1,17 @@
+.profile-info {
+    column-count: 1;
+    @media screen and (min-width: @breakpoint-md) {
+        column-count: 2;
+    }
+    column-rule: 1px solid black;
+    &__column {
+        height: 100%;
+        page-break-inside: avoid;
+    }
+    &__user {
+
+    }
+    &__events {
+
+    }
+}

@@ -5,35 +5,11 @@ MIXINS
 ======================================== */
 
 
-.padding-vertical(@amount: 2em) {
-    padding-top: @amount;
-    padding-bottom: @amount;
-}
-
-.padding-horizontal(@amount: 5%) {
-    padding-left: @amount;
-    padding-right: @amount;
-}
 
 .shadow(@size: .5em, @color: @color-dark-shadow) {
     box-shadow: 0 0 @size @color;
 }
 
-.darkenBackground {
-    position: relative;
-    > * {
-        position: relative;
-    }
-    &::before {
-        content: '';
-        position: absolute;
-        background-color: @color-dark-shadow;
-        width: 100%;
-        height: 100%;
-        left: 0;
-        top: 0;
-    }
-}
 
 
 .responsiveWidth(@width) {

@@ -1,0 +1,32 @@
+.pagination {
+	display: flex;
+	list-style: none;
+	flex-wrap: wrap;
+	&__container {
+		list-style: none;
+		display: block;
+		margin: 0 1em;
+		border-radius: .25em;
+		color: @color-light;
+		background-color: @color-dark;
+		border: 1px solid @color-primary;
+		min-width: 2em;
+		text-align: center;
+	}
+    &__item {
+		cursor: pointer;
+		display: block;
+        color: @color-primary;
+		padding: .25em .5em;
+		&--separator {
+		}
+        &--next {
+		}
+        &--previous {
+		}
+        &--last {
+		}
+        &--current {
+		}
+	}
+}
