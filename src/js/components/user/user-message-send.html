@@ -1,0 +1,79 @@
+<user-message-send>
+    <ssf-dialog ref="dialog" dialog={dialog}>
+        <form onsubmit={parent.submit} action="" method="POST">
+            <label>
+                Titel
+                <input ref="title" type="text">
+            </label>
+            <user-filter label="Empfänger" ref="user"></user-filter>
+            <label>
+                Nachricht
+                <ssf-editor ref="editor" inline></ssf-editor>
+            </label>
+            <input type="submit" class="button button--primary" value="Absenden">
+        </form>
+    </ssf-dialog>
+    <script>
+        import '../ssf-dialog.html'
+        import '../ssf-editor.html'
+        import './user-filter.html'
+
+        this.message = {
+            title: '',
+            receiver: '',
+            text: '',
+        }
+        this.dialog = {
+            isVisible: opts.visible || false,
+            heading: 'Nachricht verfassen',
+            buttons: [{
+                text: 'Ok',
+                type: 'dark',
+                action: function () { this.close() }
+            }]
+        }
+
+        this.on('mount', ()=>{
+            this.refs.dialog.on('closed', ()=>{
+                this.refs.dialog.refs.editor.editor.hide()
+            })
+        })
+
+        async sendMessage(message) {
+            var response = await fetch(
+                `/s-s-f.de/api/users/${message.receiver}/messages`,
+                {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    body: JSON.stringify(message)
+                }
+            )
+            return response.json()
+        }
+
+        open() {
+            this.refs.dialog.open()
+            this.refs.dialog.refs.editor.editor.show()
+        }
+
+        close() {
+            this.refs.dialog.close()
+            this.refs.dialog.refs.editor.editor.hide()
+        }
+
+        async submit(e) {
+            e.preventDefault()
+            this.message.title = this.refs.dialog.refs.title.value
+            this.message.text = this.refs.dialog.refs.editor.getContent()
+            this.message.receiver = this.refs.dialog.refs.user.getUser()
+            this.message.sender = api.user.name
+            let success = await this.sendMessage(this.message)
+            if (success > 0) {
+                this.trigger('sent', success)
+            } else {
+                this.trigger('failed')
+            }
+            this.close()
+        }
+    </script>
+</user-message-send>

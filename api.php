@@ -96,6 +96,83 @@ $router = new Router([
         return $users->getUsers();
 
     }),
+        // MESSAGES
+        new Route('GET', 'users/([\w-]+)/messages', function($path, $user){
+            //$user = $this->user;
+            $mode = $this->input->get('mode');
+            $user = $this->users->get("name=$user");
+            // permissions check!
+            $currentUser = $this->user;
+            if ($mode == 'inbox') {
+                $messages = $user->getMessages();
+            } elseif ($mode == 'outbox') {
+                $messages = $user->getSentMessages();
+            } else {
+                http_response_code(415);
+                return ;
+            }
+            return array_map(
+                function($message) {
+                    return [
+                        "id" => $message->id,
+                        "title" => $message->title,
+                        "text" => $message->text,
+                        "sender" => $message->sender->name,
+                        "receiver" => $message->receiver->name,
+                        "created" => (int) $message->created.'000',
+                        "read" => $message->read
+                    ];
+                },
+                $messages->getArray()
+            );
+        }),
+        new Route('GET', 'users/([\w-]+)/messages/(\d+)', function($path, $user, $messageId){
+            $user = $this->users->get("name=$user");
+            $message = $user->getMessageById($messageId);
+            $message->of(false);
+            $message->read = 1;
+            $message->save();
+            return [
+                "id" => $message->id,
+                "title" => $message->title,
+                "text" => $message->text,
+                "sender" => $message->sender->name,
+                "receiver" => $message->receiver->name,
+                "created" => (int) $message->created.'000',
+                "read" => $message->read
+            ];
+        }),
+        new Route('POST', 'users/([\w-]+)/messages', function($path, $receiver){
+            //$user = $this->user;
+            $resource = new \API\Resource($path);
+            $data = $resource->getPayload();
+            $sender = $this->user;
+            try {
+                $message = new Page();
+                $message->parent = $this->pages->get('template=messages');
+                $message->template = 'message';
+                $message->title = $this->sanitizer->text($data->title);
+                $message->text = $this->sanitizer->textarea(
+                    $data->text,
+                    ["allowableTags" => "<h2><h3><h4><h5><h6><pre><code><small><del><br><hr><cite><abbr><p><a><b><strong><i><em><u><sup><sub><ul><ol><li><dd><dl><dt><table><tr><td><tbody><thead><th><blockquote><q>"]
+                );
+                $message->receiver = $this->sanitizer->username($receiver);
+                if (property_exists($data, 'sender')) {
+                    $message->sender = $this->sanitizer->username($data->sender);
+                } else {
+                    $message->sender = $this->sanitizer->username($this->user->name);
+                }
+                $message->save();
+                return $message->id;
+            } catch (\Exception $e) {
+                return false;
+            }
+        }),
+
+    new Route('GET', 'sessions', function($path){
+        $user = new \API\User();
+        return $user->getActiveSessions();
+    }),
     new Route('POST', 'session', function($path){
         $user = new \API\User();
         $credentials = $user->getPayload();

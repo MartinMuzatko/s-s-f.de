@@ -1,0 +1,110 @@
+<user-messages>
+    <div>
+        <a href="#inbox" class="button button--primary">Inbox</a>
+        <a href="#outbox" class="button button--primary">Outbox</a>
+        <a href="#compose" class="button button--primary">Compose</a>
+    </div>
+    <div if={activeRoute != 'compose'} class="message-list">
+        <table>
+            <thead>
+                <tr>
+                    <th>Titel</th>
+                    <th>Datum</th>
+                    <th>Empfänger</th>
+                    <th>Sender</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr each={message in messages} class="message-list__message { message.read ? 'message-list__message--read' : 'message-list__message--unread'}">
+                    <td><a href="#{activeRoute}/{message.id}">{message.title}</a></td>
+                    <td>{new Date(parseInt(message.created)).toISOString()}</td>
+                    <td>{message.receiver}</td>
+                    <td>{message.sender}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <user-message-send ref="messagesend"></user-message-send>
+    <div if={messageShown}>
+        <h2>{messageShown.title}</h2>
+        <p>{new Date(parseInt(messageShown.created)).toISOString()}</p>
+        <raw content={messageShown.text}></raw>
+    </div>
+    <script>
+        import route from 'riot-route'
+        import './user-message-send.html'
+        import '../raw.html'
+
+        const COMPOSE_RETURN_ROUTE = 'inbox'
+
+        this.activeRoute = 'inbox'
+
+        route('inbox', async (name)=>{
+            this.messageShown = false
+            this.activeRoute = 'inbox'
+            this.messages = await this.getMessages('inbox')
+            this.refreshUnreadMessagesCount()
+            this.update()
+        })
+
+        route('inbox/*', async (id)=>{
+            this.activeRoute = 'inbox'
+            this.messageShown = this.getMessageById(id)
+            await this.readMessage(id)
+            this.messageShown.read = 1
+            this.refreshUnreadMessagesCount()
+            this.update()
+        })
+
+        route('outbox', async ()=>{
+            this.messageShown = false
+            this.activeRoute = 'outbox'
+            this.messages = await this.getMessages('outbox')
+            this.update()
+        })
+
+        route('outbox/*', async (id)=>{
+            this.activeRoute = 'outbox'
+            this.messageShown = this.getMessageById(id)
+            this.update()
+        })
+
+        route('compose', async (id)=>{
+            this.refs.messagesend.open()
+            this.activeRoute = 'compose'
+            this.update()
+        })
+
+        getMessageById(id) {
+            if (id) {
+                return this.messages.find(message=>message.id == parseInt(id))
+            }
+        }
+
+        refreshUnreadMessagesCount() {
+            let amount = this.messages.filter(message=>!message.read).length
+            api.user.track.trigger('messages-read', amount)
+        }
+
+        this.getReadMessages
+
+        async readMessage(id) {
+            var response = await fetch(`/s-s-f.de/api/users/${api.user.name}/messages/${id}`, {credentials: 'same-origin'})
+            return response.json()
+        }
+
+
+        this.on('mount', async ()=>{
+            route(this.activeRoute)
+            route.start(true)
+            this.refs.messagesend.on('sent', (id)=>{
+                route(COMPOSE_RETURN_ROUTE)
+            })
+        })
+
+        async getMessages(route = 'inbox') {
+            var response = await fetch(`/s-s-f.de/api/users/${api.user.name}/messages?mode=${route}`, {credentials: 'same-origin'})
+            return response.json()
+        }
+    </script>
+</user-messages>

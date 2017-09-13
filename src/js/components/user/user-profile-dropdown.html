@@ -18,6 +18,15 @@
     </ssf-dropdown>
     <script>
         import '../ssf-dropdown.html'
+
+        this.messagesCount = opts.messages | 0
+
+        api.user.track.on('messages-read', (amount)=>{
+            this.messagesCount = amount
+            console.log(amount);
+            this.update()
+        })
+
         openDropdown(event) {
             event.preventDefault()
             this.refs.dropdown.trigger('toggle')
