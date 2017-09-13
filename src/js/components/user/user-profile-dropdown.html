@@ -1,20 +1,14 @@
 <user-profile-dropdown>
-    <a onblur={closeDropdown} onclick={openDropdown} href="#" class="user-profile" layout="row" layout-align="center center">
+    <a onclick={openDropdown} href="#" class="user-profile" layout="row" layout-align="center center">
         <span class="user-profile__name">{opts.name}</span>
-        <span class="user-profile__select {refs.dropdown && refs.dropdown.open || 0 ? 'active' : '' }">▾</span>
-        <img class="user-profile__avatar" src="{opts.avatar}" alt="{opts.name}">
+        <span class="user-profile__select {refs.dropdown && refs.dropdown.open || 0 ? 'user-profile__select--active' : '' }">▾</span>
+        <div class="presence">
+            <img class="user-profile__avatar presence__item avatar avatar--round avatar--small" src="{opts.avatar}" alt="{opts.name}">
+            <span if={messagesCount} class="presence__messages presence__bubble presence__bubble--bottom presence__bubble--right">{messagesCount}</span>
+        </div>
     </a>
-    <ssf-dropdown ref="dropdown">
-        <div class="dropdown__group">
-            <a class="dropdown__item" href="{api.url}users/{api.user}">Profil anzeigen</a>
-            <a class="dropdown__item" href="{api.url}users/{api.user}">Profil bearbeiten</a>
-            <a class="dropdown__item" href="{api.url}users/{api.user}">Nachrichten</a>
-            <a class="dropdown__item" href="{api.url}admin">Admin</a>
-        </div>
-        <div class="dropdown__group">
-            <a class="dropdown__item" href="{api.url}events">Event Management</a>
-        </div>
-        <a class="dropdown__item" href="{api.url}users/logout">Logout</a>
+    <ssf-dropdown orientation="right" ref="dropdown">
+        <yield>
     </ssf-dropdown>
     <script>
         import '../ssf-dropdown.html'
@@ -29,12 +23,13 @@
 
         openDropdown(event) {
             event.preventDefault()
-            this.refs.dropdown.trigger('toggle')
+            this.refs.dropdown.trigger('open')
         }
         closeDropdown() {
-            setTimeout(function () {
+            setTimeout(() => {
                 this.refs.dropdown.trigger('close')
-            }, 1000);
+                this.update()
+            }, 100);
         }
     </script>
     <style type="text/less">
@@ -46,32 +41,6 @@
             justify-content: center;
             align-items: center;
             align-content: center;
-        }
-        .user-profile {
-            cursor: pointer;
-            color: @color-light;
-            margin-right: .5em;
-            &__avatar {
-                left: 100%;
-                width: 32px;
-                height: 32px;
-                border-radius: 100%;
-                border: 1px solid @color-primary;
-            }
-            &__select {
-                transition: all .5s ease;
-                transform: rotate(0deg);
-                &.active {
-                    transform: rotate(180deg);
-                }
-            }
-
-            &__name {
-                color: @color-light;
-            }
-            * + * {
-                margin-left: .5em;
-            }
         }
     </style>
 </user-profile-dropdown>

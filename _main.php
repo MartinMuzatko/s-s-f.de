@@ -58,14 +58,22 @@ $content = ob_get_clean();
                 </div>
                 <div layout="row" layout-align="center center" class="navigation--item">
                     <?if($user->isLoggedin()):?>
-                        <user-profile-dropdown name="<?=$user->name?>" avatar="<?=$user->avatar->url?>">
-                            <div>
-                                <?=$user->name?> <a ref="logout" href="<?=$pages->get('/users/logout')->url?>">logout</a>
+                        <user-profile-dropdown messages="<?=$user->hasUnreadMessages()?>" name="<?=$user->username?>" avatar="<?=$user->avatar instanceof Pageimages ? $user->avatar->first->size(64,64)->url : $user->avatar->size(64,64)->url?>">
+                            <div class="dropdown__group">
+                                <a class="dropdown__item" href="<?=$config->urls->root?>users/<?=$user->name?>">Profil anzeigen</a>
+                                <a class="dropdown__item" href="<?=$config->urls->root?>users/<?=$user->name?>/edit">Profil bearbeiten</a>
+                                <a class="dropdown__item" href="<?=$config->urls->root?>users/<?=$user->name?>/messages">Nachrichten (<?=$user->hasUnreadMessages()?>)</a>
+                                <a class="dropdown__item" href="<?=$config->urls->root?>admin">Admin</a>
+                            </div>
+                            <div class="dropdown__group">
+                                <a class="dropdown__item" href="<?=$config->urls->root?>events">Event Management</a>
+                            </div>
+                            <div class="dropdown__group">
+                                <a class="dropdown__item" href="<?=$config->urls->root?>users/logout">Logout</a>
                             </div>
                         </user-profile-dropdown>
                     <?else:?>
-                        <a class="button navigation__item" href="<?=$pages->get('/users/login')->url?>"><?=$pages->get('/users/login')->title?></a>|
-                        <a class="button navigation__item" href="<?=$pages->get('/users/register')->url?>"><?=$pages->get('/users/register')->title?></a>
+                        <a class="button navigation__item" href="<?=$pages->get('/users/login')->url?>"><?=$pages->get('/users/login')->title?></a>
                     <?endif?>
                 </div>
             </nav>
