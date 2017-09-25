@@ -2,13 +2,18 @@
     <div class="map" ref="map"></div>
     <script>
         this.on('mount', ()=>{
+            console.log('mount map');
             this.latLng = [48.7758, 9.1829] || opts.latLng
             this.zoom = 10 || opts.zoom
             // this.markerZoom = 15 || opts.markerZoom
             this.markers = []
-            window.api.google.on('mapInit', this.setupMap)
+            if (window.google) {
+                this.setupMap()
+            } else {
+                window.api.google.on('mapInit', this.setupMap)
+            }
         })
-        this.setupMap = (map) => {
+        this.setupMap = () => {
             this.geocoder = new google.maps.Geocoder()
             var latlng = new google.maps.LatLng(...this.latLng)
             var mapOptions = {
@@ -16,7 +21,6 @@
                 center: latlng
             }
             this.map = new google.maps.Map(this.refs.map, mapOptions)
-            window.x = this.map
         }
         this.geocodeAddress = (address) => {
             this.geocoder.geocode({address}, (results,status)=>{
@@ -59,7 +63,7 @@
             this.markers.map(marker=>marker.setMap(null))
         }
     </script>
-    <style scoped>
+    <style>
         :scope {
             width: 100%;
             height: 100%;

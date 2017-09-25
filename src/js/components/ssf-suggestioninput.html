@@ -1,20 +1,39 @@
 <ssf-suggestioninput>
-    <input type="text" ref="input" oninput={needSuggestions} onblur={hideSuggestions}>
-    <div>
-        <div each={field in suggestedData} onclick={setInput}>
-            {field}
+    <input type="text" ref="input" oninput={needSuggestions} onfocus={showSuggestions} onblur={hideSuggestions}>
+    <ssf-dropdown orientation="left" ref="dropdown">
+        <div class="dropdown__item" each={field in parent.suggestedData} onclick={parent.parent.setInput}>
+            <raw content="{parent.parent.opts.getResultHtml ? parent.parent.opts.getResultHtml(field) : field}"></raw>
         </div>
+    </ssf-dropdown>
+    <div>
     </div>
     <script>
+        import './ssf-dropdown.html'
+        import './raw.html'
+
+        showSuggestions(event) {
+            event.preventDefault()
+            this.refs.dropdown.trigger('open')
+        }
+
+        hideSuggestions() {
+            console.log('hide suggestions');
+            setTimeout(() => {
+                this.refs.dropdown.trigger('close')
+            }, 150);
+        }
+
         this.suggestedData = []
         this.suggestions = this.opts.suggestions || []
+
+        this.on('mount', ()=>{
+        })
 
         this.on('mount,update',()=>{
             this.suggestions = this.opts.suggestions
         })
 
         this.suggest = (suggestions) => {
-            console.log(suggestions);
             this.suggestions = suggestions || []
             let value = this.refs.input.value
             if (value.length) {
@@ -28,16 +47,26 @@
         }
 
         needSuggestions() {
+            this.suggest()
             this.trigger('suggest', this.refs.input.value)
         }
 
         setInput(e) {
             this.refs.input.value = e.item.field
             this.hideSuggestions()
+            this.trigger('select', e.item.field)
         }
 
-        hideSuggestions() {
-
+        getInput() {
+            return this.refs.input.value
         }
     </script>
+    <style>
+        :scope {
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
 </ssf-suggestioninput>

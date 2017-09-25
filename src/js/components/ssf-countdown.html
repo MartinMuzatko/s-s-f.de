@@ -1,0 +1,75 @@
+<ssf-countdown>
+    <div class="{timeLeft <= 0 ? 'show' : 'hide'}">
+        <yield from="after" />
+    </div>
+    <div class="{timeLeft >= 0 ? 'show' : 'hide'}">
+        <yield from="before" />
+        <div class="countdown">
+            <div class="countdown__item" each={time in times}>
+                <div class="countdown__number">
+                    <span class="button button--primary" each={number in time.number.split('')}>
+                        {number}
+                    </span>
+                </div>
+                <div class="countdown__text">
+                    {time.text}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        getTimeLeft(to) {
+            return ((to - this.now) / 1000 | 0) - this.i
+        }
+
+        countdownOver() {
+            clearInterval(this.interval)
+            this.refs.after.removeAttribute('hidden')
+            this.update()
+        }
+
+        this.on('mount', ()=>{
+            this.to = this.opts.to
+            this.to = new Date().getTime() + 5000
+            this.i = 0
+            this.now = new Date().getTime()
+            this.timeLeft = this.getTimeLeft(this.to)
+            if (this.timeLeft >= 0) {
+                this.interval = setInterval(()=>{
+                    this.i++
+                    this.timeLeft = this.getTimeLeft(this.to)
+                    const timeLeft = this.timeLeft
+                    if (timeLeft < 0) {
+                        this.countdownOver()
+                        return
+                    }
+                    const seconds = ((timeLeft % 60) + '').padStart(2, '0')
+                    const minutes = (((timeLeft / 60) | 0) % 60 + '').padStart(2, '0')
+                    const hours = ((timeLeft / 60 / 60 | 0) % 24 + '').padStart(2, '0')
+                    const days = ((timeLeft / 60 / 60 / 24 | 0) + '')
+                    this.times = [
+                        {
+                            number : days,
+                            text : `Tag${days!=1?'e':''}`
+                        },
+                        {
+                            number : hours,
+                            text : `Stunde${hours!=1?'n':''}`
+                        },
+                        {
+                            number : minutes,
+                            text : `Minute${hours!=1?'n':''}`
+                        },
+                        {
+                            number : seconds,
+                            text : `Sekunde${hours!=1?'n':''}`
+                        },
+                    ]
+                    this.update()
+                }, 1000)
+            }
+            this.update()
+        })
+
+    </script>
+</ssf-countdown>

@@ -22,16 +22,26 @@
 				target: this.refs.editor,
 				inline: opts.inline == '' || false,
 				menu: {},
+                add_form_submit_trigger: false,
+                submit_patch: false,
 				toolbar:
 					'bold italic underline strikethrough | '+
 					'alignleft aligncenter alignright alignjustify | '+
 					'formatselect | bullist numlist | outdent indent | blockquote, undo, redo',
 				plugins: [],
-				setup: (editor) => {
+				init_instance_callback: (editor) => {
                     this.editor = editor
                     this.trigger('ready', editor)
+                    if (this.opts.content) {
+                        editor.setContent(this.opts.content)
+                    }
                 }
 			})
+
 		})
+
+        getContent() {
+            return this.editor.getContent()
+        }
     </script>
 </ssf-editor>

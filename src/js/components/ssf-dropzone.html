@@ -1,0 +1,57 @@
+<ssf-dropzone>
+    <form drop={prepareFiles} class="dropzone" ref="dropzone">
+        <input onchange={prepareFiles} type="file" name="files[]" multiple />
+    </form>
+    <div if={opts.show} each={file in fileData}>
+        <img width="128" src="{file.data}" alt="{file.file.name}">
+        {file.file.name} - {file.file.size / 1000} KB
+    </div>
+    <script>
+
+        this.files = []
+        this.opts.multiple = false
+        this.opts.show = false
+        this.on('mount', ()=>{
+            let methods = 'drag dragstart dragend dragover dragenter dragleave drop'.split(' ')
+            methods.map(
+                method=>this.refs.dropzone.addEventListener(
+                    method,
+                    ()=>{
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                )
+            )
+        })
+
+        prepareFiles(event) {
+            let files = event.target.files || event.dataTransfer.files
+            if (!this.opts.multiple) {
+                files = [files[0]]
+            }
+            this.files = files
+            this.fileData = []
+            files.map(file=>{
+                const reader = new FileReader()
+                reader.onload = (e)=>{
+                    this.fileData.push(
+                        {
+                            file: file,
+                            data: e.target.result
+                        }
+                    )
+                    this.trigger('prepared', {data: this.fileData, files: files})
+                    this.update()
+                }
+
+                reader.readAsDataURL(file);
+            })
+
+            //this.traverseFiles(files)
+        }
+
+        traverseFiles(files) {
+            console.log(files);
+        }
+    </script>
+</ssf-dropzone>

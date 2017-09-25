@@ -1,56 +1,119 @@
-<ssf-dropdown>
-    <div class="items dropdown {open ? 'dropdown--open' : '' }">
-        <yield>
-    </div>
+<ssf-dropdown
+    class="dropdown dropdown--orientation-{opts.orientation || 'right'} {open ? 'dropdown--open' : '' }"
+    onmouseover={resetCloseTimer} onmouseout={startCloseTimer}>
+    <yield>
     <script>
-        this.open = false || this.opts.open
-        this.on('open', ()=>{
+        this.on('mount', () => {
+            this.dropdownItems = Array.from(this.root.querySelectorAll('.dropdown__item'))
+            this.open = false || this.opts.open
+            this.update()
+        })
+
+        const SELECTED = 'dropdown__item--selected'
+        const TIMEOUT = 1e3
+
+        resetCloseTimer() {
+            console.log('resetCloseTimer');
+            clearTimeout(this.closeTimer)
+        }
+
+        startCloseTimer() {
+            console.log('startCloseTimer');
+            this.closeTimer = setTimeout(() => {
+                if (!this.getSelectedNode()) {
+                    this.close()
+                }
+            }, TIMEOUT);
+        }
+
+        open() {
             this.open = true
+            this.setBindings()
             this.update()
-        })
-        this.on('close', ()=>{
+            this.trigger('opened')
+        }
+
+        close() {
             this.open = false
+            this.deselect()
+            this.clearBindings()
             this.update()
-        })
-        this.on('toggle', ()=>{
-            this.open = !this.open
-            this.update()
-        })
+            this.trigger('closed')
+        }
+
+        toggle() {
+            this.open ? this.open() : this.close()
+        }
+
+        navigateUp() {
+            let selectedIndex = this.getSelectedIndex()
+            this.deselect()
+            selectedIndex > 0 ?
+                this.select(selectedIndex - 1) :
+                this.select(this.dropdownItems.length-1)
+        }
+
+        navigateDown() {
+            let selectedIndex = this.getSelectedIndex()
+            this.deselect()
+            selectedIndex < this.dropdownItems.length - 1 ?
+                this.select(selectedIndex + 1) :
+                this.select(0)
+        }
+
+        select(nodeIndex) {
+            this.dropdownItems[nodeIndex].classList.add(SELECTED)
+        }
+
+        deselect() {
+            this.dropdownItems.map(item=>item.classList.remove(SELECTED))
+        }
+
+        getSelectedIndex() {
+            return this.dropdownItems
+                .map(item=>item.classList.contains(SELECTED))
+                .findIndex(item=>item)
+        }
+
+        getSelectedNode() {
+            return ~this.getSelectedIndex() ? this.dropdownItems[this.getSelectedIndex()] : false
+        }
+
+        this.on('open', this.open)
+        this.on('close', this.close)
+        this.on('toggle', this.toggle)
+
+        setBindings() {
+            this.bindings = addEventListener('keydown', this.navigateDropdown)
+        }
+
+        clearBindings() {
+            removeEventListener('keydown', this.navigateDropdown)
+        }
+
+        navigateDropdown(event) {
+            this.dropdownItems = Array.from(this.root.querySelectorAll('.dropdown__item'))
+            switch (event.which) {
+                case 13: //Enter
+                    this.getSelectedNode().click()
+                    event.preventDefault()
+                    break
+                case 38: // Up
+                    this.navigateUp()
+                    event.preventDefault()
+                    break
+                case 40: // Down
+                    this.navigateDown()
+                    event.preventDefault()
+                    break
+                case 27: // Escape
+                    this.trigger('close')
+                    break
+            }
+        }
     </script>
     <style type="text/less">
         @import "src/less/variables.less";
-        :scope {
-            position: absolute;
-            right: 0;
-            top: 100%;
-        }
-        .dropdown {
-            transition: all .5s ease;
-            background: @color-light;
-            border-radius: .1em;
-            overflow: hidden;
-            pointer-events: none;
-            box-shadow: 0 0 .1em @color-dark-shadow;
-            opacity: 0;
-            &--open {
-                opacity: 1;
-                pointer-events: all;
-            }
-            &__item {
-                transition: all .25s ease;
-                padding: .5em 1em;
-                display: block;
-                color: @color-dark;
-                white-space: nowrap;
-                &:hover {
-                    background: @color-dark;
-                    color: @color-primary;
-                }
-            }
-            &__group {
-                border-top: 1px solid gray;
-                border-bottom: 1px solid gray;
-            }
-        }
+
     </style>
 </ssf-dropdown>

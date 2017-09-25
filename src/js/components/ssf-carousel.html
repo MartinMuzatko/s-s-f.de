@@ -1,0 +1,30 @@
+<ssf-carousel>
+    <div class="carousel" ref="carousel">
+        <yield>
+    </div>
+    <script>
+        import Flickity from 'flickity'
+        this.on('mount', ()=>{
+            this.initCarousel()
+        })
+
+        initCarousel() {
+            let options = Object.assign(
+                {
+                    wrapAround: true,
+                    cellSelector: '.carousel__item',
+                    autoPlay: 6000,
+                    prevNextButtons: false
+                },
+                this.opts.options
+            )
+            this.carousel = new Flickity(this.refs.carousel, options)
+
+        }
+
+        this.on('updated', ()=>{
+            this.carousel && this.carousel.destroy()
+            this.initCarousel()
+        })
+    </script>
+</ssf-carousel>
