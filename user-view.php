@@ -1,39 +1,14 @@
 <?php namespace ProcessWire;
-    $username = $input->urlSegmentStr;
+    $username = $input->urlSegment(1);
+    $action = $input->urlSegment(2);
 	$profile = $users->get("name=$username");
 ?>
 <? if ($profile instanceof User): ?>
-    <?php
-        if ($profile->isInvisible) {
-            $session->redirect($pages->get('name=404')->url);
-        }
-        $userLink = $this->config->urls->root.'users/'.$profile->name;
-        $profileImage = $profile->avatar->size(128,128);
-    ?>
-    <div class="profile-info">
-        <div class="profile-info__column">
-            <div layout="row" layout-nowrap>
-                <h1><?=$profile->username?></h1>
-                <img flex-end class="profile" src="<?=$profileImage->url?>" alt="Profilbild von <?=$profile->username?>">
-            </div>
-            <div class="actions">
-                <? if($profile->name == $user->name || $user->hasRole('superuser')):?>
-                    <a href="<?=$profile->editUrl?>">Profil bearbeiten</a>
-                <? endif?>
-            </div>
-            <?php
-                $events = $pages->find("template=event-registration,profile=$profile");
-                foreach ($events as $event) {
-                    echo $event->parent->parent->title;
-                }
-            ?>
-            <?=$profile->renderFields()?>
-        </div>
-        <div class="profile-info__column">
-            <event-list-short></event-list-short>
-            <event-list-short></event-list-short>
-        </div>
-    </div>
+    <? if(!$action): ?>
+        <? require('./partials/user/profile.php'); ?>
+    <? elseif($action == 'messages'): ?>
+        <? require('./partials/user/messages.php'); ?>
+    <? endif; ?>
 <? else: ?>
 	<?php
         $letter = $input->get->letter ? trim($sanitizer->name($input->get->letter), ', ') : '';
@@ -86,13 +61,13 @@
                     <?php
                         $events = $pages->find("template=event-registration,profile=$profile")->getArray();
                     ?>
-                    <user-profile flex="33"
+                    <user-profile-card flex="33"
                         joined="<?=date('Y-m-d', $profile->created)?>"
                         link="<?=$this->config->urls->root?>users/<?=$profile->name?>"
                         club-number="<?=$profile->clubNumber?>"
                         username="<?=$profile->username?>"
                         events="<?= join(',', array_map(function($event){return $event->parent->parent->title;}, $events));?>"
-                        avatar="<?=$profile->avatar->size(64,64)->url?>"></user-profile>
+                        avatar="<?=$profile->avatar->size(64,64)->url?>"></user-profile-card>
             	<? endforeach ?>
             </div>
         </user-profile-list>
