@@ -2,19 +2,46 @@
     <h1 class="heading {'heading--menu' : !isIntroVisible}"><yield from="heading" /></h1>
     <div show={isIntroVisible} ref="intro">
         <yield from="accept" />
-        <a onclick={hideIntro} class="button">
+        <a onclick={hideIntro} class="button button--primary">
             <yield from="accept-button" />
         </a>
     </div>
-    <event-editor inactive="{!isIntroVisible}" ref="editor"></event-editor>
+    <ssf-loader ref="loader">
+        <yield to="loading-message">
+            <h2>Dein Event wird erstellt</h2>
+        </yield>
+        <yield to="success-message">
+            <h2>Dein Event {parent.parent.data.title} wurde erfolgreich erstellt :3</h2>
+            <p><a class="button button--primary" href="{parent.parent.eventUrl}">Zum Event</a></p>
+        </yield>
+    </ssf-loader>
+    <event-editor inactive="{isIntroVisible}" ref="editor"></event-editor>
     <script>
+        import '../../ssf-loader.html'
         import './event-editor.html'
+        import {createEvent} from '../../../api'
+
+        const MIN_LOAD_TIME = 1500
 
         this.isIntroVisible = true
 
         this.on('mount', ()=>{
-            this.refs.editor.on('submit', (data)=>{
-                this.createEvent(data)
+            this.refs.editor.on('submit', async (data)=>{
+                this.data = data
+                this.update()
+                this.refs.loader.trigger('load')
+                await Promise.all([
+                    (async ()=>{
+                        //let result = await createEvent(data)
+                        //this.eventUrl = result
+                    })(),
+                    (async ()=>{
+                        return new Promise(resolve => setTimeout(resolve, MIN_LOAD_TIME))
+                    })()
+                ])
+                this.refs.loader.trigger('success')
+                //this.refs.dialogLoading.close()
+                //console.log(x);
             })
         })
 
