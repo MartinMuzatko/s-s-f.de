@@ -5,6 +5,7 @@ $content = ob_get_clean();
 <html itemscope itemtype="http://schema.org/Website">
 <head>
     <meta charset="utf-8">
+    <link rel="manifest" href="<?=$config->urls->templates?>dist/manifest.json">
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -16,7 +17,7 @@ $content = ob_get_clean();
     <!-- Schema.org markup for Google+ -->
     <meta itemprop="name" content="<?=$page->title?>">
     <meta itemprop="description" content="<?=$page->summary?>">
-    <meta itemprop="image" content="http://www.example.com/image.jpg">
+    <meta itemprop="image" content="<?=$favicon?>">
 
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="summary">
@@ -31,7 +32,7 @@ $content = ob_get_clean();
     <meta property="og:title" content="<?=$page->title?>" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="<?=$page->httpUrl?>" />
-    <meta property="og:image" content="http://example.com/image.jpg" />
+    <meta property="og:image" content="<?=$homepage->logo->size(128,128)->httpUrl?>" />
     <meta property="og:description" content="<?=$page->summary?>" />
     <meta property="og:site_name" content="<?=$homepage->title?> - <?=$homepage->summary?>" />
     <meta property="og:locale" content="de_DE" />
@@ -39,9 +40,8 @@ $content = ob_get_clean();
     <meta property="article:modified_time" content="<?=date('c', $page->modifed)?>" />
 
     <link rel="stylesheet" type="text/css" href="<?=$config->urls->templates?>dist/css/main.css" />
-
     <!-- FavIcons -->
-    <link rel="icon" type="image/png" href="<?php //$homepage->image->get('name%=dark')->size(128,128)->httpUrl?>" />
+    <link rel="icon" type="image/png" href="<?=$favicon?>" />
 </head>
 <body claass="<?=$page->template->name?>">
     <div class="site__container">
@@ -77,22 +77,6 @@ $content = ob_get_clean();
                     <?endif?>
                 </div>
             </nav>
-            <!-- <? if($page != $homepage && $page->children->count): ?>
-                Children:
-                <nav class="site__nav">
-                    <? foreach($page->children as $child):?>
-                        <a class="button" href="<?=$child->url?>"><?=$child->title?></a>
-                    <? endforeach;?>
-                </nav>
-            <? endif; ?>
-            <? if($page != $homepage && $page->siblings->count): ?>
-                Siblings:
-                <nav class="site__nav">
-                    <? foreach($page->siblings as $child):?>
-                        <a class="button" href="<?=$child->url?>"><?=$child->title?></a>
-                    <? endforeach;?>
-                </nav>
-            <? endif; ?> -->
         </header>
         <!-- <a href="" class="button button-dark">Miau</a> -->
         <main class="site__content">
