@@ -1,0 +1,80 @@
+<page-editor>
+    <modules-library allowed-modules={opts.pageModules} ref="library" drop-target={refs.pageModules}></modules-library>
+    <div class="page-modules page-editor" ref="pageModules">
+        <div class="page-modules__module" each={pageModule,index in pageModules}>
+            <menu class="page-modules__controls">
+                <span class="action action--down" onclick={moveDown} if={index < pageModules.length - 1}></span>
+                <span class="action action--up" onclick={moveUp} if={index > 0}></span>
+                <span class="action action--remove" onclick={remove}></span>
+            </menu>
+            <div ref="module" data-is={pageModule.template} content={pageModule}></div>
+        </div>
+        <a href="#" onclick={save} class="button button--primary">Speichern</a>
+        <a href="#" onclick={saveAndView} class="button button--primary">Speichern und Ansehen</a>
+    </div>
+    <script>
+        import '../ssf-editor.html'
+        import './modules-library.html'
+        import './module/page-module-content.html'
+        import './module/page-module-map.html'
+        import './module/page-module-carousel.html'
+        import './module/page-module-event-registration.html'
+        import './module/page-module-event-guestlist.html'
+        import arrayMove from 'array-move'
+        import {getPageModules} from '../../api'
+
+        this.on('mount', async () => {
+            window.addEventListener('beforeunload', function () {
+                return true
+            })
+            this.pageModules = await getPageModules(this.opts.pageId)
+            this.update()
+
+            this.refs.library.on('module-added', template=>{
+                this.pageModules.push({template})
+                this.update()
+            })
+        })
+
+        async saveAndView(e) {
+            await this.save(e)
+            location.href = location.href.split('?')[0]
+        }
+
+        getModuleContent(module) {
+            let moduleFields = module.get ? module.get() : {}
+            return Object.assign({}, module.opts.content, moduleFields)
+        }
+
+        async save(e) {
+            e.preventDefault()
+            this.update()
+            if (this.refs.module.length > 1) {
+                this.pageModules.map((item,index)=>{
+                    Object.assign(item, this.getModuleContent(this.refs.module[index]))
+                })
+            } else if(!this.refs.module.length) {
+                this.pageModules = [this.getModuleContent(this.refs.module)]
+            }
+            const response = await fetch(
+                `/s-s-f.de/api/pages/${opts.pageId}`,
+                {
+                    credentials: 'same-origin',
+                    method: 'PUT',
+                    body: JSON.stringify(this.pageModules)})
+            return await response.text()
+        }
+
+        remove(e) {
+            this.pageModules.splice(e.item.index, 1)
+        }
+
+        moveDown(e) {
+            this.pageModules = arrayMove(this.pageModules, e.item.index, e.item.index+1)
+        }
+
+        moveUp(e) {
+            this.pageModules = arrayMove(this.pageModules, e.item.index, e.item.index-1)
+        }
+    </script>
+</page-editor>

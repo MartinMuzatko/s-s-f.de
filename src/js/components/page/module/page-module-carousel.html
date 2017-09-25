@@ -1,0 +1,57 @@
+<page-module-carousel>
+    <ssf-carousel ref="carousel" options={sliderOptions}>
+        <div class="carousel__item" each={slide,index in parent.content.slides}>
+            <img src="{slide.image}" alt="" class="carousel__image">
+            <div class="carousel__content" layout="row" layout-align="start end">
+                <ssf-dropzone index={index} ref="dropzone"></ssf-dropzone>
+                <div flex="66">
+                    <ssf-editor ref="editor" content={parent.parent.html.htmlDecode(slide.text)} inline></ssf-editor>
+                </div>
+            </div>
+        </div>
+    </ssf-carousel>
+    <div onclick={addSlide} class="button button--primary">+</div>
+    <script>
+        import '../../ssf-carousel.html'
+        import '../../ssf-editor.html'
+        import '../../ssf-dropzone.html'
+        import html from 'js-htmlencode'
+        import {upload} from '../../../api'
+        this.html = html
+
+        this.sliderOptions = {
+            draggable: false,
+            autoPlay: false
+        }
+        this.content = Object.assign({},this.opts.content)
+        if (!(this.content.slides && this.content.slides.length)) {
+            this.content.slides = [{text:'',image:''}]
+        }
+        this.on('mount', ()=>{
+            if (this.refs.carousel.refs.dropzone && !this.refs.carousel.refs.dropzone.length) {
+                var dropzones = [this.refs.carousel.refs.dropzone]
+            } else {
+                var dropzones = this.refs.carousel.refs.dropzone
+            }
+                dropzones.map(dropzone => {
+                    dropzone.on('prepared', (files)=>{
+                        console.log(files);
+                        this.content.slides[dropzone.opts.index].image = files.data[0].data
+                        let formdata = new FormData()
+                        formdata.append('image', files.files[0])
+                        upload(formdata)
+                        this.update()
+                    })
+                })
+        })
+
+        addSlide(e) {
+            this.content.slides.push({text: 'Beschreib mich', image: ''})
+            // this.refs.carousel.update()
+        }
+
+        get() {
+            return Object.assign({}, this.opts.content, this.content)
+        }
+    </script>
+</page-module-carousel>

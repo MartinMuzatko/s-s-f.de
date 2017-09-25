@@ -1,0 +1,61 @@
+<modules-library>
+    <div class="modules-library">
+        <h2 class="modules-library__heading">Inhalts-Module</h2>
+        <span>Einfach per Drag & Drop in den Inhaltsbereich schieben</span>
+        <div ref="moduleList" class="modules-library__list">
+            <div data-template="{module.associatedTemplate}" class="modules-library__module" each={module in modules}>
+                <img src="{module.moduleIcon}" alt="" class="modules-library__icon">
+                <p class="modules-library__name">{module.title}</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        import dragula from 'dragula'
+        import {getModules} from '../../api'
+
+        this.on('mount', async () => {
+            this.allowedModulesCategories = this.opts.allowedModules.split(' ')
+            this.modules = await getModules()
+            this.modules = this.modules.filter(module=>{
+                return module.templateType
+                    .map(type=>!!~this.allowedModulesCategories.indexOf(type))
+                    .reduce((sum, item)=>{return sum && item}, true)
+                //this.allowedModulesCategories
+            })
+            this.update()
+        })
+
+        this.on('update', ()=>{
+            this.destroyDragDrop()
+            this.setupDragDrop()
+        })
+
+        destroyDragDrop() {
+            if (this.drake) {
+                this.drake.end()
+                this.drake.destroy()
+            }
+        }
+
+        setupDragDrop() {
+            this.drake = dragula([this.refs.moduleList, this.opts.dropTarget], {
+                copy: (el, source) => {
+                    return source === this.refs.moduleList
+                },
+                accepts: (el, target) => {
+                    return target !== this.refs.moduleList
+                },
+                moves: (el, source) => {
+                    return source !== this.opts.dropTarget
+                }
+            })
+            this.drake.on('drop', (el)=>{
+                //el.classList.remove('modules-library__module')
+                setTimeout(()=>{
+                    el.remove()
+                    this.trigger('module-added', el.dataset.template)
+                }, 100);
+            })
+        }
+    </script>
+</modules-library>
