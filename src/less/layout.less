@@ -67,28 +67,39 @@
 }
 
 .field-group {
+    width: 100%;
 	display: flex;
 	margin: 1em 0;
-	> label {
-        padding: .25em .5em;
-        background-color: fadeout(@color-primary-light, 20%);
+    overflow: hidden;
+    border-radius: .25em;
+    border-bottom: 1px solid @color-primary;
+    //box-shadow: 0 1px 0 1px fadeout(@color-dark-shadow, 10%);
+    &__label {
+        padding: 1em 2em;
+        background-color: ;
+        color: @color-primary;
         min-width: 10em;
         word-break: break-all;
-		display: block;
-		padding-right: 1em;
-        small {
-            display: block;
-        }
-	}
-	&--centered {
-		> label {
-			flex: 0 0 50%;
-		}
-        > input {
-            flex: 1;
-            width: 100%;
-        }
-	}
+        display: block;
+        padding-right: 1em;
+        flex-grow: 1;
+        background-image: linear-gradient(
+            to top,
+            @color-dark 10%,
+            lighten(@color-dark, 10%) 80%,
+            lighten(@color-dark, 10%) 100%
+        );
+        @size: .33em;
+        box-shadow:
+            inset 0 @size @size -@size @color-light-shadow,
+            inset 0 -@size @size -@size darken(@color-light-shadow, 50%);
+    }
+    &__input {
+        padding: 1em 2em;
+        flex-grow: 1;
+        background-color: @color-light;
+        border: 0;
+    }
 }
 
 .text-or {
