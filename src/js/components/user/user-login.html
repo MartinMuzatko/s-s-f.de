@@ -1,0 +1,18 @@
+<user-login>
+    <yield>
+    <script>
+        import debounce from 'debounce'
+        import {getUserAvatar} from '../../api'
+
+
+        this.on('mount', ()=>{
+            const debouncedUpdate = debounce(this.updateAvatar, 500)
+            this.refs.username.addEventListener('input', debouncedUpdate)
+        })
+
+        async updateAvatar() {
+            const username = this.refs.username.value.length ? encodeURIComponent(this.refs.username.value) : 'guest'
+            this.refs.avatar.src = await getUserAvatar(username)
+        }
+    </script>
+</user-login>

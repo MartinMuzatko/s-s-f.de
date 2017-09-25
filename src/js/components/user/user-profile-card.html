@@ -1,0 +1,29 @@
+<user-profile-card>
+    <div class="user-profile-card {opts.clubNumber.length ? 'user-profile-card--club-member' : ''}">
+        <a href="{opts.link}" title="zum Profil von {opts.username}">
+            <h3 class="user-profile-card__name">{opts.username}</h3>
+            <img class="user-profile-card__avatar" src="{opts.avatar}" alt="">
+        </a>
+        <div each={event in events}>
+            {event}
+        </div>
+        <div class="actions">
+            Nachricht | Edit
+        </div>
+    </div>
+    <script>
+        this.events = opts.events.split(',')
+    </script>
+    <style type="text/less">
+        @import "src/less/variables.less";
+        .actions {
+            background-color: darken(@color-primary-light-shadow, 20%);
+            color: @color-dark;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            left: 0;
+            padding: .25em;
+        }
+    </style>
+</user-profile-card>

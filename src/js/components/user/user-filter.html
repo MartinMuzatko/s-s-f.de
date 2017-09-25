@@ -1,0 +1,37 @@
+<user-filter>
+    <label>
+        {opts.label || 'Username'}
+        <ssf-suggestioninput ref="input" get-result-html={getUserHtml} suggestions={suggestions}></ssf-suggestioninput>
+    </label>
+    <script>
+        import '../ssf-suggestioninput.html'
+        import {getUsers} from '../../api'
+
+        this.users = []
+
+        this.getUserHtml = field => {
+            let user = this.users.find(user=>user.username == field)
+            return `
+                <div class="user-list" layout="row" layout-align="space-between center">
+                    <span class="user-list__username">${user.username}</span>
+                    <img class="user-list__avatar avatar avatar--round avatar--small" src="${user.avatar}">
+                </div>
+            `
+        }
+
+        this.on('mount', ()=>{
+            this.refs.input.on('suggest', this.updateSuggestionInput)
+        })
+
+        this.updateSuggestionInput = async (name) => {
+            let data = await getUsers(name)
+            this.users = data
+            this.refs.input.suggest(data.map(user=>user.username))
+        }
+
+        getUser() {
+            return this.refs.input.getInput()
+        }
+
+    </script>
+</user-filter>
