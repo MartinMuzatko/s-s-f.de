@@ -1,0 +1,73 @@
+<event-register>
+    <form ref="form" onsubmit={register} action="" method="POST" layout="column" layout-align="center center">
+        <input type="hidden" name="method" value="POST">
+        <div class="fieldset">
+            <label class="field-group">
+                <span class="field-group__label">
+                    Items
+                </span>
+                <div>
+                    <p each={item in items}>
+                        {item.title} - {item.sellPrice} €
+                        <input class="field-group__input" type="checkbox" onchange={checkItem} name="items[{item.name}]">
+                    </p>
+                </div>
+            </label>
+            <label class="field-group">
+                <span class="field-group__label">Auf Gasteliste sichtbar?</span>
+                <input class="field-group__input" checked type="checkbox" name="isGuest">
+            </label>
+            Confee: {conFee} €
+            <input class="button button--primary button--block button--big" type="submit" value="Für {opts.eventTitle} registrieren">
+        </div>
+    </form>
+    <ssf-dialog ref="dialog" size="small" type="success">
+        <div style="text-align:center">
+            <h2>Yay, du bist dabei!</h2>
+            <p>
+                Wir freuen uns, dass du beim {parent.opts.eventTitle} teilnimmst!
+            </p>
+            <p>Auf der nachsten Seite findest du alle Informationen wie Bezahlungsstatus.</p>
+            <p><a class="button button--primary" href="">{parent.ok}</a></p>
+        </div>
+    </ssf-dialog>
+    <script>
+        import '../ssf-dialog.html'
+        import {registerUser} from '../../api'
+        this.conFee = this.opts.ticketPrice
+        this.items = this.opts.items
+        this.items.map(item=>{item.checked = false})
+        this.ok = ['Cool!', 'Aye!', 'Genial!', 'Super!', 'Top!', 'Yay!', 'Ausgezeichnet!', 'Exzellent!', 'Phantastisch!', 'Fabelhaft!', 'Grandios!', 'Klasse!', 'Prachtvoll!', 'Wunderbar!']
+        this.ok = this.ok[Math.random()*this.ok.length | 0]
+
+        checkItem(e) {
+            e.item.item.checked = e.target.checked
+            console.log(this.items);
+            this.recalculate()
+        }
+
+        recalculate() {
+            console.log(this.items.filter(item=>item.checked));
+            this.conFee = parseInt(this.opts.ticketPrice) + this.getItemPriceSum()
+        }
+
+        getItemPriceSum() {
+            return this.items
+                .filter(item=>item.checked)
+                .reduce((sum,item)=>{return sum+parseInt(item.sellPrice)},0)
+        }
+
+        this.on('mount', ()=>{
+            this.refs.dialog.on('closed', ()=>{
+                location.reload()
+            })
+        })
+
+        async register(e) {
+            e.preventDefault()
+            this.refs.dialog.open()
+            await registerUser(this.opts.eventName, api.user.name, new FormData(this.refs.form))
+        }
+
+    </script>
+</event-register>
