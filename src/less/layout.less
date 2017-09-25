@@ -152,3 +152,19 @@
     object-fit: cover;
     object-position: center;
 }
+.event-list {
+    &__event {
+        border-radius: @radius-small;
+        margin: 1em;
+        background-color: @color-primary-light;
+    }
+}
+
+.event {
+    &__column {
+        padding: .5em;
+    }
+    &__column + &__column {
+        border-left: 1px solid @color-primary-dark;
+    }
+}
