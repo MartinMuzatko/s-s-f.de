@@ -2,7 +2,9 @@
     <div class={'editor-inactive' : opts.inactive}>
         <ssf-step-indicator ref="stepIndicator" steps={steps}></ssf-step-indicator>
         <form onsubmit={submit} method="POST" action="">
-            <div show={currentRoute == step.route} ref="{step.route}" each={step in steps} data-is={'event-edit-'+step.route}></div>
+            <div>
+                <div show={currentRoute == step.route} ref="{step.route}" each={step in steps} data-is={'event-edit-'+step.route}></div>
+            </div>
             <div if={refs.stepIndicator.steps} class="form-legend" layout="row" layout-align="space-between">
                 <a href="#{refs.stepIndicator.getPreviousStep().route}" flex-start if={!refs.stepIndicator.isFirstStep()} class="button">Voriger Schritt</a>
                 <a href="#{refs.stepIndicator.getNextStep().route}" flex-end if={!refs.stepIndicator.isLastStep()} class="button">Nächster Schritt</a>
@@ -10,10 +12,13 @@
             </div>
         </form>
     </div>
-    <style scoped>
+    <style>
         .editor-inactive {
             opacity: .33;
             pointer-events: none;
+        }
+        form {
+            padding: 1em;
         }
 
     </style>
@@ -56,24 +61,24 @@
         })
 
         submit(e) {
+            e.preventDefault()
+            let dates = this.refs.general.tags['event-duration-editor'].refs.date.datepicker
+            let [startDate, endDate] = dates.selectedDates.map(date=>dates.formatDate(date, 'U'))
             var data = {
-                startDate : this.refs.general.tags['event-duration-editor'].refs.date.date,
-                endDate : this.refs.general.tags['event-duration-editor'].refs.date.date,
+                startDate : startDate || 0,
+                endDate : endDate || 0,
                 title : this.refs.general.refs.title.value,
-                summary : this.refs.general.refs.summary.value,
+                summary : this.refs.general.refs.summary.getContent(),
                 street : this.refs.general.refs.street.value,
                 city : this.refs.general.refs.city.value,
                 zip : this.refs.general.refs.zip.value,
                 roles: [],
-                items: [this.refs.registration.refs.items.items],
-                ticketLimit : this.refs.general.refs.tickets.limit,
-                sellPrice: this.refs.general.refs.tickets.price,
+                items: this.refs.registration.refs.items.items,
+                ticketLimit : this.refs.registration.refs.tickets.limit,
+                sellPrice: this.refs.registration.refs.tickets.price,
             }
             console.log(data);
-            e.preventDefault()
             this.trigger('submit', data)
-            // var data = new FormData(e.currentTarget)
-            // console.log(data)
         }
 
 

@@ -15,7 +15,7 @@
         <p>Kurztext für die Übersicht</p>
         <label>
             Zusammenfassung
-            <input size="30" ref="summary" name="summary" type="text">
+            <ssf-editor ref="summary"></ssf-editor>
         </label>
     </div>
     <div layout="row">
@@ -47,6 +47,7 @@
     <script>
         import './event-duration-editor.html'
         import '../../ssf-map.html'
+        import '../../ssf-editor.html'
         import debounce from 'debounce'
 
         this.debouncedUpdate = debounce(()=>{
