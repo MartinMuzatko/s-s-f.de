@@ -14,6 +14,8 @@ $favicon = $homepage->logo->size(128,128)->httpUrl;
 
 include('_func.php');
 
+$events = new Events($this->wire);
+$this->wire('events', $events, true);
 
 if ($input->get->json) {
     include('json.php');

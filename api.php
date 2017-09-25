@@ -1,103 +1,267 @@
 <?php namespace ProcessWire;
 
-use \API\Events;
 use \API\Response;
-use \API\Event;
 use \API\Request;
 use \API\Router;
 use \API\Route;
 
+function getFieldValues($page, $fields)
+{
+    return array_map(
+        function($field) use ($page) {
+            if ($field->type instanceof FieldtypeImage) {
+                $image = $page->{$field->name};
+                if($image->count) {
+                    $image = $image instanceof Pageimages ? $image->first->httpUrl : $image->httpUrl;
+                } else {
+                    $image = '';
+                }
+                return [$field->name => $image];
+            }
+            if ($field->type instanceof FieldtypeRepeater) {
+                $repeaterPages = $page->{$field->name};
+                $repeaterFields = array_map(
+                    function($repeaterPage) {
+                        $fields = getFieldValues($repeaterPage, $repeaterPage->fields->getArray());
+                        return call_user_func_array('array_merge', $fields);
+                    },
+                    $repeaterPages->getArray()
+                );
+                return [$field->name => $repeaterFields];
+            }
+            return [$field->name => htmlentities($page->{$field->name})];
+        },
+        $fields
+    );
+}
+
 $router = new Router([
 
-    // EVENTS
+    new Route('GET', 'pages/([0-9]+)', function($path, $pageId) {
+        $page = $this->pages->get("id=$pageId");
+        $pages = array_map(
+            function($page) {
+                $data = ["template" => $page->template->name];
+                $fields = getFieldValues($page, $page->fields->getArray());
+                return array_merge($data, ...$fields);
+            },
+            $page->pageModules->getArray()
+        );
+        return $pages;
+    }),
+    new Route('GET', 'modules', function($path) {
+        $modules = array_map(
+            function($module) {
+                return [
+                    "title" => $module->title,
+                    "moduleIcon" => $module->moduleIcon ? $module->moduleIcon->size(128,128)->httpUrl : '',
+                    "summary" => $module->summary,
+                    "associatedTemplate" => $module->associatedTemplate,
+                    "templateType" => explode(' ', $this->templates->{$module->associatedTemplate}->tags),
+                ];
+            },
+            $this->pages->get("template=page-modules")->children->getArray()
+        );
+        return $modules;
+    }),
 
-    new Route('GET', 'events', function($path){
-        $events = new Events($path);
+
+    new Route('POST', 'pages/([0-9]+)', function($path, $pageId) {
+        $data = Request::getPayload();
+        if (!$data) {
+            return 'no data';
+            http_response_code(415);
+        }
+        $page = $this->pages->get("id=$pageId");
+        $contentPage = $this->pages->get('template=page-contents');
+        if (!$page instanceof Page) {
+            return 'no page with ID found';
+            http_response_code(415);
+        }
+        $module = new Page();
+        $module->parent = $contentPage;
+        $module->of(false);
+        $module->title = $page->title.'_'.$data->template;
+        $validTemplates = [''];
+        $module->template = $data->template;
+        array_map(
+            function($key, $value) use ($module) {
+                //get_class($module->{$key});
+                $module->{$key} = html_entity_decode($value);
+            },
+            array_keys((array) $data),
+            (array) $data
+        );
+        $module->save();
+        $page->of(false);
+        $page->pageModules->add($module);
+        $page->save();
+    }),
+
+    new Route('PUT', 'pages/([0-9]+)', function($path, $pageId) {
+        $data = Request::getPayload();
+        if (!is_array($data)) {
+            return 'no data';
+            http_response_code(415);
+        }
+        $page = $this->pages->get("id=$pageId");
+        $contentPage = $this->pages->get('template=page-contents');
+        if (!$page instanceof Page) {
+            return 'no page with ID found';
+            http_response_code(415);
+        }
+        $page->of(false);
+        $pages = $page->pageModules;
+        //$page->pageModules->removeAll();
+        foreach ($pages as $pageModule) {
+            $pageModule->delete(true);
+        }
+        // page deletion has to be made as a second call BEFORE creating page with same name again.
+        $page->save();
+
+        function setFieldValues($data, $page)
+        {
+            return array_map(
+                function($key, $value) use ($page) {
+                    if ($page->{$key} instanceof RepeaterPageArray) {
+                        $page->save();
+                        $repeaterItem = $page->{$key}->getNew();
+                        //$repeaterItem->of(false);
+                        array_map(function($val) use ($repeaterItem) {
+                            setFieldValues($val, $repeaterItem);
+                        }, $value);
+                        //$repeaterItem->parent = $page;
+                        $repeaterItem->save();
+                        $page->{$key}->add($repeaterItem);
+                        //$page->
+                    } else {
+                        $page->{$key} = html_entity_decode($value);
+                    }
+                },
+                array_keys((array) $data),
+                (array) $data
+            );
+        }
+
+        foreach ($data as $moduleData) {
+            $module = new Page();
+            $module->parent = $contentPage;
+            $module->of(false);
+            $validTemplates = [''];
+            $module->template = $moduleData->template;
+            $module->title = $page->title.'_'.$moduleData->template;
+            $module->save();
+            $page->pageModules->add($module);
+            $page->save();
+            setFieldValues($moduleData, $module);
+            $module->save();
+        }
+        $page->save();
+    }),
+
+    new Route('POST', 'test', function($path) {
+        \TD::dump($this->pages->get('/')->logo->pagefiles->path());
+        die;
+        $x = new WireUpload('image');
+        $x->setMaxFiles(1);
+        $x->setOverwrite(false);
+        $x->setValidExtensions(['jpg','png', 'jpeg', 'svg', 'pdf']);
+        $x->setDestinationPath('/Users/martinmuzatko/dev/http/s-s-f.de/site/assets/files/');
+        $y = $x->execute();
+        var_dump($y);
+        //var_dump($this->wire->input->post);
+    }),
+
+    new Route('GET', 'events', function($path) {
+        $events = new \API\Events($path);
         return $events->listEvents();
     }),
-    new Route('POST', 'events', function($path){
-        $x = Request::getPayload();
-        // var_dump($x);
-        die;
-        $events = new Events($path);
-        return $events->createEvent();
+    new Route('POST', 'events', function($path) {
+        return $this->events->createEvent(Request::getPayload());
     }),
 
         // EVENT
-        new Route('GET', 'events/([\w-]+)', function($path, $eventName){
-            $events = new Events($path);
+        new Route('GET', 'events/([\w-]+)', function($path, $eventName) {
+            $events = new \API\Events($path);
             return $events->getEvent($eventName);
         }),
-        new Route('PUT', 'events/([\w-]+)', function($path, $eventName){
-            $events = new Events($path);
+        new Route('PUT', 'events/([\w-]+)', function($path, $eventName) {
+            $events = new \API\Events($path);
             $eventData = $events->getEvent($eventName);
             if ($eventData) {
-                $event = new Event($eventData->page);
+                $event = new \API\Event($eventData->page);
                 return $event->updateEvent(Request::getPayload());
             }
             return false;
         }),
 
             // REGISTRATIONS
-            new Route('GET', 'events/([\w-]+)/registrations', function($path, $eventName){
-                $events = new Events($path);
-                $event = new Event($events->getEvent($eventName)->page);
+            new Route('GET', 'events/([\w-]+)/registrations', function($path, $eventName) {
+                $events = new \API\Events($path);
+                $event = new \API\Event($events->getEvent($eventName)->page);
                 $registrations = $event->getRegistrations();
                 return $registrations;
             }),
-            new Route('POST', 'events/([\w-]+)/registrations', function($path, $eventName){
-            }),
-            new Route('PUT', 'events/([\w-]+)/registrations', function($path, $eventName){
-            }),
                 // REGISTRATION
-                new Route('GET', 'events/([\w-]+)/registrations/([\w-]+)', function($path, $eventName, $userName){
+                new Route('POST', 'events/([\w-]+)/registrations/([\w-]+)', function($path, $eventName, $user) {
+                    $user = $this->users->get("name=$user");
+                    if ($user instanceof NullPage) {
+                        return false;
+                    }
+                    $this->wire->events->get("name=$eventName")->registerUser($user, $this->input->post);
+                }),
+                new Route('GET', 'events/([\w-]+)/registrations/([\w-]+)', function($path, $eventName, $userName) {
 
                 }),
-                new Route('PUT', 'events/([\w-]+)/registrations/([\w-]+)', function($path, $eventName, $userName){
-
+                new Route('PUT', 'events/([\w-]+)/registrations/([\w-]+)', function($path, $eventName, $userName) {
+                    $user = $this->users->get("name=$user");
+                    if ($user instanceof NullPage) {
+                        return false;
+                    }
+                    //$this->wire->events->get("name=$eventName")->unregisterUser($user);
+                }),
+                new Route('DELETE', 'events/([\w-]+)/registrations/([\w-]+)', function($path, $eventName, $userName) {
+                    $user = $this->users->get("name=$user");
+                    if ($user instanceof NullPage) {
+                        return false;
+                    }
+                    $this->wire->events->get("name=$eventName")->unregisterUser($user);
                 }),
 
             // ITEMS
-            new Route('GET', 'events/([\w-]+)/items', function($path, $eventName){
+            new Route('GET', 'events/([\w-]+)/items', function($path, $eventName) {
 
             }),
-            new Route('POST', 'events/([\w-]+)/items', function($path, $eventName){
+            new Route('POST', 'events/([\w-]+)/items', function($path, $eventName) {
 
             }),
                 // ITEM
-                new Route('GET', 'events/([\w-]+)/items/([\w-]+)', function($path, $eventName, $itemName){
+                new Route('GET', 'events/([\w-]+)/items/([\w-]+)', function($path, $eventName, $itemName) {
 
                 }),
-                new Route('PUT', 'events/([\w-]+)/items/([\w-]+)', function($path, $eventName, $itemName){
-
-                }),
-
-            // TICKETS
-            new Route('GET', 'events/([\w-]+)/tickets', function($path, $eventName){
-                $events = new Events($path);
-                $event = new Event($events->getEvent($event)->page);
-                $registrations = $event->getRegistrations();
-                return $registrations;
-            }),
-            new Route('POST', 'events/([\w-]+)/tickets', function($path, $eventName){
-
-            }),
-                // TICKET
-                new Route('GET', 'events/([\w-]+)/tickets/([\w-]+)', function($path, $eventName, $ticketName){
-
-                }),
-                new Route('PUT', 'events/([\w-]+)/tickets/([\w-]+)', function($path, $eventName, $ticketName){
+                new Route('PUT', 'events/([\w-]+)/items/([\w-]+)', function($path, $eventName, $itemName) {
 
                 }),
 
     // USERS
-    new Route('GET', 'users', function($path){
-        $users = new \API\Users();
-        return $users->getUsers();
-
+    new Route('GET', 'users', function($path) {
+        $nameFilter = $this->input->get->name;
+		$limit = $this->input->get->limit ? $this->input->get->limit : 10;
+		if ($nameFilter) {
+			$users = $this->users->find("username^=$nameFilter, limit=$limit");
+		} else {
+            $users = $this->users->find("limit=$limit");
+        }
+        return array_map(function($user) {return ["username"=>$user->username, "avatar"=>$user->avatar->size(32,32)->url];}, $users->getArray());
     }),
+        new Route('GET', 'users/getAvatar', function($path) {
+            $name = $this->input->get->name;
+            $user = $this->users->get("username|name|email=$name");
+            $user = $user instanceof NullPage ? $this->users->getGuestUser() : $user;
+            return $user->getAvatar(256);
+        }),
         // MESSAGES
-        new Route('GET', 'users/([\w-]+)/messages', function($path, $user){
+        new Route('GET', 'users/([\w-]+)/messages', function($path, $user) {
             //$user = $this->user;
             $mode = $this->input->get('mode');
             $user = $this->users->get("name=$user");
@@ -126,7 +290,8 @@ $router = new Router([
                 $messages->getArray()
             );
         }),
-        new Route('GET', 'users/([\w-]+)/messages/(\d+)', function($path, $user, $messageId){
+        // GET A SINGLE MESSAGE
+        new Route('GET', 'users/([\w-]+)/messages/(\d+)', function($path, $user, $messageId) {
             $user = $this->users->get("name=$user");
             $message = $user->getMessageById($messageId);
             $message->of(false);
@@ -142,7 +307,8 @@ $router = new Router([
                 "read" => $message->read
             ];
         }),
-        new Route('POST', 'users/([\w-]+)/messages', function($path, $receiver){
+        // WRITE A MESSAGE
+        new Route('POST', 'users/([\w-]+)/messages', function($path, $receiver) {
             //$user = $this->user;
             $resource = new \API\Resource($path);
             $data = $resource->getPayload();
@@ -169,28 +335,26 @@ $router = new Router([
             }
         }),
 
-    new Route('GET', 'sessions', function($path){
+    new Route('GET', 'sessions', function($path) {
         $user = new \API\User();
         return $user->getActiveSessions();
     }),
-    new Route('POST', 'session', function($path){
+    new Route('POST', 'session', function($path) {
         $user = new \API\User();
         $credentials = $user->getPayload();
         return $user->login($credentials->username, $credentials->password);
     }),
-    new Route('DELETE', 'session', function($path){
+    new Route('DELETE', 'session', function($path) {
         $user = new \API\User();
         return $user->logout();
     }),
-    new Route('GET', 'users/getSpecies', function($path){
+    new Route('GET', 'users/getSpecies', function($path) {
         $users = new \API\Users();
         return $users->getAllSpecies();
 
     }),
 ]);
 $data = true;
-
-
 try {
     $data = $router->execute($input->urlSegmentStr);
     try {
@@ -203,7 +367,7 @@ try {
                 throw new \Exception('not logged in');
             }
         }
-    } finally {
+    } catch(\Exception $e) {
         header('WWW-Authenticate: Basic realm="SüdStaaten Furs"');
         http_response_code(401);
     }
