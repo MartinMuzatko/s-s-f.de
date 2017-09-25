@@ -1,31 +1,13 @@
-/*
-c-button(@color, @type)
 
-Creates a Button
 
-@type 	-
-@color 	- any color
-
-Styleguide Button - Mixin
-*/
-
-// .button {
-//     cursor: pointer;
-//     padding: .5em 2em;
-//     display: inline-block;
-//     text-decoration: none;
-//     border: 0;
-//     border-radius: .25em;
-//     transition: all .25s ease-out;
-// }
-
-.c-button(@color: none, @type: none) {
-
-    & when (@type = none) {
-        cursor: pointer;
-        padding: .5em 2em;
-        display: inline-block;
-        text-decoration: none;
+.button {
+    cursor: pointer;
+    padding: .5em 2em;
+    display: inline-block;
+    text-decoration: none;
+    border: 0;
+    color: @color-dark;
+    &--primary {
         color: @color-primary;
         background-size: 100% 200%;
         background-position: 0 -100%;
@@ -37,8 +19,7 @@ Styleguide Button - Mixin
             darken(@color-primary, 10%) 50%,
             lighten(@color-primary, 10%) 90%,
             lighten(@color-primary, 10%) 90%
-        );
-        border: 0;
+            );
         border-bottom: 1px solid @color-primary;
         @size: .33em;
         box-shadow:
@@ -52,12 +33,18 @@ Styleguide Button - Mixin
         }
     }
 
-    & when not (@type = none) {
-        // Put specific styling here
+    &--big {
+        padding: 1em 2em;
     }
 
-    & when not (@color = none) {
-        background-image: linear-gradient(to top, @color, lighten(@color, 20%));
+    &--subtle {
+        background: none;
+        border: none;
+        box-shadow: none;
+        color: @color-dark;
     }
 
+    &--round {
+        border-radius: 100%;
+    }
 }

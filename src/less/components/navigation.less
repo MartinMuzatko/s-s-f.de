@@ -20,10 +20,24 @@ Styleguide Navigation - Mixin
         );
         border-bottom: 2px solid @color-primary;
         background-color: @color-dark;
+        .navigation__image {
+            margin-right: .5em;
+            display: flex;
+        }
         .navigation__item {
+            padding: .5em 1em;
+            @media screen and (min-width: @breakpoint-md) {
+                padding: .5em 1.5em;
+            }
+            @media screen and (min-width: @breakpoint-lg) {
+                padding: .5em 2em;
+            }
             color: @color-primary;
             border-bottom: none;
             display: flex;
+            align-items: center;
+            align-content: center;
+            justify-content: space-between;
             border-radius: 0;
             border-left: 1px solid hsl(0, 0%, 13%);
             border-right: 1px solid #444;
@@ -38,10 +52,6 @@ Styleguide Navigation - Mixin
             }
         }
 
-    }
-
-    & when not (@type = none) {
-        // Put specific styling here
     }
 
 }
