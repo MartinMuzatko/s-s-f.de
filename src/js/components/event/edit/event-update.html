@@ -1,16 +1,19 @@
 <event-update>
+    <h1 class="heading heading--menu">Event bearbeiten</h1>
     <event-editor ref="editor"></event-editor>
     <script>
         import './event-editor.html'
+        import {getEventData} from '../../../api'
 
-        this.refs.editor.on('submit', (data)=>{
-            this.updateEvent(data)
+        this.on('mount', async ()=>{
+            this.refs.editor.on('submit', (data)=>{
+                this.updateEvent(data)
+            })
+
+            var x= await getEventData(this.opts.eventName)
+            console.log(x);
+
         })
-
-        this.getEventData = async() => {
-            var response = await fetch(`/s-s-f.de/api/events/${opts.eventName}`, {method: 'GET', body: JSON.stringify(data)})
-            return response.json()
-        }
 
         this.updateEvent = async (data) => {
             var response = await fetch('/s-s-f.de/api/events/', {method: 'PUT', body: JSON.stringify(data)})

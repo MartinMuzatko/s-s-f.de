@@ -49,11 +49,5 @@
             this.isIntroVisible = false
         }
 
-        this.createEvent = async (data) => {
-            var response = await fetch('/s-s-f.de/api/events/', {method: 'POST', body: JSON.stringify(data)})
-            var x = await response.text()
-            console.log(x);
-        }
-
     </script>
 </event-create>

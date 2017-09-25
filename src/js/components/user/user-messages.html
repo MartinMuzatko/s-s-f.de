@@ -34,6 +34,7 @@
         import route from 'riot-route'
         import './user-message-send.html'
         import '../raw.html'
+        import {readMessage, getMessages} from '../../api'
 
         const COMPOSE_RETURN_ROUTE = 'inbox'
 
@@ -42,7 +43,7 @@
         route('inbox', async (name)=>{
             this.messageShown = false
             this.activeRoute = 'inbox'
-            this.messages = await this.getMessages('inbox')
+            this.messages = await getMessages(api.user.name, 'inbox')
             this.refreshUnreadMessagesCount()
             this.update()
         })
@@ -50,7 +51,7 @@
         route('inbox/*', async (id)=>{
             this.activeRoute = 'inbox'
             this.messageShown = this.getMessageById(id)
-            await this.readMessage(id)
+            await readMessage(api.user.name, id)
             this.messageShown.read = 1
             this.refreshUnreadMessagesCount()
             this.update()
@@ -59,7 +60,7 @@
         route('outbox', async ()=>{
             this.messageShown = false
             this.activeRoute = 'outbox'
-            this.messages = await this.getMessages('outbox')
+            this.messages = await getMessages(api.user.name, 'outbox')
             this.update()
         })
 
@@ -88,12 +89,6 @@
 
         this.getReadMessages
 
-        async readMessage(id) {
-            var response = await fetch(`/s-s-f.de/api/users/${api.user.name}/messages/${id}`, {credentials: 'same-origin'})
-            return response.json()
-        }
-
-
         this.on('mount', async ()=>{
             route(this.activeRoute)
             route.start(true)
@@ -101,10 +96,5 @@
                 route(COMPOSE_RETURN_ROUTE)
             })
         })
-
-        async getMessages(route = 'inbox') {
-            var response = await fetch(`/s-s-f.de/api/users/${api.user.name}/messages?mode=${route}`, {credentials: 'same-origin'})
-            return response.json()
-        }
     </script>
 </user-messages>
