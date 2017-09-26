@@ -190,6 +190,26 @@
     object-fit: cover;
     object-position: center;
 }
+.notification {
+    border-radius: @radius-small;
+    border: 1px solid;
+    padding: 1em 2em;
+    margin: 2em 0;
+    &--error {
+        background-color: @color-error-subtle;
+        border-color: @color-error;
+        box-shadow: 0 0 0 .25em @color-error-subtle;
+        color: @color-dark;
+        text-shadow: 1px 0 .25em @color-light-shadow;
+    }
+    &--success {
+        background-color: @color-success-subtle;
+        border-color: @color-success;
+        box-shadow: 0 0 0 .25em @color-success-subtle;
+        color: @color-dark;
+        text-shadow: 1px 0 .25em @color-light-shadow;
+    }
+}
 .event-list {
     &__event {
         border-radius: @radius-small;
