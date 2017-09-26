@@ -222,6 +222,41 @@
     }
 }
 
+
+.presence {
+    position: relative;
+    &__bubble {
+        border-radius: 100%;
+        position: absolute;
+        font-size: .5em;
+        line-height: 1;
+        padding: .25em;
+        font-size: .5em;
+        width: 2em;
+        height: 2em;
+        display: flex;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
+        &--right {
+            right: 0;
+        }
+        &--left {
+            left: 0;
+        }
+        &--top {
+            top: 0;
+        }
+        &--bottom {
+            bottom: 0;
+        }
+    }
+    &__messages {
+        background-color: @color-member;
+        color: @color-light;
+    }
+}
+
 .notification {
     border-radius: @radius-small;
     border: 1px solid;
