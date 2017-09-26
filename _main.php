@@ -46,14 +46,22 @@ $content = ob_get_clean();
 <body claass="<?=$page->template->name?>">
     <div class="site__container">
         <header class="site__header">
-            <div class="site__logo">
-                <img src="<?=$homepage->logo->height(160)->url?>" alt="">
-                <span class="site__title">SSF - Die Südstaaten Furs</span>
-            </div>
+            <a href="<?=$config->urls->root?>" class="site__logo">
+                <img class="logo" src="<?=$homepage->logo->height(160)->url?>" alt="">
+                <div class="site__title">
+                    <div class="js-fitty">SSF - Die Südstaaten Furs</div>
+                </div>
+            </a>
+            <!-- <img src="<?=$config->urls->templates?>dist/images/home.svg" alt=""> -->
             <nav layout="row" layout-align="space-between" class="site__nav navigation">
                 <div layout="row">
                     <? foreach($homepage->and($homepage->children) as $child):?>
-                        <a class="button navigation__item" href="<?=$child->url?>"><?=$child->title?></a>
+                        <a class="button navigation__item" href="<?=$child->url?>">
+                            <span class="navigation__image">
+                                <?=file_get_contents('dist/images/'.$child->name.'.svg')?>
+                            </span>
+                            <span class="navigation__page"><?=$child->title?></span>
+                        </a>
                     <? endforeach;?>
                 </div>
                 <div layout="row" layout-align="center center" class="navigation--item">
@@ -73,7 +81,13 @@ $content = ob_get_clean();
                             </div>
                         </user-profile-dropdown>
                     <?else:?>
-                        <a class="button navigation__item" href="<?=$pages->get('/users/login')->url?>"><?=$pages->get('/users/login')->title?></a>
+                        <a class="button navigation__item" href="<?=$pages->get('/users/login')->url?>">
+                            <span class="navigation__image">
+                                <?=file_get_contents('dist/images/login.svg')?>
+                            </span>
+                            <span class="navigation__page"><?=$pages->get('/users/login')->title?></span>
+
+                        </a>
                     <?endif?>
                 </div>
             </nav>
