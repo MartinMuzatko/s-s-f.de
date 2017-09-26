@@ -173,8 +173,7 @@ $router = new Router([
     }),
 
     new Route('GET', 'events', function($path) {
-        $events = new \API\Events($path);
-        return $events->listEvents();
+        return $this->events->listEvents();
     }),
     new Route('POST', 'events', function($path) {
         return $this->events->createEvent(Request::getPayload());
@@ -182,12 +181,11 @@ $router = new Router([
 
         // EVENT
         new Route('GET', 'events/([\w-]+)', function($path, $eventName) {
-            $events = new \API\Events($path);
-            return $events->getEvent($eventName);
+
+            return $this->events->getEvent($eventName);
         }),
         new Route('PUT', 'events/([\w-]+)', function($path, $eventName) {
-            $events = new \API\Events($path);
-            $eventData = $events->getEvent($eventName);
+            $eventData = $this->events->getEvent($eventName);
             if ($eventData) {
                 $event = new \API\Event($eventData->page);
                 return $event->updateEvent(Request::getPayload());
