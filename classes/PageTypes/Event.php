@@ -15,6 +15,12 @@ class Event extends Page {
         parent::__construct($tpl);
 	}
 
+	public function getAddress()
+	{
+		//Format: Ostendstraße 20, 70190 Stuttgart, Germany
+		return $this->street.', '.$this->zip.' '.$this->city.', '.$this->country->name;
+	}
+
     public function getRegistrations($selector = '')
     {
         return $this->getRegistrationsPage()->find($selector);
@@ -112,6 +118,17 @@ class Event extends Page {
             return (bool) $isRegOpen;
         }
     }
+
+	public function isRegistrationOver()
+	{
+		$registrations = $this->getRegistrationsPage();
+		$endTimestamp = $registrations->getUnformatted('endDate');
+		if (strlen($endTimestamp)) {
+			return time() > $endTimestamp;
+		} else {
+			return (bool) $registrations->isRegistrationOpen;
+		}
+	}
 
     public function isRegistrationClosed()
     {
