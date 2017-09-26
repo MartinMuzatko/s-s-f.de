@@ -92,17 +92,25 @@ $content = ob_get_clean();
                 </div>
             </nav>
         </header>
-        <!-- <a href="" class="button button-dark">Miau</a> -->
         <main class="site__content">
             <article>
-                <h1><?=$page->title?></h1>
-                <br>
                 <?=$content?>
             </article>
             <a href="<?=$page->editUrl?>">Edit <?=$page->title?></a>
         </main>
         <footer class="site__footer">
-            SSF - Südstaaten Furs &copy; 2017
+            <p>SSF - Südstaaten Furs &copy; 2017</p>
+            <p>Uneingetragener Verrein zur Förderung antropomorpher Künste</p>
+            <p>
+                <?php
+                    $resource = new \API\Resource('');
+                    $sessions = $resource->getActiveSessions();
+                ?>
+                <h4>Eingeloggte User</h4>
+                <? foreach($sessions as $session): ?>
+                    <?=$session['user_name']?>
+                <? endforeach;?>
+            </p>
         </footer>
     </div>
     <? if(!$user->isLoggedin()): ?>
@@ -112,7 +120,7 @@ $content = ob_get_clean();
                 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
             })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-            ga('create', 'UA-52989130-5', 'auto');
+            ga('create', '', 'auto');
             ga('send', 'pageview');
         </script>
     <? endif; ?>
@@ -120,7 +128,10 @@ $content = ob_get_clean();
         window.api = {}
         Object.assign(window.api, <?=json_encode(
             [
-                "user" => $user->name,
+                "user" => [
+                    "name" => $user->name,
+                    "username" => $user->username
+                ],
                 "url" => $config->urls->root
             ]
         )?>)
@@ -130,11 +141,11 @@ $content = ob_get_clean();
         function googleSignIn(googleUser) {
             api.google.trigger('signIn', googleUser)
         }
-        function initMap(map) {
-            api.google.trigger('mapInit', map)
+        function initApi(map) {
+            api.google.trigger('initApi', map)
         }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=<?=$homepage->googleMapsAPIKey?>&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=<?=$homepage->googleMapsAPIKey?>&callback=initApi" async defer></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 </body>
 </html>
