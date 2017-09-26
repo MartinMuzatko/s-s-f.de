@@ -10,7 +10,7 @@
             if (window.google) {
                 this.setupMap()
             } else {
-                window.api.google.on('mapInit', this.setupMap)
+                window.api.google.on('initApi', this.setupMap)
             }
         })
         this.setupMap = () => {

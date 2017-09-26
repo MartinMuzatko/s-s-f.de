@@ -1,0 +1,30 @@
+<ssf-location-distance>
+    <div>{distance.text}</div>
+    <script>
+        this.distance = {text: '... km'}
+        this.on('mount', ()=>{
+            if (window.google) {
+                this.getDistance()
+            } else {
+                window.api.google.on('initApi', this.getDistance)
+            }
+        })
+
+        getDistance() {
+            if (this.opts.to.length) {
+                this.service = new google.maps.DistanceMatrixService()
+                this.service.getDistanceMatrix(
+                    {
+                        origins: [this.opts.from],
+                        destinations: [this.opts.to],
+                        travelMode: 'DRIVING'
+                    }, (res,stat) => {
+                        this.distance = res.rows[0].elements[0].distance
+                        this.update()
+                    }
+                )
+            }
+        }
+
+    </script>
+</ssf-location-distance>

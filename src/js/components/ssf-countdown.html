@@ -4,7 +4,7 @@
     </div>
     <div class="{timeLeft >= 0 ? 'show' : 'hide'}">
         <yield from="before" />
-        <div class="countdown">
+        <div class="countdown {opts.size ? 'countdown--'+opts.size : ''}">
             <div class="countdown__item" each={time in times}>
                 <div class="countdown__number">
                     <span class="button button--primary" each={number in time.number.split('')}>
@@ -30,7 +30,6 @@
 
         this.on('mount', ()=>{
             this.to = this.opts.to
-            this.to = new Date().getTime() + 5000
             this.i = 0
             this.now = new Date().getTime()
             this.timeLeft = this.getTimeLeft(this.to)
