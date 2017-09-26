@@ -12,8 +12,8 @@
         <a href="<?=$event->guestlist->url?>" class="button button--secondary">Gästeliste</a>
         <a href="<?=$event->registration->url?>" class="button button--primary">Jetzt Registrieren</a>
     </div>
-<? elseif(!$event->isRegistrationOpen() && !$event->isEventOver()): ?>
-    <ssf-countdown to="<?=$event->getRegistrationsPage()->getUnformatted('startDate')?>000">
+<? elseif(!$event->isRegistrationOpen() && !$event->isRegistrationOver() && !$event->isEventOver()): ?>
+    <ssf-countdown size="small" to="<?=$event->getRegistrationsPage()->getUnformatted('startDate')?>000">
         <yield to="before">
             <p>
                 Die Registrierung ist noch nicht offen.
@@ -26,5 +26,9 @@
                 <a href="<?=$event->registration->url?>" class="button button--primary">Jetzt Registrieren</a>
             </p>
         </yield>
+    </ssf-countdown>
+<? elseif($event->isRegistrationOver() && !$event->isEventRunning()): ?>
+    <p>Die Registrierung ist bereits geschlossen. Das Event startet am <?=$event->startDate?></p>
+    <ssf-countdown size="small" to="<?=$event->getUnformatted('startDate')?>000">
     </ssf-countdown>
 <? endif ?>
