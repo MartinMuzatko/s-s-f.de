@@ -16,6 +16,13 @@ class Resource extends Wire
         $this->pages = $this->wire('pages');
         $this->modules = $this->wire('modules');
         $this->page = $this->pages->get('/'.$path);
+        $this->users = \ProcessWire\wire('users');
+        $this->user = \ProcessWire\wire('user');
+        $this->sanitizer = \ProcessWire\wire('sanitizer');
+        $this->session = \ProcessWire\wire('session');
+        $this->input = \ProcessWire\wire('input');
+        $this->fields = \ProcessWire\wire('fields');
+        $this->templates = \ProcessWire\wire('templates');
 
     }
 
