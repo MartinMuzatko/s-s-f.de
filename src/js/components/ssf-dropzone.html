@@ -1,16 +1,23 @@
 <ssf-dropzone>
-    <form drop={prepareFiles} class="dropzone" ref="dropzone">
-        <input onchange={prepareFiles} type="file" name="files[]" multiple />
+    <form drop={prepareFiles} class="dropzone" ref="dropzone" style="background-image: url({multiple ? '' : fileData[0].data })">
+        <label for="file" class="dropzone__label">
+            Wähle ein Bild aus, oder ziehe es in die Box
+        </label>
+        <input id="file" class="dropzone__input" onchange={prepareFiles} type="file" name="files[]" multiple />
+        <div if={fileData.length && multiple}>
+            {fileData.length} Dateien hochladen
+        </div>
     </form>
-    <div if={opts.show} each={file in fileData}>
+    <div if={show && multiple} each={file in fileData}>
         <img width="128" src="{file.data}" alt="{file.file.name}">
         {file.file.name} - {file.file.size / 1000} KB
     </div>
     <script>
 
         this.files = []
-        this.opts.multiple = false
-        this.opts.show = false
+        this.multiple = this.opts.multiple == ''
+        this.show = this.opts.show == ''
+        console.log(this.opts);
         this.on('mount', ()=>{
             let methods = 'drag dragstart dragend dragover dragenter dragleave drop'.split(' ')
             methods.map(
@@ -46,12 +53,6 @@
 
                 reader.readAsDataURL(file);
             })
-
-            //this.traverseFiles(files)
-        }
-
-        traverseFiles(files) {
-            console.log(files);
         }
     </script>
 </ssf-dropzone>
