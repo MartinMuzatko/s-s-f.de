@@ -5,6 +5,7 @@ var cssnano = require('cssnano')
 var ExtractTextPlugin = require("extract-text-webpack-plugin")
 var BrowserSyncPlugin = require('browser-sync-webpack-plugin')
 var path = require('path')
+var WebpackPwaManifest = require('webpack-pwa-manifest')
 
 
 var postcssSetup = {
@@ -16,14 +17,18 @@ var postcssSetup = {
 
 module.exports = {
 
-    entry: "./src/index.js", // string | object | array
+    entry: {
+		main: './src/main.js',
+		// vendor: './src/vendor.js',
+		// admin: './src/admin.js',
+	},
     // Here the application starts executing
     // and webpack starts bundling
 
     output: {
         path: path.resolve(__dirname, 'dist'), // string
         filename: "[name].js", // string
-        publicPath: '../../src/', // string
+        publicPath: '../../dist/', // string
     },
 
     module: {
@@ -33,8 +38,8 @@ module.exports = {
             //{ test: /\.js$/, loader: 'source-map', enforce: 'pre' },
             { test: /\.html$/, loader: ['riotjs'], enforce: 'pre' },
             { test: /\.js|\.html$/, loader: 'babel', options: { presets: ['es2015-riot', 'es2017'] }},
-            { test: /\.(jpe?g|png|gif)$/i, loader: 'file', options: {name: 'images/[name].[ext]'}},
-            { test: /\.ttf$/, loader: `file`, options: {name:'fonts/[name].[ext]'}},
+			{ test: /\.(jpe?g|png|gif|svg)$/i, loader: 'file', options: {name: 'images/[name].[ext]'}},
+            { test: /\.(ttf|woff|eot)$/, loader: `file`, options: {name:'fonts/[name].[ext]'}},
             {
                 test: /\.less$/, use: ExtractTextPlugin.extract(
                     [
@@ -55,6 +60,14 @@ module.exports = {
                     ]
                 ),
             },
+			{
+				test: /\.css$/, use: ExtractTextPlugin.extract(
+                    [
+                        {loader:'css'},
+                        {loader:'postcss', options: postcssSetup},
+                    ]
+                ),
+			}
         ],
 
     },
@@ -67,6 +80,7 @@ module.exports = {
         new ExtractTextPlugin("css/[name].css"),
 		new webpack.ProvidePlugin({
 			riot: 'riot',
+			// route: 'riot-route',
             regeneratorRuntime: 'regenerator-runtime'
 		}),
         new BrowserSyncPlugin({
@@ -78,13 +92,25 @@ module.exports = {
             //server: { baseDir: ['public'] }
             proxy: 'http://localhost:8888/'
         }),
+		new WebpackPwaManifest({
+			fingerprints: false,
+			name: 'SSF - Die Südstaaten Furs',
+			short_name: 'südstaatenfurs',
+			description: 'Alles um Events für Furries im Raum Baden-Württemberg und Umgebung',
+			background_color: '#F9C842',
+			icons: [
+				{
+					src: path.resolve('src/images/logo.png'),
+					sizes: [96, 128, 192, 256, 384, 512] // multiple sizes
+				}
+			]
+		})
 
-        // new webpack.optimize.UglifyJsPlugin({
-        //     compress: {
-        //         sourceMap: true,
-        //         warnings: false,
-        //     },
-        // }),
+		// new webpack.optimize.UglifyJsPlugin({
+		// 	output: {
+		// 		"ascii_only": true
+		// 	}
+		// })
     ],
 
     devtool: "source-map", // enum
