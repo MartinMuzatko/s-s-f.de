@@ -31,11 +31,11 @@
                 </div>
             <? endif ?>
             <label class="field-group" for="username">
-                <span class="field-group__label">Nick / E-Mail</span>
+                <span class="field-group__label field-group__label--dark">Nick / E-Mail</span>
                 <input ref="username" class="field-group__input" type="text" name="username" required autocomplete autofocus value="<?=$input->post->username?>">
             </label>
             <label class="field-group">
-                <span class="field-group__label">Passwort</span>
+                <span class="field-group__label field-group__label--dark">Passwort</span>
                 <input class="field-group__input" type="password" name="password" autocomplete required value="">
             </label>
             <input class="button button--primary button--block button--big" type="submit" value="Login">

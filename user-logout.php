@@ -1,6 +1,3 @@
-<?php namespace ProcessWire;?>
-
-<? if($user->isLoggedIn()): ?>
-    Bye <?=$user->name?>
-<? endif;?>
-<? $session->logout(); ?>
+<?php namespace ProcessWire;
+$session->logout();
+$session->redirect($pages->get('/')->url);
