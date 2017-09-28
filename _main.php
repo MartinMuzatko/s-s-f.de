@@ -100,7 +100,7 @@ $content = ob_get_clean();
         </main>
         <footer class="site__footer">
             <p>SSF - Südstaaten Furs &copy; 2017</p>
-            <p>Uneingetragener Verrein zur Förderung antropomorpher Künste</p>
+            <p>Verrein zur Förderung antropomorpher Künste</p>
             <p>
                 <?php
                     $resource = new \API\Resource('');
