@@ -13,7 +13,9 @@
         }
     ],
     "autoload": {
-        "psr-4": {"API\\": "classes/API"}
+        "psr-4": {"API\\": "classes/API", "ProcessWire\\": "classes/PageTypes"}
     },
-    "require": {}
+    "require": {
+        "google/apiclient": "^2.2"
+    }
 }
