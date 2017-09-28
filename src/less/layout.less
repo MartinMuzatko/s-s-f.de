@@ -58,6 +58,7 @@
     }
 
     &__content {
+        margin-top: .25em;
         position: relative;
         padding: 0;
         border-radius: 0 0 .1em .1em;
@@ -71,6 +72,7 @@
         color: @color-light;
         background-color: @color-dark;
         padding: 2em 1em;
+        font-size: .8em;
     }
 }
 
@@ -261,6 +263,50 @@
         background-color: @color-member;
         color: @color-light;
     }
+}
+
+.message-list {
+    &__message {
+        &--read {
+
+        }
+        &--unread {
+            font-weight: 700;
+        }
+    }
+}
+
+.navigation__item:hover {
+    .navigation__image {
+        .fil0,.fil1 {
+            fill: @color-primary;
+        }
+    }
+}
+
+.svg {
+    @size: 1.25em;
+    width: @size;
+    height: @size;
+    .str0 {
+        stroke: @color-dark;
+    }
+    .str1 {
+        stroke: @color-dark;
+    }
+    .fil0 {
+        fill: @color-light;
+    }
+
+    .fil1 {
+        fill: @color-light;
+    }
+}
+
+
+.fieldset {
+    padding: 2em;
+    background-color: @color-primary-light-shadow;
 }
 
 .notification {
