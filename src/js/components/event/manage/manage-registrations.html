@@ -12,28 +12,25 @@
     <table>
         <thead>
             <th><input onchange={checkAll} type="checkbox"></th>
-            <th>Nick</th>
-            <th>Rolle</th>
-            <th>Bezahlt</th>
-            <th>Betrag</th>
-            <th>Neu</th>
-            <th>Geldliste</th>
-            <th>Barzahler</th>
-            <th>Aktiv</th>
-            <th>Warteliste</th>
+            <th onclick={sortByField} each={label in labels}>
+                {label.name}
+                <span if={sortMode == label.name}>V</span>
+                <span if={sortMode == '-'+label.name}>^</span>
+                <span if={!~sortMode.indexOf(label.name)}>-</span>
+            </th>
         </thead>
         <tbody>
             <tr each={user in users}>
-                <td><input type="checkbox" checked={user.checked}></td>
-                <td><img class="avatar avatar--round avatar--small" width="16" height="16" src="/s-s-f.de/site/assets/files/1019/misan.32x32.jpg" alt="Misan"> {user.username}</td>
+                <td><input onchange={selectUser} type="checkbox" checked={user.checked}></td>
+                <td>{user.username}</td>
                 <td>{user.role}</td>
-                <td style={getPaidThreshold(user)}>{user.paid ? '✓' : getUserRegdate(user)}</td>
+                <td style={getPaidThreshold(user)}>{getUserRegdate(user) == -1 ? '✓' : getUserRegdate(user)}</td>
                 <td>{moneyFormat.to(user.price)}</td>
-                <td><input type="radio" name="{user.username}"></td>
-                <td><input type="radio" name="{user.username}"></td>
-                <td><input type="radio" name="{user.username}"></td>
-                <td><input type="radio" name="{user.username}"></td>
-                <td><input type="radio" name="{user.username}"></td>
+                <td><input type="radio" checked={user.status == 'Neu'} onchange={setStatus} data-status="Neu" name="{user.username}"></td>
+                <td><input type="radio" checked={user.status == 'Geldliste'} onchange={setStatus} data-status="Geldliste" name="{user.username}"></td>
+                <td><input type="radio" checked={user.status == 'Barzahler'} onchange={setStatus} data-status="Barzahler" name="{user.username}"></td>
+                <td><input type="radio" checked={user.status == 'Aktiv'} onchange={setStatus} data-status="Aktiv" name="{user.username}"></td>
+                <td><input type="radio" checked={user.status == 'Warteliste'} onchange={setStatus} data-status="Warteliste" name="{user.username}"></td>
             </tr>
         </tbody>
     </table>
@@ -46,18 +43,35 @@
         }
 
         getUserRegdate(user) {
-            return differenceInDays(new Date(), user.created)
+            if (user.status == 'Geldliste') {
+                return differenceInDays(new Date(), user.created)
+            } else if (user.status == 'Aktiv') {
+                return -1
+            } else {
+                return '-'
+            }
         }
 
         getPaidThreshold(user) {
-            if (user.paid) {
-                return `background-color: hsl(180, 50%, 80%)`
+            if (user.status == 'Bezahlt') {
+                return `background-color: hsl(180, 50%, 70%)`
+            } else if (user.status == 'Aktiv') {
+                return `background-color: hsl(120, 50%, 70%)`
+            } else if (user.status == 'Geldliste') {
+                let hueGradient = [0, 120]
+                let maxDays = 42
+                let hue = hueGradient[0] + hueGradient[1] / maxDays * (maxDays - differenceInDays(new Date(), user.created))
+                let background = `background-color: hsl(${hue}, 50%, 50%)`
+                return background
             }
-            let hueGradient = [0, 120]
-            let maxDays = 42
-            let hue = hueGradient[0] + hueGradient[1] / maxDays * (maxDays - differenceInDays(new Date(), user.created))
-            let background = `background-color: hsl(${hue}, 50%, 50%)`
-            return background
+        }
+
+        selectUser(e) {
+            e.item.user.checked = e.target.checked
+        }
+
+        setStatus(e) {
+            e.item.user.status = e.item
         }
 
         checkAll(e) {
@@ -65,48 +79,89 @@
             this.users.map(user=>user.checked = e.target.checked)
         }
 
+        sortByField(event) {
+            let label = event.item.label
+            this.sortMode = this.sortMode.indexOf(label.name) == 0 ? `-${label.name}` : label.name
+            let mode = this.sortMode.indexOf('-') == 0
+            this.users.sort((a,b)=>{
+                a = label.sort(a)
+                b = label.sort(b)
+                if (a<b) {
+                    return mode ? -1 : 1
+                }
+                if (a>b) {
+                    return mode ? 1 : -1
+                }
+                return 0
+            })
+        }
+
+        this.sortMode = 'Nick'
+
+        this.labels = [
+            {name: 'Nick', sort: user=>user.username},
+            {name: 'Rolle', sort: user=>user.role},
+            {name: 'Bezahlt', sort: user=>this.getUserRegdate(user)},
+            {name: 'Betrag', sort: user=>user.price},
+            {name: 'Neu', sort: user=>user.status=='Neu'},
+            {name: 'Geldliste', sort: user=>user.status=='Geldliste'},
+            {name: 'Barzahler', sort: user=>user.status=='Barzahler'},
+            {name: 'Aktiv', sort: user=>user.status=='Aktiv'},
+            {name: 'Warteliste', sort: user=>user.status=='Warteliste'},
+        ]
+
         this.moneyFormat = moneyFormat
+
+        this.status = ['']
 
         this.users = [
             {
                 username: 'Misan',
                 role: 'Teilnehmer',
-                paid: false,
                 created: 1506100000000,
-                price: 40,
-                checked: false
+                price: 40.5,
+                checked: false,
+                status: 'Geldliste',
             },
             {
                 username: 'Pum',
                 role: 'Suiter',
-                paid: false,
                 created: 1505300000000,
-                price: 40,
-                checked: false
+                price: 45,
+                checked: false,
+                status: 'Geldliste',
             },
             {
                 username: 'BerkWolf',
                 role: 'Staff',
-                paid: false,
                 created: 1503300000000,
-                price: 40,
-                checked: false
+                price: 63,
+                checked: false,
+                status: 'Geldliste',
             },
             {
                 username: 'Milan',
                 role: 'Staff',
-                paid: false,
                 created: 1504600000000,
-                price: 40,
-                checked: false
+                price: 49,
+                checked: false,
+                status: 'Geldliste',
             },
             {
                 username: 'Minn',
                 role: 'Teilnehmer',
-                paid: true,
                 created: 1504600000000,
                 price: 40,
-                checked: false
+                checked: false,
+                status: 'Aktiv',
+            },
+            {
+                username: 'Lunos',
+                role: 'Security',
+                created: 1504600000000,
+                price: 40,
+                checked: false,
+                status: 'Neu',
             }
         ]
     </script>
