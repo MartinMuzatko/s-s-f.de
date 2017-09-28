@@ -33,7 +33,7 @@
 		<a class="button button--<?=$sort == '-startDate' ? 'primary' : 'secondary' ?>" href="<?=$page->url?>?sort=-startDate">Neueste zuerst</a>
 		<a class="button button--<?=$sort == 'startDate' ? 'primary' : 'secondary' ?>" href="<?=$page->url?>?sort=startDate">Älteste zuerst</a>
 	</div>
-
+</div>
 <div class="event-list">
 	<? foreach ($eventPages->sort($sort) as $event): ?>
 		<?

@@ -1,7 +1,10 @@
-<article class="event">
-    <h1 class="event__heading"><?=$page->title?></h1>
-    <p class="event__summary"><?=$page->summary?></p>
-    <div class="content" layout="row">
+<?php namespace ProcessWire; ?>
+<article class="event-view content content--padded">
+    <div class="event-view__heading">
+        <h1 class="event-view__title"><?=$page->title?></h1>
+        <p class="event-view__summary"><?=$page->summary?></p>
+    </div>
+    <div class="event-view__content" layout="row">
         <div layout="row" flex="75" layout-align="space-between">
             <div flex="45" class="text--centered">
                 <h2 class="text--centered heading heading--underlined">Programm & Verpflegung</h2>
