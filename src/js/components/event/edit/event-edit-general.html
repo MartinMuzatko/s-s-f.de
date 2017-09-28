@@ -1,54 +1,62 @@
 <event-edit-general>
-    <div class="field-group">
-        <label>
-            Titel
-            <input required ref="title" name="title" type="text">
-        </label>
-    </div>
-    <div class="field-group">
-        <label>
-            Logo
-            <input ref="logo" name="logo" type="file">
-        </label>
-    </div>
-    <div class="field-group">
-        <p>Kurztext für die Übersicht</p>
-        <label>
-            Zusammenfassung
-            <ssf-editor ref="summary"></ssf-editor>
-        </label>
-    </div>
-    <div layout="row">
-        <div flex="40">
-            <div class="field-group">
-                <label>
-                    Strasse
-                    <input oninput={updateMap} ref="street" name="street" type="text">
-                </label>
-            </div>
-            <div class="field-group">
-                <label>
-                    Ort
-                    <input oninput={updateMap} ref="city" name="city" type="text">
-                </label>
-            </div>
-            <div class="field-group">
-                <label>
-                    PLZ
-                    <input oninput={updateMap} ref="zip" name="zip" type="text">
-                </label>
-            </div>
+    <h2 class="heading text-or"><span>Beschreibung</span></h2>
+    <div layout="row" layout-align="space-between end">
+        <div flex="65">
+            <label class="field-group">
+                <span class="field-group__label field-group__label--primary">Titel</span>
+                <input class="field-group__input" type="text" name="title" required autofocus>
+            </label>
+            <label class="field-group" layout="column">
+                <span class="field-group__label field-group__label--primary">Zusammenfassung</span>
+                <ssf-editor ref="summary"></ssf-editor>
+            </label>
         </div>
-        <div flex="60">
+        <div flex="30" flex-end>
+            <label class="field-group" layout="column">
+                <span class="field-group__label field-group__label--primary">Logo</span>
+                <ssf-dropzone show></ssf-dropzone>
+            </label>
+        </div>
+    </div>
+    <h2 class="heading text-or"><span>Datum & Uhrzeit</span></h2>
+    <event-duration-editor ref="duration"></event-duration-editor>
+    <h2 class="heading text-or"><span>Location</span></h2>
+    <div layout="row" layout-align="space-between">
+        <div flex="30">
+            <label class="field-group">
+                <span class="field-group__label field-group__label--primary">Strasse</span>
+                <input oninput={updateMap} class="field-group__input" type="text" ref="street" name="street">
+            </label>
+            <label class="field-group">
+                <span class="field-group__label field-group__label--primary">Ort</span>
+                <input oninput={updateMap} class="field-group__input" type="text" ref="city" name="city">
+            </label>
+            <label class="field-group">
+                <span class="field-group__label field-group__label--primary">PLZ</span>
+                <input oninput={updateMap} class="field-group__input" type="text" ref="zip" name="zip">
+            </label>
+            <label class="field-group">
+                <span class="field-group__label field-group__label--primary">Land</span>
+                <select class="field-group__input">
+                    <option value="">Deutschland</option>
+                    <option value="">Österreich</option>
+                    <option value="">Schweiz</option>
+                </select>
+            </label>
+        </div>
+        <div flex="65">
             <ssf-map ref="map" zoom="12"></ssf-map>
         </div>
     </div>
-    <event-duration-editor ref="duration"></event-duration-editor>
     <script>
         import './event-duration-editor.html'
         import '../../ssf-map.html'
+        import '../../ssf-dropzone.html'
+        import '../../ssf-suggestioninput.html'
         import '../../ssf-editor.html'
         import debounce from 'debounce'
+
+        this.countries = ['Deutschland', 'Österreich', 'Schweiz']
 
         this.debouncedUpdate = debounce(()=>{
             let address = `${this.refs.street.value} ${this.refs.city.value} ${this.refs.zip.value}`
@@ -61,6 +69,7 @@
             this.refs.map.on('droppedMarker', (event)=>{
                 console.log(event);
                 try {
+                    console.log(event.results);
                     let address = event.results[0].formatted_address.split(',')
                     this.refs.street.value = address[0]
                     this.refs.zip.value = address[1].trim().split(' ')[0]

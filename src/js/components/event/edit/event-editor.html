@@ -6,9 +6,9 @@
                 <div show={currentRoute == step.route} ref="{step.route}" each={step in steps} data-is={'event-edit-'+step.route}></div>
             </div>
             <div if={refs.stepIndicator.steps} class="form-legend" layout="row" layout-align="space-between">
-                <a href="#{refs.stepIndicator.getPreviousStep().route}" flex-start if={!refs.stepIndicator.isFirstStep()} class="button">Voriger Schritt</a>
-                <a href="#{refs.stepIndicator.getNextStep().route}" flex-end if={!refs.stepIndicator.isLastStep()} class="button">Nächster Schritt</a>
-                <input flex-end if={refs.stepIndicator.isLastStep()} type="submit" class="button" name="" value="Event erstellen">
+                <a href="#{refs.stepIndicator.getPreviousStep().route}" flex-start if={!refs.stepIndicator.isFirstStep()} class="button button--primary">Voriger Schritt</a>
+                <a href="#{refs.stepIndicator.getNextStep().route}" flex-end if={!refs.stepIndicator.isLastStep()} class="button button--primary">Nächster Schritt</a>
+                <input flex-end if={refs.stepIndicator.isLastStep()} type="submit" class="button button--primary" name="" value="Event erstellen">
             </div>
         </form>
     </div>

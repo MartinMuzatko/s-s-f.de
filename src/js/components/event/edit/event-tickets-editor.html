@@ -1,12 +1,12 @@
 <event-tickets-editor>
     <div layout="row" layout-align="space-between start">
         <div flex="100" flex-gt-md="45">
-            <h2>Plätze</h2>
+            <h3>Plätze</h3>
             <input type="hidden" name="limit" value={limit}>
             <event-ticket-limit-slider ref="limit"></event-ticket-limit-slider>
         </div>
         <div flex="100" flex-gt-md="45">
-            <h2>Eintrittskosten</h2>
+            <h3>Eintrittskosten</h3>
             <input type="hidden" name="price" value={price}>
             <event-ticket-price-slider ref="price"></event-ticket-price-slider>
         </div>
@@ -19,17 +19,12 @@
     <script>
         import './event-ticket-price-slider.html'
         import './event-ticket-limit-slider.html'
-        import wNumb from 'wnumb'
+        import {moneyFormat} from '../../../constants'
         // import '../../ssf-rangeslider.html'
         this.limit = 20
         this.price = 10
 
-        this.moneyFormat = wNumb({
-            mark: ',',
-            thousand: '.',
-            suffix: ' €',
-            decimals : 2
-        })
+        this.moneyFormat = moneyFormat
 
         this.on('mount', ()=>{
 
