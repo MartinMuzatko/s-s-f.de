@@ -69,7 +69,14 @@ class Resource extends Wire
     public function getActiveSessions()
     {
         $sessionHandler = $this->modules->get('SessionHandlerDB');
-        return $sessionHandler->getSessions();
+        $sessions = array_map(
+            function($session) {
+                $session['user_name'] = $this->users->get($session['user_id'])->name;
+                return $session;
+            },
+            $sessionHandler->getSessions(60*10)
+        );
+        return array_filter($sessions, function($session) {return $session['user_name'] != 'guest';});
     }
 
     public function setFields($page, $fields)
