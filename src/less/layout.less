@@ -283,6 +283,126 @@
         text-shadow: 1px 0 .25em @color-light-shadow;
     }
 }
+
+.show, .hide {
+    transition: all .5s ease;
+}
+.show {
+    opacity: 1;
+}
+
+.hide {
+    opacity: 0;
+}
+
+
+.countdown {
+    display: flex;
+    justify-content: space-around;
+    &--small {
+        font-size: .8em;
+    }
+
+    .button {
+        padding: .4em .3em;
+        margin: .1em;
+        line-height: 1;
+    }
+
+    &__item {
+        margin: .25em;
+        text-align: center;
+    }
+    &__number {
+        display: flex;
+        font-size: 2em;
+    }
+    &__text {
+        text-transform: uppercase;
+        color: #777;
+    }
+}
+
+
+.action {
+    padding: .25em;
+    &::after {
+        background-color: @color-light;
+        color: @color-dark;
+        padding: .25em;
+        border-radius: 100%;
+        border: 1px solid @color-primary;
+        width: 1em;
+        height: 1em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    &--remove::after {
+        content: "×";
+    }
+    &--up::after {
+        content: "▴";
+    }
+    &--down::after {
+        content: "▾";
+    }
+}
+
+.page-modules {
+    padding: 1em;
+    &__controls {
+        padding: 0;
+        margin: .25em;
+        position: absolute;
+        left: 100%;
+        display: flex;
+    }
+    &__module {
+        margin: 1em;
+    }
+}
+
+
+.page-editor {
+    [contenteditable=true] {
+        background-color: transparent;
+        border: 1px dashed @color-primary;
+    }
+}
+
+.dropzone {
+    padding: 4.8em 2em;
+    border: .25em solid @color-primary;
+    text-align: center;
+    background-position: center;
+    background-size: cover;
+
+    &__input {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+
+    &__label {
+        cursor: pointer;
+    }
+}
+
+
+.content {
+    &--padded {
+        padding: 1em;
+        clear: both;
+    }
+    &--seamless {
+
+    }
+}
+
 .event-list {
     &__event {
         border-radius: @radius-small;
@@ -297,5 +417,32 @@
     }
     &__column + &__column {
         border-left: 1px solid @color-primary-dark;
+    }
+}
+
+.event-view {
+    &__content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+    }
+
+    &__heading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    &__title, &__summary {
+        margin: 1em;
+    }
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &--centered {
+
     }
 }
