@@ -46,4 +46,20 @@ class User extends Resource
     {
         return $this->session->logout();
     }
+
+	public function setCreated($user, $created)
+	{
+		if ($user instanceof \ProcessWire\User) {
+			$sql = "UPDATE `pages` SET `created` = '".$created."' WHERE `name` = '".$user->name."';";
+			$update = $this->wire('db')->query($sql);
+		}
+	}
+
+	public function setModified($user, $modified)
+	{
+		if ($user instanceof \ProcessWire\User) {
+			$sql = "UPDATE `pages` SET `modified` = '".$modified."' WHERE `name` = '".$user->name."';";
+			$update = $this->wire('db')->query($sql);
+		}
+	}
 }

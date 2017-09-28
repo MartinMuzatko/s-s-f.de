@@ -10,29 +10,14 @@ class Users extends Resource
 
     function __construct()
     {
-        $this->users = ProcessWire\wire('users');
-        $this->user = ProcessWire\wire('user');
-        $this->sanitizer = ProcessWire\wire('sanitizer');
-        $this->session = ProcessWire\wire('session');
-        $this->input = ProcessWire\wire('input');
-        $this->fields = ProcessWire\wire('fields');
-        $this->templates = ProcessWire\wire('templates');
+
     }
 
     public function doesUserExist($username) {
         $existingUser = $this->users->get($username);
         return $existingUser instanceof ProcessWire\User;
     }
-
-    public function getUsers()
-    {
-        $users = [];
-        foreach ($this->users->find('*') as $user) {
-            $users[$user->name] = $user;
-        }
-        return $users;
-    }
-
+    
     public function getUser($username)
     {
         if ($this->doesUserExist($username)) {
@@ -54,7 +39,7 @@ class Users extends Resource
 
     private function createUser($data)
     {
-        $newUser = $this->users->add($submission->username);
+        $newUser = $this->users->add($data->username);
         $newUser->email = $email;
         $newUser->species = $species;
         $newUser->firstname = $firstname;
@@ -74,6 +59,23 @@ class Users extends Resource
     {
         return $this->users->get("email=$email") instanceOf ProcessWire\User;
     }
+
+	public function isUsernameAllowed($username)
+	{
+		$blacklist = [
+			'/^page\d+$/gi',
+			'/^delete$/gi',
+			'/^login$/gi',
+			'/^logout$/gi',
+			'/^register$/gi',
+		];
+		foreach ($blacklist as $regex) {
+			if(preg_match($regex, $username)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
     public function registerUser(ProcessWire\WireInputData $submission)
     {
@@ -98,6 +100,9 @@ class Users extends Resource
 
         if (strlen($submission->username) && $this->doesUserExist($submission->username)) {
             $form->username->error("User $submission->username already exists");
+        }
+		if (strlen($submission->username) && $this->isUsernameAllowed($submission->username)) {
+            $form->username->error("Username $submission->username is blacklisted");
         }
         if (strlen($submission->email) && $this->doesUserWithSameMailExist($submission->email)) {
             $form->email->error("Email $submission->email already used");
