@@ -1,0 +1,116 @@
+.fade.show {
+    opacity: 1;
+    display: flex;
+}
+
+.dialog {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    display: none;
+    //overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    outline: 0;
+
+    &--small .dialog__content {
+        width: 20vw;
+    }
+    &--medium .dialog__content {
+        width: 40vw;
+    }
+    &--large .dialog__content {
+        width: 60vw;
+    }
+    &--full .dialog__content {
+        width: 100vw;
+        height: 100vh;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        margin: 0;
+    }
+
+    &__content {
+        background-image: url('../../images/bg.png');
+        background-size: 50%;
+        background-position: 0;
+        transition: all .5s linear;
+        width: auto;
+        min-width: 20vw;
+        margin: 1em;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        background-color: @color-light;
+        background-clip: padding-box;
+        border: 1px solid @color-dark-shadow;
+        box-shadow: 0 0 0 .25rem @color-dark-shadow;
+        border-radius: .25rem;
+        outline: 0;
+    }
+
+    &__backdrop {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1040;
+        background-color: @color-dark;
+        &.fade {
+            opacity: 0;
+        }
+
+        &.show {
+            opacity: .98;
+        }
+    }
+
+    &__title {
+        margin-bottom: 0;
+        line-height: 1.5;
+    }
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px;
+    }
+
+    &__body {
+        position: relative;
+        flex: 1 1 auto;
+        padding: 1em;
+        overflow-y: auto;
+        max-height: 70vh;
+    }
+
+    &__footer {
+        display: flex;
+        justify-content: flex-end;
+        padding: 1em;
+        > :not(:first-child) {
+            margin-left: .25rem;
+        }
+
+        > :not(:last-child) {
+            margin-right: .25rem;
+        }
+    }
+
+    &.fade &__dialog {
+        transition: transform .3s ease-out;
+        transform: translate(0, -25%);
+    }
+
+    &.show &__dialog {
+        transform: translate(0, 0);
+    }
+    &__header .close {
+        margin-left: auto;
+    }
+}
