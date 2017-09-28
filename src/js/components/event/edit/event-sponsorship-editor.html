@@ -1,0 +1,120 @@
+<event-sponsorship-editor>
+    <h2>Sponsorenlevel</h2>
+    <p>Hier kannst du definieren, ab welchem Betrag Goodies enthalten sind.</p>
+    <div>
+        <div layout="row">
+            <div each={sponsorlevel in sponsorlevels}>
+                {sponsorlevel.name}
+            </div>
+        </div>
+        <div>
+            <div layout="row" layout-align="space-between">
+                <div flex-gt-sm="45">
+                    <div class="field-group" layout="row">
+                        <label for="name">Name:</label>
+                        <input maxlength="25" oninput={parent.parent.editName} type="text" name="name" value={opts.item.name}>
+                    </div>
+                    <div class="field-group" layout="row">
+                        <label for="buyPrice">Mindestpreis:
+                            <event-item-price-slider onupdate={parent.parent.minPrice} ref="minPrice" options={{start: opts.item.minPrice}}></event-item-price-slider>
+                        </label>
+                    </div>
+                    <ssf-editor inline></ssf-editor>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        import '../../ssf-editor.html'
+        import './event-item-price-slider.html'
+
+        this.sponsorlevels = [
+            {
+                name: 'Fennek',
+                minPrice: 10,
+                summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön'
+            },
+            {
+                name: 'Wolf',
+                minPrice: 20,
+                summary: ''
+            },
+            {
+                name: 'Tiger',
+                minPrice: 30,
+                summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön'
+            }
+        ]
+
+        addItem() {
+            this.sponsorlevels.push({
+                name: 'Supporter',
+                minPrice: 20,
+                summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön'
+            })
+            this.update()
+        }
+
+        removeItem(e) {
+            e.preventDefault()
+            console.log(e.item.index);
+            this.items.splice(e.item.index, 1)
+            this.update()
+        }
+
+        editName(e) {
+            e.item.item.name = e.target.value
+            this.update()
+        }
+
+        editSellPrice(e) {
+            e.parent.opts.item.sellPrice = e.refs.slider.value
+            this.update()
+        }
+
+        checkVariants(e) {
+            e.item.item.variantsActive = !e.item.item.variantsActive
+            this.update()
+        }
+
+        removeVariant(e) {
+            let data = e.target.dataset
+            let variants = this.items[data.itemIndex].variants
+            variants.splice(variants.indexOf(variants[data.variantIndex]),1)
+            this.update()
+        }
+
+        addOption(e) {
+            e.item.item.variants.push('')
+            this.update()
+        }
+
+        this.on('mount', ()=>{
+            this.refs.item.map(item=>{
+                item.refs.dialog.refs.included.on('toggle', ()=>{
+                    this.update()
+                })
+                item.refs.dialog.refs.variantsActive.on('toggle', (checked)=>{
+                    item.variantsActive = checked
+                    console.log(item.variantsActive);
+                    this.update()
+                })
+            })
+        })
+    </script>
+    <style type="text/less">
+        @import "src/less/variables.less";
+        .items__add {
+            padding: 0 4em;
+            min-height: 5em;
+            border: 1px solid @color-primary;
+            border-radius: .25em;
+            text-align: center;
+            display: flex;
+            align-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 1em;
+        }
+    </style>
+</event-sponsorship-editor>
