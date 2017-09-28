@@ -13,6 +13,7 @@ MIXINS
 
 
 .responsiveWidth(@width) {
+    width: calc(~"95%");
     @media screen and (min-width: @breakpoint-sm) {
         width: calc(@breakpoint-sm * (min(1, min(@width + .2, 1))) ~'- 1rem');
     }
