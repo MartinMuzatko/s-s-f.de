@@ -15,6 +15,28 @@ class Event extends Page {
         parent::__construct($tpl);
 	}
 
+	public function getAttendeesPerDay($filter = '')
+	{
+		$attendees = $this->getRegistrations($filter.', sort=created')->getArray();
+	    $dates = [];
+	    foreach ($attendees as $attendee) {
+	        $dates[date('d.m.Y', $attendee->created)][] = $attendee->profile->username;
+	    }
+	    $registration = $this->getRegistrationsPage();
+	    $startDate = $registration->getUnformatted('startDate');
+	    $endDate = $registration->getUnformatted('endDate');
+	    $period = new \DatePeriod(
+	        (new \DateTime())->setTimestamp($startDate),
+	        new \DateInterval('P1D'),
+	        (new \DateTime())->setTimestamp($endDate)
+	    );
+	    $dateRange = [];
+	    foreach ($period as $date) {
+	        $dateRange[$date->format('d.m.Y')] = count($dates[$date->format('d.m.Y')]);
+	    }
+		return $dateRange;
+	}
+
 	public function getAddress()
 	{
 		//Format: Ostendstraße 20, 70190 Stuttgart, Germany
