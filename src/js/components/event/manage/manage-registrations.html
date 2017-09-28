@@ -1,0 +1,113 @@
+<manage-registrations>
+    <div>
+
+    </div>
+    <p>Aktion für <strong>{getMarkedUsers()}</strong> markierte</p>
+    <div class="actions">
+        <button class="button button--primary">Auf Geldeingang setzen</button>
+        <button class="button button--primary">Auf Warteliste setzen</button>
+        <button class="button button--primary">Auf Aktiv setzen</button>
+        <button class="button button--primary">Nachricht verfassen</button>
+    </div>
+    <table>
+        <thead>
+            <th><input onchange={checkAll} type="checkbox"></th>
+            <th>Nick</th>
+            <th>Rolle</th>
+            <th>Bezahlt</th>
+            <th>Betrag</th>
+            <th>Neu</th>
+            <th>Geldliste</th>
+            <th>Barzahler</th>
+            <th>Aktiv</th>
+            <th>Warteliste</th>
+        </thead>
+        <tbody>
+            <tr each={user in users}>
+                <td><input type="checkbox" checked={user.checked}></td>
+                <td><img class="avatar avatar--round avatar--small" width="16" height="16" src="/s-s-f.de/site/assets/files/1019/misan.32x32.jpg" alt="Misan"> {user.username}</td>
+                <td>{user.role}</td>
+                <td style={getPaidThreshold(user)}>{user.paid ? '✓' : getUserRegdate(user)}</td>
+                <td>{moneyFormat.to(user.price)}</td>
+                <td><input type="radio" name="{user.username}"></td>
+                <td><input type="radio" name="{user.username}"></td>
+                <td><input type="radio" name="{user.username}"></td>
+                <td><input type="radio" name="{user.username}"></td>
+                <td><input type="radio" name="{user.username}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <script>
+        import differenceInDays from 'date-fns/difference_in_days'
+        import {moneyFormat} from '../../../constants'
+
+        getMarkedUsers() {
+            return this.users.filter(user=>user.checked).length
+        }
+
+        getUserRegdate(user) {
+            return differenceInDays(new Date(), user.created)
+        }
+
+        getPaidThreshold(user) {
+            if (user.paid) {
+                return `background-color: hsl(180, 50%, 80%)`
+            }
+            let hueGradient = [0, 120]
+            let maxDays = 42
+            let hue = hueGradient[0] + hueGradient[1] / maxDays * (maxDays - differenceInDays(new Date(), user.created))
+            let background = `background-color: hsl(${hue}, 50%, 50%)`
+            return background
+        }
+
+        checkAll(e) {
+            //console.log(e.target.checked);
+            this.users.map(user=>user.checked = e.target.checked)
+        }
+
+        this.moneyFormat = moneyFormat
+
+        this.users = [
+            {
+                username: 'Misan',
+                role: 'Teilnehmer',
+                paid: false,
+                created: 1506100000000,
+                price: 40,
+                checked: false
+            },
+            {
+                username: 'Pum',
+                role: 'Suiter',
+                paid: false,
+                created: 1505300000000,
+                price: 40,
+                checked: false
+            },
+            {
+                username: 'BerkWolf',
+                role: 'Staff',
+                paid: false,
+                created: 1503300000000,
+                price: 40,
+                checked: false
+            },
+            {
+                username: 'Milan',
+                role: 'Staff',
+                paid: false,
+                created: 1504600000000,
+                price: 40,
+                checked: false
+            },
+            {
+                username: 'Minn',
+                role: 'Teilnehmer',
+                paid: true,
+                created: 1504600000000,
+                price: 40,
+                checked: false
+            }
+        ]
+    </script>
+</manage-registrations>

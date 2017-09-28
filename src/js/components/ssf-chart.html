@@ -1,0 +1,40 @@
+<ssf-chart>
+
+    <div ref="chart" class="ct-chart ct-double-octave"></div>
+
+    <script>
+        import Chartist from 'chartist'
+        import ctPointLabels from 'chartist-plugin-pointlabels'
+        import ctToolTips from 'chartist-plugin-tooltips/dist/chartist-plugin-tooltip'
+        //import ctAxisTitle from 'chartist-plugin-axistitle'
+        this.on('mount', () => {
+            var data = {
+                labels: this.opts.labels,
+                series: this.opts.series
+            }
+            var settings = {
+                axisY: {
+                    onlyInteger: true,
+                    //offset: 10,
+                    low: 0,
+                    showArea: true
+                },
+                plugins: [
+                    ctPointLabels({
+                        textAnchor: 'middle',
+                        labelInterpolationFnc: n=>n?n:0
+                    }),
+                    // ctToolTips({
+                    //     transformTooltipTextFnc: (value)=>{return value + ' $'}
+                    // })
+                ]
+            }
+            new Chartist.Line(this.refs.chart, data, settings)
+        })
+    </script>
+    <style>
+        .ct-chart {
+            margin: 1em;
+        }
+    </style>
+</ssf-chart>
