@@ -1,6 +1,6 @@
 <event-create>
     <h1 class="heading {'heading--menu' : !isIntroVisible}"><yield from="heading" /></h1>
-    <div show={isIntroVisible} ref="intro">
+    <div show={isIntroVisible} class="content content--padded" ref="intro">
         <yield from="accept" />
         <a onclick={hideIntro} class="button button--primary">
             <yield from="accept-button" />
