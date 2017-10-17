@@ -7,3 +7,21 @@ export const moneyFormat = wNumb({
     suffix: ' €',
     decimals : 2
 })
+
+export const DEFAULT_SPONSORLEVELS = [
+    {
+        name: 'Fennek',
+        minPrice: 10,
+        summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön'
+    },
+    {
+        name: 'Wolf',
+        minPrice: 20,
+        summary: ''
+    },
+    {
+        name: 'Tiger',
+        minPrice: 30,
+        summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön'
+    }
+]

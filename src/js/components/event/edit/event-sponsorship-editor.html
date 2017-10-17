@@ -1,120 +1,95 @@
 <event-sponsorship-editor>
     <h2>Sponsorenlevel</h2>
     <p>Hier kannst du definieren, ab welchem Betrag Goodies enthalten sind.</p>
-    <div>
-        <div layout="row">
-            <div each={sponsorlevel in sponsorlevels}>
+    <div class="sponsorlevels" layout="row">
+        <div flex="25" class="sponsorlevels__menu" layout="column">
+            <div onclick={selectSponsorLevel} class="sponsorlevels__menu-item {sponsorlevel.name == selectedSponsorLevel.name ? 'sponsorlevels__menu-item--selected' : ''}" each={sponsorlevel in sponsorlevels}>
                 {sponsorlevel.name}
+                <span if={sponsorlevel.name == selectedSponsorLevel.name}></span>
+            </div>
+            <div class="sponsorlevels__menu-item" onclick={addSponsorLevel}>
+                +
             </div>
         </div>
-        <div>
-            <div layout="row" layout-align="space-between">
-                <div flex-gt-sm="45">
-                    <div class="field-group" layout="row">
-                        <label for="name">Name:</label>
-                        <input maxlength="25" oninput={parent.parent.editName} type="text" name="name" value={opts.item.name}>
-                    </div>
-                    <div class="field-group" layout="row">
-                        <label for="buyPrice">Mindestpreis:
-                            <event-item-price-slider onupdate={parent.parent.minPrice} ref="minPrice" options={{start: opts.item.minPrice}}></event-item-price-slider>
-                        </label>
-                    </div>
-                    <ssf-editor inline></ssf-editor>
-                </div>
+        <div flex="75" class="sponsorlevels__form content content--padded">
+            <input oninput={editName} type="text" value={selectedSponsorLevel.name}>
+            <div class="field-group" layout="row">
+                <label for="buyPrice">Mindestpreis:
+                    <event-item-price-slider onupdate={parent.parent.minPrice} ref="minPrice" options={{start: opts.item.minPrice}}></event-item-price-slider>
+                </label>
             </div>
+            <ssf-editor inline></ssf-editor>
         </div>
     </div>
     <script>
         import '../../ssf-editor.html'
         import './event-item-price-slider.html'
+        import {DEFAULT_SPONSORLEVELS} from '../../../constants'
+        
 
-        this.sponsorlevels = [
-            {
-                name: 'Fennek',
-                minPrice: 10,
-                summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön'
-            },
-            {
-                name: 'Wolf',
-                minPrice: 20,
-                summary: ''
-            },
-            {
-                name: 'Tiger',
-                minPrice: 30,
-                summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön'
-            }
-        ]
+        this.sponsorlevels = DEFAULT_SPONSORLEVELS
 
-        addItem() {
+        this.selectedSponsorLevel = this.sponsorlevels[0]
+
+        addSponsorLevel() {
+            // let nameExists = this.sponsorlevels.filter(level=>level.name=='Supporter')
             this.sponsorlevels.push({
                 name: 'Supporter',
                 minPrice: 20,
                 summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön'
             })
-            this.update()
         }
-
+        
+        editName(event) {
+            this.selectedSponsorLevel.name = event.target.value
+        }
         removeItem(e) {
             e.preventDefault()
             console.log(e.item.index);
             this.items.splice(e.item.index, 1)
             this.update()
         }
-
-        editName(e) {
-            e.item.item.name = e.target.value
-            this.update()
-        }
-
-        editSellPrice(e) {
-            e.parent.opts.item.sellPrice = e.refs.slider.value
-            this.update()
-        }
-
-        checkVariants(e) {
-            e.item.item.variantsActive = !e.item.item.variantsActive
-            this.update()
-        }
-
-        removeVariant(e) {
-            let data = e.target.dataset
-            let variants = this.items[data.itemIndex].variants
-            variants.splice(variants.indexOf(variants[data.variantIndex]),1)
-            this.update()
-        }
-
+        
         addOption(e) {
             e.item.item.variants.push('')
             this.update()
         }
+        
+        selectSponsorLevel(event) {
+            this.selectedSponsorLevel = event.item.sponsorlevel 
+        }
 
         this.on('mount', ()=>{
-            this.refs.item.map(item=>{
-                item.refs.dialog.refs.included.on('toggle', ()=>{
-                    this.update()
-                })
-                item.refs.dialog.refs.variantsActive.on('toggle', (checked)=>{
-                    item.variantsActive = checked
-                    console.log(item.variantsActive);
-                    this.update()
-                })
-            })
+            
         })
     </script>
     <style type="text/less">
         @import "src/less/variables.less";
-        .items__add {
-            padding: 0 4em;
-            min-height: 5em;
-            border: 1px solid @color-primary;
-            border-radius: .25em;
-            text-align: center;
-            display: flex;
-            align-content: center;
-            align-items: center;
-            cursor: pointer;
-            margin-bottom: 1em;
+        
+        .sponsorlevels {
+            background-color: @color-light;
         }
+        .sponsorlevels__menu {
+            background-color: @color-primary-light;
+            
+            &-item {
+                padding: 1em;
+                cursor: pointer;
+                background-color: @color-primary-light;
+                &:hover {
+                    background-color: @color-primary;
+                }
+            }
+            
+            &-item--selected {
+                background-color: @color-light;
+            }
+        }
+        
+        
+        .sponsorlevels {
+            box-shadow: 0 0 .125em @color-dark-shadow;
+        }
+        
     </style>
 </event-sponsorship-editor>
