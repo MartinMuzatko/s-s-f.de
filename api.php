@@ -283,6 +283,32 @@ $router = new Router([
                 new Route('PUT', 'events/([\w-]+)/items/([\w-]+)', function($path, $eventName, $itemName) {
 
                 }),
+                
+            new Route('GET', 'events/([\w-]+)/helpers', function($path, $eventName) {
+                $event = $this->events->get("name=$eventName");
+                $helpers = array_map(
+                    function($helper) {
+                        return [
+                            "permissions" => array_map(
+                                function($permission){
+                                    return [
+                                        "name" => $permission->name,
+                                        "title" => $permission->title,
+                                    ];
+                                },
+                                $helper->permissions->getArray()
+                            ),
+                            "profile" => [
+                                "name" => $helper->profile->name,
+                                "username" => $helper->profile->username,
+                                "avatar" => $helper->profile->getAvatar(),
+                            ],
+                        ];
+                    },
+                    $event->getHelpers()->getArray()
+                );
+                return $helpers;
+            }),
 
     // USERS
     new Route('GET', 'users', function($path) {

@@ -52,11 +52,36 @@ class Event extends Page {
 	{
 		return $this->getRegistrations("user=$name")->first;
 	}
-
-    public function getRegistrationsPage()
+	
+	public function getHelpersPage()
     {
-        return $this->find("template=event-registrations")->first;
-    }
+        return $this->find("template=event-helpers")->first;
+	}
+	
+	public function getHelpers($selector = '*')
+    {
+        return $this->getHelpersPage()->find($selector);
+	}
+	
+	public function getSponsorlevelsPage()
+	{
+	    return $this->find("template=event-sponsorlevels")->first;
+	}
+
+	public function getSponsorlevels($selector = '*')
+	{
+	    return $this->getSponsorlevelsPage()->find($selector);
+	}
+	
+	public function userCan($permission)
+	{
+		$user = $this->wire('user');
+		if ($user->hasPermission('event-admin')) {
+			return true;
+		}
+		$helper = $this->getHelpers("profile=$user")->first;
+		return $helper ? $helper->permissions->has($permission) : false;
+	}
 
 	public function getPageByModule($module)
 	{
@@ -164,7 +189,7 @@ class Event extends Page {
 
     public function updateEvent($data)
     {
-        if ($data && $this->user->hasPermission('event-manage')) {
+        if ($data && $this->user->hasPermission('event-user-manage')) {
             $this->of(false);
             $this->setFields($this, $data);
             if (property_exists($data,'title')) {
@@ -185,6 +210,27 @@ class Event extends Page {
 		$item->title = $this->wire->sanitizer->text($data->name);
 		$item->sellPrice = $this->wire->sanitizer->text($data->sellPrice);
 		$item->buyPrice = $this->wire->sanitizer->text($data->buyPrice);
+		$item->save();
+	}
+
+	public function addHelper($data)
+	{
+		$item = new Page();
+		$item->parent = $this->getHelpersPage();
+		$item->template = $this->wire->templates->get('event-helper');
+		$item->title = $this->wire->sanitizer->text($data->user->name);
+		$username = $this->wire->sanitizer->username($data->user->name);
+		$item->profile = $this->wire->users->get("name=$username");
+		array_map(
+			function($permission) use ($item) {
+				if ($permission->active) {
+					$name = $permission->name;
+					$perm = $this->wire('permissions')->get("name=$name");
+					$item->permissions->add($perm);
+				}
+			},
+			(array) $data->permissions
+		);
 		$item->save();
 	}
 

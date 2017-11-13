@@ -26,12 +26,12 @@
 
 <div class="actions">
 	<div class="actions__filter">
-		<a class="button button--<?=$filter == 'open' ? 'primary' : 'secondary' ?>" href="<?=$page->url?>?filter=open">Nur offene Events</a>
-		<a class="button button--<?=$filter == 'all' ? 'primary' : 'secondary' ?>" href="<?=$page->url?>?filter=all">Alle Events</a>
+		<a class="button button--<?=$filter == 'all' ? 'secondary' : 'primary' ?>" href="<?=$page->url?>?filter=all">Alle Events</a>
+        <a class="button button--<?=$filter == 'open' ? 'secondary' : 'primary' ?>" href="<?=$page->url?>?filter=open">Nur offene Events</a>
 	</div>
 	<div class="actions__sort">
-		<a class="button button--<?=$sort == '-startDate' ? 'primary' : 'secondary' ?>" href="<?=$page->url?>?sort=-startDate">Neueste zuerst</a>
-		<a class="button button--<?=$sort == 'startDate' ? 'primary' : 'secondary' ?>" href="<?=$page->url?>?sort=startDate">Älteste zuerst</a>
+		<a class="button button--<?=$sort == '-startDate' ? 'secondary' : 'primary' ?>" href="<?=$page->url?>?sort=-startDate">Neueste zuerst</a>
+		<a class="button button--<?=$sort == 'startDate' ? 'secondary' : 'primary' ?>" href="<?=$page->url?>?sort=startDate">Älteste zuerst</a>
 	</div>
 </div>
 <div class="event-list">

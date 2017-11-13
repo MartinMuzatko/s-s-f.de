@@ -30,7 +30,13 @@ class Events extends PagesType {
 
     public function getEvents()
     {
-        return parent::find('template=event');
+        return parent::find('template=event, status!=hidden');
+    }
+
+    public function getOwnEvents()
+    {
+        $user = $this->wire('user');
+        return $this->getEvents()->find("createdUser=$user");
     }
 
     /**
@@ -100,6 +106,22 @@ class Events extends PagesType {
                             $event->addItem($item);
                         },
                         $data->items
+                    );
+                }
+                if (property_exists($data, 'helpers')) {
+                    array_map(
+                        function($helper) use ($event) {
+                            $event->addHelper($helper);
+                        },
+                        $data->helpers
+                    );
+                }
+                if (property_exists($data, 'sponsorlevels')) {
+                    array_map(
+                        function($sponsorlevel) use ($event) {
+                            $event->addSponsorlevel($sponsorlevel);
+                        },
+                        $data->helpers
                     );
                 }
                 http_response_code(201);
