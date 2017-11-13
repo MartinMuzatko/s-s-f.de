@@ -64,6 +64,49 @@ $router = new Router([
         );
         return $modules;
     }),
+    new Route('GET', 'permissions', function($path) {
+        $name = $this->input->get->name;
+        $this->input->whitelist('name', $name);
+        $permissions = array_map(
+            function($permission) {
+                return [
+                    "name" => $permission->name,
+                    "title" => $permission->title,
+                ];
+            },
+            $this->permissions->find("name*=$name")->getArray()
+        );
+        return $permissions;
+    }),
+    new Route('GET', 'roles', function() {
+        $roles = array_map(
+            function($role) {
+                return [
+                    "title" => $role->title,
+                    "summary" => $role->summary,
+                    "image" => $role->image->first->url,
+                ];
+            },
+            $this->pages->get('/events/resources/roles')->children->getArray()
+        );
+        return $roles;
+    }),
+    new Route('GET', 'items', function() {
+        $roles = array_map(
+            function($role) {
+                return [
+                    "title" => $role->title,
+                    "summary" => $role->summary,
+                    "included" => $role->included,
+                    "buyPrice" => $role->buyPrice,
+                    "sellPrice" => $role->sellPrice,
+                    "image" => $role->image->first->url,
+                ];
+            },
+            $this->pages->get('/events/resources/items')->children->getArray()
+        );
+        return $roles;
+    }),
 
 
     new Route('POST', 'pages/([0-9]+)', function($path, $pageId) {
