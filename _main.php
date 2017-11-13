@@ -124,17 +124,25 @@ $content = ob_get_clean();
             ga('send', 'pageview');
         </script>
     <? endif; ?>
+    <?php
+        $itemPages = $pages->get('/events/resources/items')->children('include=all')->getArray();
+        $imageKeys = array_map(function($item) { return $item->name; }, $itemPages);
+        $imageValues = array_map(function($item) { return $item->image->first->url ; }, $itemPages);
+        $itemImages = array_combine($imageKeys, $imageValues);
+        
+        $api = [
+            "user" => [
+                "name" => $user->name,
+                "username" => $user->username,
+                "avatar" => $user->getAvatar(),
+            ],
+            "url" => $config->urls->root,
+            "images" => $itemImages
+        ];
+    ?>
     <script>
         window.api = {}
-        Object.assign(window.api, <?=json_encode(
-            [
-                "user" => [
-                    "name" => $user->name,
-                    "username" => $user->username
-                ],
-                "url" => $config->urls->root
-            ]
-        )?>)
+        Object.assign(window.api, <?=json_encode($api)?>)
     </script>
     <script src="<?=$config->urls->templates?>dist/main.js"></script>
     <script>
