@@ -43,6 +43,11 @@ class Event extends Page {
 		return $this->street.', '.$this->zip.' '.$this->city.', '.$this->country->name;
 	}
 
+	public function getRegistrationsPage()
+	{
+		return $this->find("template=event-registrations")->first;
+	}
+
     public function getRegistrations($selector = '')
     {
         return $this->getRegistrationsPage()->find($selector);
@@ -101,6 +106,11 @@ class Event extends Page {
 	public function getItemsPage()
 	{
 		return $this->find("template=event-items")->first;
+	}
+	
+	public function getRolesPage()
+	{
+		return $this->find("template=event-roles")->first;
 	}
 
 	public function isUserRegistered($user)
@@ -207,36 +217,82 @@ class Event extends Page {
 		$item = new Page();
 		$item->parent = $this->getItemsPage();
 		$item->template = $this->wire->templates->get('event-item');
-		$item->title = $this->wire->sanitizer->text($data->name);
+		$item->title = $this->wire->sanitizer->text($data->title);
+		$item->save();
 		$item->sellPrice = $this->wire->sanitizer->text($data->sellPrice);
 		$item->buyPrice = $this->wire->sanitizer->text($data->buyPrice);
+		$item->image->add('http://'.$this->wire->config->httpHost.$data->image);
 		$item->save();
+	}
+	
+	public function addRole($data)
+	{
+		$role = new Page();
+		$role->parent = $this->getRolesPage();
+		$role->template = $this->wire->templates->get('event-role');
+		$role->title = $this->wire->sanitizer->text($data->title);
+		$role->save();
+		$role->summary = $this->wire->sanitizer->text($data->summary);
+		$role->image->add('http://'.$this->wire->config->httpHost.$data->image);
+		$role->save();
+	}
+	
+	public function addSponsorlevel($data)
+	{
+		$sponsorlevel = new Page();
+		$sponsorlevel->parent = $this->getSponsorlevelsPage();
+		$sponsorlevel->template = $this->wire->templates->get('event-sponsorlevel');
+		$sponsorlevel->title = $this->wire->sanitizer->text($data->name);
+		$sponsorlevel->minPrice = $this->wire->sanitizer->text($data->minPrice);
+		$sponsorlevel->summary = $this->wire->sanitizer->text($data->summary);
+		// $item->image = $this->wire->sanitizer->text($data->image);
+		$sponsorlevel->save();
 	}
 
 	public function addHelper($data)
 	{
-		$item = new Page();
-		$item->parent = $this->getHelpersPage();
-		$item->template = $this->wire->templates->get('event-helper');
-		$item->title = $this->wire->sanitizer->text($data->user->name);
+		$helper = new Page();
+		$helper->parent = $this->getHelpersPage();
+		$helper->template = $this->wire->templates->get('event-helper');
+		$helper->title = $this->wire->sanitizer->text($data->user->name);
 		$username = $this->wire->sanitizer->username($data->user->name);
-		$item->profile = $this->wire->users->get("name=$username");
+		$helper->profile = $this->wire->users->get("name=$username");
 		array_map(
-			function($permission) use ($item) {
+			function($permission) use ($helper) {
 				if ($permission->active) {
 					$name = $permission->name;
 					$perm = $this->wire('permissions')->get("name=$name");
-					$item->permissions->add($perm);
+					$helper->permissions->add($perm);
 				}
 			},
 			(array) $data->permissions
 		);
-		$item->save();
+		$helper->save();
+	}
+	
+	public function addPage($data)
+	{
+		$page = new Page();
+		$page->parent = $this;
+		$page->template = $this->wire->templates->get('page');
+		$page->title = $this->wire->sanitizer->text($data->title);
+		// array_map(
+		// 	function($pageModule) use ($page) {
+        // 
+		// 	},
+		// 	(array) $data->pageModules
+		// );
+		$page->save();
 	}
 
 	public function getItems()
 	{
 		return $this->getItemsPage()->children;
+	}
+	
+	public function getRoles()
+	{
+		return $this->getRolesPage()->children;
 	}
 
 }

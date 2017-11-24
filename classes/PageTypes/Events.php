@@ -99,7 +99,14 @@ class Events extends PagesType {
                 $template->of(false);
                 $event = $this->pages->clone($template, $events);
                 $this->updateEvent($event, $data);
-                $event->save();
+                if (property_exists($data, 'roles')) {
+                    array_map(
+                        function($role) use ($event) {
+                            $event->addRole($role);
+                        },
+                        $data->roles
+                    );
+                }
                 if (property_exists($data, 'items')) {
                     array_map(
                         function($item) use ($event) {
@@ -121,7 +128,15 @@ class Events extends PagesType {
                         function($sponsorlevel) use ($event) {
                             $event->addSponsorlevel($sponsorlevel);
                         },
-                        $data->helpers
+                        $data->sponsorlevels
+                    );
+                }
+                if (property_exists($data, 'pages')) {
+                    array_map(
+                        function($page) use ($event) {
+                            $event->addPage($page);
+                        },
+                        $data->pages
                     );
                 }
                 http_response_code(201);

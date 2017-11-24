@@ -5,8 +5,7 @@ use \API\Request;
 use \API\Router;
 use \API\Route;
 
-function getFieldValues($page, $fields)
-{
+function getFieldValues($page, $fields) {
     return array_map(
         function($field) use ($page) {
             if ($field->type instanceof FieldtypeImage) {
