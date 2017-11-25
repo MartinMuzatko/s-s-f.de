@@ -18,8 +18,8 @@
         <ssf-countdown to="<?=$event->getRegistrationsPage()->getUnformatted('startDate')?>000">
             <yield to="before">
                 <p>
-                    Die Registrierung ist noch nicht offen.
-                    <? if($event->getRegistrationsPage()->startDate): ?>Sie offnet am <?=$event->getRegistrationsPage()->startDate?><?endif?>
+                    Die Registrierung ist momentan geschlossen.
+                    <? if($event->getRegistrationsPage()->startDate): ?>Sie öffnet am <?=$event->getRegistrationsPage()->startDate?><?endif?>
                 </p>
             </yield>
             <yield to="after">

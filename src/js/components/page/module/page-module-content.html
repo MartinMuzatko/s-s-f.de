@@ -1,10 +1,11 @@
 <page-module-content>
-    <ssf-editor ref="editor" content={html.htmlDecode(opts.content.text)} inline></ssf-editor>
+    <ssf-editor ref="editor" content={html.htmlDecode(opts.content.text || defaultText)} inline></ssf-editor>
     <script>
         import '../../ssf-editor.html'
         import html from 'js-htmlencode'
 
         this.html = html
+        this.defaultText = `Um den Text zu bearbeiten, klicke auf das Feld.`
         get() {
             let fields = {
                 text: html.htmlEncode(this.refs.editor.getContent())

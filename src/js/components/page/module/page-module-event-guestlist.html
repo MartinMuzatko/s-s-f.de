@@ -1,8 +1,19 @@
 <page-module-event-guestlist>
-    <div>Hier erscheint die Guestlist</div>
+    <div>
+        <h2>Gästeliste</h2>
+        <div class="modules-library__module modules-library__module--disabled">
+            <img src="{getModule().moduleIcon}" class="modules-library__icon">
+            <p class="modules-library__name">{getModule().title}</p>
+        </div>
+    </div>
     <script>
         get() {
             return {}
+        }
+        
+        getModule() {
+            let module = this.parent.modules.find(module=>module.associatedTemplate == 'page-module-event-guestlist')
+            return module ? module : {}
         }
     </script>
 </page-module-event-guestlist>

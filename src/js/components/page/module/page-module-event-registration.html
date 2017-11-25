@@ -1,4 +1,15 @@
 <page-module-event-registration>
-    <div>Hier erscheint die reg.</div>
-    <script></script>
+    <img src="dist/images/page-module-registration.png" alt="">
+    <h2>Registrierung</h2>
+    <div layout="row" layout-align="center center" class="placeholder">
+        <img src="{getPlaceholderImage()}" class="placeholder__image" alt="">
+    </div>
+    <script>
+        getPlaceholderImage() {
+            console.log('MODULES');
+            console.log(this.parent.modules);
+            let module = this.parent.modules.find(module=>module.associatedTemplate == 'page-module-event-registration')
+            return module ? module.placeholderImage : ''
+        }
+    </script>
 </page-module-event-registration>
