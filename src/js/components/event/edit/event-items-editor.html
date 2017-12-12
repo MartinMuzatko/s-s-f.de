@@ -1,184 +1,90 @@
 <event-items-editor>
-    <p>Alle Zusatzoptionen die ein Teilnehmer dazu buchen kann.</p>
-    <div layout="row" layout-align="space-between" class="items">
-        <ssf-item-editor
-            edit-item-label="Item Bearbeiten"
-            ref="item"
-            each={item,index in items}
-            item={item}
-            index={index}
-            class="item"
-            flex="100" flex-gt-sm="45" flex-gt-md="30">
-            <yield to="actions">
-                <button onclick={editItem}>E</button>
-                <button onclick={parent.removeItem}>&times;</button>
-            </yield>
-            <yield to="content">
-                <p>Verkaufspreis: {item.sellPrice} €</p>
-                <p>Einkaufspreis: {item.buyPrice} €</p>
-            </yield>
-            <yield to="editor">
-                <div layout="row" layout-align="space-between">
-                    <div flex-gt-sm="45">
-                        <div class="field-group" layout="row">
-                            <label for="name">Name:</label>
-                            <input maxlength="25" oninput={parent.parent.editName} type="text" name="name" value={opts.item.name}>
-                        </div>
-                        <div class="field-group" layout="row">
-                            <label for="buyPrice">Einkaufspreis:
-                                <event-item-price-slider onupdate={parent.parent.editBuyPrice} ref="buyPrice" options={{start: opts.item.buyPrice}}></event-item-price-slider>
-                            </label>
-                        </div>
-                        <div class="field-group">
-                            <ssf-toggle ref="included" label="In Con-fee enthalten?"></ssf-toggle>
-                        </div>
-                        <div if={!refs.included.checked} class="field-group" layout="row">
-                            <label for="sellPrice">Verkaufspreis:
-                                <event-item-price-slider onupdate={parent.parent.editSellPrice} ref="sellPrice" options={{start: opts.item.sellPrice}}></event-item-price-slider>
-                            </label>
-                        </div>
-                    </div>
-                    <div flex-gt-sm="45">
-                        <div class="field-group">
-                            <ssf-toggle ref="variantsActive" checked={opts.item.variantsActive} label="Varianten" description="Zum Beispiel bei T-shirts: S, M, L und XL"></ssf-toggle>
-                        </div>
-                        <div if={opts.item.variantsActive}>
-                            <div each={variant,variantIndex in opts.item.variants}>
-                                <input type="text" value={variant}>
-                                <span data-item-index="{parent.parent.opts.index}" data-variant-index="{variantIndex}" onclick={parent.parent.parent.removeVariant}>&times;</span>
-                            </div>
-                            <div onclick={parent.parent.addOption}>+</div>
-                        </div>
-                    </div>
-                </div>
-            </yield>
-        </ssf-item-editor>
-        <div flex="100" flex-gt-sm="45" flex-gt-md="30" class="items__add" onclick={addItem}>
-            +<br>
-            Neues Item anlegen
+    <div layout="row" layout-align="start">
+        <div flex="30" class="role card card--light" each={item in items}>
+            <div style="width: 100%;" class="actions" layout="row" layout-align="end end">
+                <button onclick={deleteItem}>X</button>
+            </div>
+            <div onclick={select} class="icon-card">
+                <input oninput={updateTitle} class="icon-card__title" value={item.title}>
+                <img onclick={updateImage} class="icon-card__image icon-card__editable" src="{item.image}">
+            </div>
+            <div layout="row" layout-align="space-between">
+                <label flex="45" class="field-group">
+                    <span class="field-group__label field-group__label--primary">Einkaufspreis</span>
+                    <input oninput={updateBuyPrice} class="field-group__input" maxlength="4" type="number" ref="buyPrice" value={item.buyPrice}>
+                </label>
+                <label flex="45" class="field-group">
+                    <span class="field-group__label field-group__label--primary">Verkaufspreis</span>
+                    <input oninput={updateSellPrice} class="field-group__input" maxlength="4" type="number" ref="sellPrice" value={item.sellPrice}>
+                </label>
+            </div>
+            <label class="field-group">
+                <span class="field-group__label field-group__label--primary">Beschreibung</span>
+                <textarea oninput={updateSummary} class="field-group__input">{item.summary}</textarea>
+            </label>
         </div>
-        <article flex="100" flex-gt-sm="45" flex-gt-md="30"></article>
+        <div flex="30" class="role card card--light" layout="column" layout-align="center center">
+            <div onclick={createItem} class="icon-card icon-card__image" layout="column" layout-align="center center">
+                <span class="icon-card__title">Neues Item</span>
+                <span>+</span>
+            </div>
+        </div>
     </div>
+    <ssf-dialog ref="dialog" size="large">
+        <div layout="row" layout-align="center center">
+            <div class="icon-card" layout="column" layout-align="center center" onclick={parent.parent.selectImage} each={image, name in api.images}>
+                <img class="icon-card__image icon-card__editable" src="{image}">
+            </div>
+        </div>
+    </ssf-dialog>
     <script>
-        import '../../ssf-item-editor.html'
-        import '../../ssf-toggle.html'
-        import './event-item-price-slider.html'
-
-        this.items = [
-            {
-                name: 'Badge',
-                sellPrice: 2,
-                buyPrice: 2,
-                variants: [],
-                variantsActive: false,
-                included: false
-            },
-            {
-                name: 'T-Shirt',
-                sellPrice: 16,
-                buyPrice: 16,
-                variants: ['S','M','L','XL','XXL','3XL'],
-                variantsActive: true,
-                included: false
-            },
-            {
-                name: 'Early Bird',
-                sellPrice: 20,
-                buyPrice: 20,
-                variants: [],
-                variantsActive: false,
-                included: false
-            },
-            {
-                name: 'Dead Dog',
-                sellPrice: 20,
-                buyPrice: 20,
-                variants: [],
-                variantsActive: false,
-                included: false
-            }
-        ]
-
-        addItem() {
-            this.items.push({
-                name: '',
-                sellPrice: 35,
-                buyPrice: 65,
-                variants: [],
-                variantsActive: false,
-                included: false
-            })
-            this.one('updated', ()=>{
-                this.refs['item'][this.items.length - 1].editItem()
-            })
+        import '../../ssf-dialog.html'
+        import { getDefaultItems } from '../../../api'
+        this.on('mount', async ()=>{
+            this.items = await getDefaultItems()
             this.update()
-        }
-
-        removeItem(e) {
-            e.preventDefault()
-            console.log(e.item.index);
-            this.items.splice(e.item.index, 1)
-            this.update()
-        }
-
-        editName(e) {
-            e.item.item.name = e.target.value
-            this.update()
-        }
-
-        editSellPrice(e) {
-            e.parent.opts.item.sellPrice = e.refs.slider.value
-            this.update()
-        }
-
-        editBuyPrice(e) {
-            e.parent.opts.item.buyPrice = e.refs.slider.value
-            this.update()
-        }
-
-        checkVariants(e) {
-            e.item.item.variantsActive = !e.item.item.variantsActive
-            this.update()
-        }
-
-        removeVariant(e) {
-            let data = e.target.dataset
-            let variants = this.items[data.itemIndex].variants
-            variants.splice(variants.indexOf(variants[data.variantIndex]),1)
-            this.update()
-        }
-
-        addOption(e) {
-            e.item.item.variants.push('')
-            this.update()
-        }
-
-        this.on('mount', ()=>{
-            this.refs.item.map(item=>{
-                item.refs.dialog.refs.included.on('toggle', ()=>{
-                    this.update()
-                })
-                item.refs.dialog.refs.variantsActive.on('toggle', (checked)=>{
-                    item.variantsActive = checked
-                    console.log(item.variantsActive);
-                    this.update()
-                })
-            })
         })
-    </script>
-    <style type="text/less">
-        @import "src/less/variables.less";
-        .items__add {
-            padding: 0 4em;
-            min-height: 5em;
-            border: 1px solid @color-primary;
-            border-radius: .25em;
-            text-align: center;
-            display: flex;
-            align-content: center;
-            align-items: center;
-            cursor: pointer;
-            margin-bottom: 1em;
+        
+        updateImage(e) {
+            this.itemToUpdate = e.item.item
+            this.refs.dialog.open()
         }
-    </style>
+        
+        selectImage(e) {
+            this.itemToUpdate.image = e.item.image
+            this.refs.dialog.close()
+            this.update()
+        }
+        
+        updateTitle(e) {
+            e.item.item.title = e.target.value
+        }
+        
+        updateBuyPrice(e) {
+            e.item.item.buyPrice = e.target.value
+        }
+        
+        updateSellPrice(e) {
+            e.item.item.sellPrice = e.target.value
+        }
+        
+        updateSummary(e) {
+            e.item.item.summary = e.target.value
+        }
+        
+        createItem(e) {
+            this.items.push({
+                title: 'Item',
+                image: api.images.default,
+                buyPrice: 2,
+                sellPrice: 2,
+                included: false,
+                summary: 'Ein neues item! Beschreibe was es bietet',
+            })
+        }
+        
+        deleteItem(e) {
+            this.items.splice(this.items.findIndex(item=>item.title==e.item.item.title), 1)
+        }
+    </script>
 </event-items-editor>

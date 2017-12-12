@@ -1,146 +1,81 @@
 <event-pages-editor>
     <h2>Seiten</h2>
-    <div layout="row" layout-align="space-between" class="pages">
-        <ssf-item-editor
-            edit-item-label="Item Bearbeiten"
-            ref="item"
-            each={item,index in pages}
-            item={item}
-            class="item"
-            flex="100" flex-gt-sm="45" flex-gt-md="30">
-            <yield to="actions">
-                <button onclick={editItem}>E</button>
-                <button onclick={parent.removeItem}>&times;</button>
-            </yield>
-            <yield to="content">
-                <div>AAA</div>
-            </yield>
-            <yield to="editor">
-                <div layout="row" layout-align="space-between">
-                    <div flex-gt-sm="45">
-                        <label class="field-group">
-                            <span class="field-group__label field-group__label--primary">Name</span>
-                            <input class="field-group__input" oninput={parent.parent.editName} type="text" name="name" value={opts.item.name} required>
-                        </label>
-                    </div>
-                    <div flex-gt-sm="45">
-                        <fieldset>
-                            <label for="price">
-                                Optionen
-                                <small>Zum Beispiel bei T-shirts: S, M, L und XL</small>
-                            </label>
-                            <input type="checkbox" {checked: opts.item.variantsActive} onchange={parent.parent.checkOptions}>
-                        </fieldset>
-                        <div if={opts.item.variantsActive}>
-                            <div each={option in opts.item.variants}>
-                                <input type="text">
-                            </div>
-                            <div onclick={parent.parent.addOption}>+</div>
-                        </div>
-                    </div>
-                </div>
-            </yield>
-        </ssf-item-editor>
-        <div flex="100" flex-gt-sm="45" flex-gt-md="30" class="pages__add" onclick={addItem}>
-            +<br>
-            Neue Seite anlegen
+    <p>Hier kannst Du Seiten anlegen und diese verwalten.</p>
+    <p class="notification notification--warning">Die Inhalte kannst Du erst nach dem Erstellen des Events bearbeiten</p>
+    
+    <div layout="row" layout-align="start">
+        <div flex="30" class="role card card--light" each={page in pages}>
+            <div style="width: 100%;" class="actions" layout="row" layout-align="end end">
+                <button onclick={deletePage}>X</button>
+            </div>
+            <div onclick={select} class="icon-card">
+                <input oninput={updateTitle} class="icon-card__title" value={page.title}>
+                <img onclick={updateTemplate} class="icon-card__image icon-card__editable" src="{page.image}">
+            </div>
         </div>
-        <article flex="100" flex-gt-sm="45" flex-gt-md="30"></article>
+        <div flex="30" class="role card card--light" layout="column" layout-align="center center">
+            <div onclick={createPage} class="icon-card icon-card__image" layout="column" layout-align="center center">
+                <span class="icon-card__title">Neue Seite</span>
+                <span>+</span>
+            </div>
+        </div>
     </div>
+    <ssf-dialog ref="dialog" size="large" heading="Wähle ein Template">
+        <div layout="row" layout-align="center center">
+            <div class="icon-card icon-card__editable" layout="column" layout-align="center center" onclick={parent.parent.selectTemplate} each={template, name in parent.templates}>
+                <span class="icon-card__title">{template.title}</span>
+                <img class="icon-card__image" src="{template.image}">
+            </div>
+            {template.summary}
+        </div>
+    </ssf-dialog>
     <script>
-        import '../../ssf-item-editor.html'
-        import '../../ssf-toggle.html'
-        import {getPageModules} from '../../../api'
-
-        this.templates = [
-            {
-                name : '',
+        import '../../ssf-dialog.html'
+        import {getTemplates} from '../../../api'
+        
+        this.on('mount', async ()=>{
+            this.templates = await getTemplates()
+            this.pages = this.opts.pages || [...this.templates]
+            if (this.opts.pages) {
+                this.pages.map(page=>{page.initial = true})
+            } else {
+                this.pages.map(page=>{page.initial = false})
             }
-        ]
+            this.update()
+        })
+        
+        updateTemplate(e) {
+            this.pageToUpdate = e.item.page
+            this.refs.dialog.open()
+        }
 
-        this.pages = [
-            {
-                name: 'Home',
-                template: '',
-                removable: false,
-            },
-            {
-                name: 'Registrierung',
-                template: '',
-                removable: false,
-            },
-            {
-                name: 'Gästeliste',
-                template: '',
-                removable: false,
-            },
-            {
-                name: 'Anfahrt & Kontakt',
-                template: '',
-                removable: true,
-            }
-        ]
-
-        addItem() {
+        selectTemplate(e) {
+            this.pageToUpdate.image = e.item.template.image
+            this.pageToUpdate.pageModules = e.item.template.pageModules
+            this.refs.dialog.close()
+            this.update()
+        }
+        
+        updateTitle(e) {
+            e.item.page.title = e.target.value
+        }
+        
+        createPage(e) {
             this.pages.push({
-                name: '',
-                sellPrice: 35,
-                buyPrice: 65,
-                variants: [],
-                variantsActive: false,
-                included: false
+                title: 'Page',
+                image: this.templates[0].image,
+                pageModules: 'arr',
+                summary: 'arr',
             })
-            this.one('updated', ()=>{
-                this.refs['item'][this.pages.length - 1].editItem()
-            })
-            this.update()
         }
-
-        removeItem(e) {
+        
+        deletePage(e) {
             e.preventDefault()
-            console.log(e.item.index);
-            this.pages.splice(e.item.index, 1)
-            this.update()
-        }
-
-        editName(e) {
-            e.item.item.name = e.target.value
-            this.update()
-        }
-
-        editSellPrice(e) {
-            e.parent.opts.item.sellPrice = e.refs.slider.value
-            this.update()
-        }
-
-        editBuyPrice(e) {
-            e.parent.opts.item.buyPrice = e.refs.slider.value
-            this.update()
-        }
-
-        checkOptions(e) {
-            e.item.item.variantsActive = !e.item.item.variantsActive
-            this.update()
-        }
-
-        addOption(e) {
-            e.item.item.variants.push('')
-            this.update()
+            this.pages.splice(this.pages.findIndex(page=>page.title==e.item.page.title), 1)
         }
     </script>
     <style type="text/less">
         @import "src/less/variables.less";
-        .pages__add {
-            padding: 0 4em;
-            min-height: 5em;
-            border: 1px solid @color-primary;
-            border-radius: .25em;
-            text-align: center;
-            display: flex;
-            align-content: center;
-            align-pages: center;
-            cursor: pointer;
-            margin-bottom: 1em;
-        }
+        
     </style>
 </event-pages-editor>

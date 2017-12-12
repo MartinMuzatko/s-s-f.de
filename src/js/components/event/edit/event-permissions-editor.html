@@ -1,0 +1,86 @@
+<event-permissions-editor>
+    <h3>Neuer Helfer</h3>
+    <div class="card card--light content content--padded">
+        <div layout="row" layout-align="space-between start">
+            <user-filter flex="75" ref="filter" label="Helfer"></user-filter>
+            <button flex="20" class="button button--primary" onclick={addHelper}>Helfer hinzufügen</button>
+        </div>
+    </div>
+    <div layout="row" layout-align="space-between">
+        <div each={helper, index in helpers} flex="45" style="margin: 1em;" class="card card--light content--padded">
+            <div layout="row" layout-align="space-between center">
+                <div layout="row" layout-align="start center">
+                    <img class="avatar avatar--round avatar--small" src="{helper.user.avatar}" alt="{helper.user.username}">
+                    <span>{helper.user.username}</span>
+                </div>
+                <button if={index} onclick={removeHelper} class="button button--secondary">Benutzer Entfernen</button>
+            </div>
+            <p if={!index}>
+                Als Administrator hast Du alle Berechtigungen für dieses Event.
+            </p>
+            <div if={index}>
+                <ssf-toggle ref="permissiontoggle" item={permission} each={permission in helper.permissions} active={permission.active} label="{permission.title}"></ssf-toggle>
+            </div>
+        </div>
+    </div>
+    <script>
+        import '../../ssf-toggle.html'
+        import '../../user/user-filter.html'
+        import {getPermissions} from '../../../api'
+        
+        addHelper(event) {
+            event.preventDefault()
+            let user = this.refs.filter.users.find(user=>user.username == this.refs.filter.getUser())
+            if (!~this.findUser(user.name)) {
+                this.helpers.push({
+                    user: user,
+                    permissions: this.getPermissionSet(false)
+                })
+                this.refs.filter.refs.input.refs.input.value = ''
+            } else {
+                // this.refs.filter.refs.input.refs.input.setVali
+            }
+            //this.helpers.push({})
+        }
+        
+        removeHelper(event) {
+            event.preventDefault()
+            let index = this.findUser(event.item.helper.user.name)
+            this.helpers.splice(index, 1)
+        }
+        
+        findUser(name) {
+            return this.helpers.findIndex(helper=>helper.user.name == name)
+        }
+        
+        getPermissionSet(active = false) {
+            return this.availablePermissions.map(
+                permission => {
+                    return {
+                        name: permission.name,
+                        title: permission.title,
+                        active: active
+                    }
+                }
+            )
+        }
+        
+        togglePermission(event) {
+            event.item.active = !event.item.active
+        }
+        
+        this.on('mount', async ()=>{
+            this.availablePermissions = await getPermissions() 
+            this.helpers = opts.helpers || [
+                {
+                    user: api.user,
+                    permissions: this.getPermissionSet(true)
+                }
+            ]
+            this.update()
+            this.on('updated', ()=>{
+                this.refs.permissiontoggle && this.refs.permissiontoggle.map(toggle=>toggle.opts.onchange = this.togglePermission)
+            })
+        })
+    </script>
+</event-permissions-editor>

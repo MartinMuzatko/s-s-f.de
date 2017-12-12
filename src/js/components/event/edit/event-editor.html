@@ -3,11 +3,11 @@
         <ssf-step-indicator ref="stepIndicator" steps={steps}></ssf-step-indicator>
         <form onsubmit={submit} method="POST" action="">
             <div>
-                <div show={currentRoute == step.route} ref="{step.route}" each={step in steps} data-is={'event-edit-'+step.route}></div>
+                <div data-is={'event-edit-'+step.route} canpublish={opts.canpublish} show={currentRoute == step.route} ref="{step.route}" each={step in steps}></div>
             </div>
             <div if={refs.stepIndicator.steps} class="form-legend" layout="row" layout-align="space-between">
-                <a href="#{refs.stepIndicator.getPreviousStep().route}" flex-start if={!refs.stepIndicator.isFirstStep()} class="button button--primary">Voriger Schritt</a>
-                <a href="#{refs.stepIndicator.getNextStep().route}" flex-end if={!refs.stepIndicator.isLastStep()} class="button button--primary">Nächster Schritt</a>
+                <a onclick={jumpToTop} href="#{refs.stepIndicator.getPreviousStep().route}" flex-start if={!refs.stepIndicator.isFirstStep()} class="button button--primary">Voriger Schritt</a>
+                <a onclick={jumpToTop} href="#{refs.stepIndicator.getNextStep().route}" flex-end if={!refs.stepIndicator.isLastStep()} class="button button--primary">Nächster Schritt</a>
                 <input flex-end if={refs.stepIndicator.isLastStep()} type="submit" class="button button--primary" name="" value="Event erstellen">
             </div>
         </form>
@@ -26,6 +26,7 @@
         import route from 'riot-route'
         import './event-edit-general.html'
         import './event-edit-registration.html'
+        import './event-edit-notifications.html'
         import './event-edit-pages.html'
         import '../../ssf-step-indicator.html'
 
@@ -38,6 +39,10 @@
             {
                 name: 'Registrierung',
                 route: 'registration'
+            },
+            {
+                name: 'Benachrichtigungen',
+                route: 'notifications'
             },
             {
                 name: 'Seiten',
@@ -59,29 +64,41 @@
                 this.update()
             })
         })
+        
+        jumpToTop() {
+            window.scrollTo(0,0)
+        }
 
         submit(e) {
             e.preventDefault()
             let dates = this.refs.general.tags['event-duration-editor'].refs.date.datepicker
             let [startDate, endDate] = dates.selectedDates.map(date=>dates.formatDate(date, 'U'))
+            
+            let regDates = this.refs.registration.tags['event-duration-editor'].refs.date.datepicker
+            let [regStartDate, regEndDate] = regDates.selectedDates.map(date=>dates.formatDate(date, 'U'))
             var data = {
                 startDate : startDate || 0,
                 endDate : endDate || 0,
+                registration: {
+                    startDate : regStartDate || 0,
+                    endDate : regEndDate || 0,
+                },
                 title : this.refs.general.refs.title.value,
                 summary : this.refs.general.refs.summary.getContent(),
                 street : this.refs.general.refs.street.value,
                 city : this.refs.general.refs.city.value,
                 zip : this.refs.general.refs.zip.value,
-                roles: [],
-                items: this.refs.registration.refs.items.items,
                 ticketLimit : this.refs.registration.refs.tickets.limit,
                 sellPrice: this.refs.registration.refs.tickets.price,
+                helpers: this.refs.general.refs.helpers.helpers,
+                items: this.refs.registration.refs.items.items,
+                sponsorlevels: this.refs.registration.refs.sponsorship.sponsorlevels,
+                roles: this.refs.registration.refs.roles.getActiveRoles(),
+                notifications: this.refs.notifications.getNotifications(),
+                pages: this.refs.pages.refs.pages.pages,
             }
             console.log(data);
             this.trigger('submit', data)
         }
-
-
-
     </script>
 </event-editor>

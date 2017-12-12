@@ -1,14 +1,15 @@
 <event-edit-general>
+    publish: {opts.canpublish+''}
     <h2 class="heading text-or"><span>Beschreibung</span></h2>
     <div layout="row" layout-align="space-between end">
         <div flex="65">
             <label class="field-group">
                 <span class="field-group__label field-group__label--primary">Titel</span>
-                <input class="field-group__input" type="text" name="title" required autofocus>
+                <input class="field-group__input" maxlength="36" ref="title" type="text" required autofocus>
             </label>
             <label class="field-group" layout="column">
                 <span class="field-group__label field-group__label--primary">Zusammenfassung</span>
-                <ssf-editor ref="summary"></ssf-editor>
+                <ssf-editor limit="280" ref="summary"></ssf-editor>
             </label>
         </div>
         <div flex="30" flex-end>
@@ -37,7 +38,7 @@
             </label>
             <label class="field-group">
                 <span class="field-group__label field-group__label--primary">Land</span>
-                <select class="field-group__input">
+                <select ref="country" class="field-group__input">
                     <option value="">Deutschland</option>
                     <option value="">Österreich</option>
                     <option value="">Schweiz</option>
@@ -48,8 +49,11 @@
             <ssf-map ref="map" zoom="12"></ssf-map>
         </div>
     </div>
+    <h2 class="heading text-or"><span>Berechtigungen</span></h2>
+    <event-permissions-editor ref="helpers"></event-permissions-editor>
     <script>
         import './event-duration-editor.html'
+        import './event-permissions-editor.html'
         import '../../ssf-map.html'
         import '../../ssf-dropzone.html'
         import '../../ssf-suggestioninput.html'

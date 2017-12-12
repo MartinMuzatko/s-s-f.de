@@ -1,6 +1,6 @@
 <event-update>
     <h1 class="heading heading--menu">Event bearbeiten</h1>
-    <event-editor ref="editor"></event-editor>
+    <event-editor canpublish={opts.canpublish} ref="editor"></event-editor>
     <script>
         import './event-editor.html'
         import {getEventData} from '../../../api'

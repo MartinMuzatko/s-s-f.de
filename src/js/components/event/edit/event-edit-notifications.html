@@ -1,0 +1,45 @@
+<event-edit-notifications>
+    <div>
+        <h2 class="heading text-or"><span>Notifications</span></h2>
+        <p>Hier kann festgelegt werden, welche Nachrichten bei bestimmten Aktionen versendet werden.</p>
+        <div each={notification in notifications}>
+            <h3>{notification.trigger}</h3>
+            <label class="field-group">
+                <span class="field-group__label field-group__label--primary">Titel:</span>
+                <input class="field-group__input" type="text" oninput={updateTitle} value={notification.title}></label>
+            <ssf-editor ref="editor" data-trigger="{notification.trigger}" content="{notification.text}"></ssf-editor>
+        </div>
+        <h2 class="heading text-or"><span>Footer</span></h2>
+        <p>Dieser Text wird an jede Nachricht automatisch angehängt</p>
+        <ssf-editor ref="footer" content="{footer}"></ssf-editor>
+    </div>
+    <script>
+        import { getDefaultNotifications } from '../../../api'
+        import '../../ssf-editor.html'
+        
+        this.notifications = []
+        this.footer = `<p>Liebe Grüße,<br>Dein Eventteam</p>`
+
+        this.on('mount', async ()=>{
+            this.notifications = await getDefaultNotifications()
+            this.update()
+        })
+
+        getNotifications() {
+            return this.notifications.map(
+                notification => {
+                    notification.text = this.refs.editor.find(editor=>editor.opts.dataTrigger == notification.trigger).getContent()
+                    return notification
+                }
+            )
+        }
+
+        updateTitle(e) {
+            e.item.notification.title = e.target.value
+        }
+
+        updateTitle(e) {
+            e.item.notification.title = e.target.value
+        }
+    </script>
+</event-edit-notifications>

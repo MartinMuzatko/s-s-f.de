@@ -1,24 +1,48 @@
 <event-sponsorship-editor>
     <h2>Sponsorenlevel</h2>
-    <p>Hier kannst du definieren, ab welchem Betrag Goodies enthalten sind.</p>
-    <div class="sponsorlevels" layout="row">
-        <div flex="25" class="sponsorlevels__menu" layout="column">
-            <div onclick={selectSponsorLevel} class="sponsorlevels__menu-item {sponsorlevel.name == selectedSponsorLevel.name ? 'sponsorlevels__menu-item--selected' : ''}" each={sponsorlevel in sponsorlevels}>
+    <p>Hier kannst Du definieren, ab welchem Betrag Goodies enthalten sind.</p>
+    <div class="sponsorlevels card card--light" layout="row">
+        <div flex="25" class="menu" layout="column">
+            <div onclick={selectSponsorLevel} class="menu__item {sponsorlevel.name == selectedSponsorLevel.name ? 'menu__item--selected' : ''}" each={sponsorlevel in sponsorlevels}>
                 {sponsorlevel.name}
                 <span if={sponsorlevel.name == selectedSponsorLevel.name}></span>
             </div>
-            <div class="sponsorlevels__menu-item" onclick={addSponsorLevel}>
+            <div class="menu__item" onclick={addSponsorLevel}>
                 +
             </div>
         </div>
         <div flex="75" class="sponsorlevels__form content content--padded">
-            <input oninput={editName} type="text" value={selectedSponsorLevel.name}>
-            <div class="field-group" layout="row">
-                <label for="buyPrice">Mindestpreis:
-                    <event-item-price-slider onupdate={parent.parent.minPrice} ref="minPrice" options={{start: opts.item.minPrice}}></event-item-price-slider>
-                </label>
+            <div if={selectedSponsorLevel}>
+                <div layout="row" layout-align="space-between">
+                    <input onblur={checkEmptyName} required oninput={editName} type="text" value={selectedSponsorLevel.name}>
+                    <button class="button button--primary" onclick={deleteSponsorLevel}>Delete</button>
+                </div>
+                <div layout="row" layout-align="space-between">
+                    <div flex-gt-sm="75">
+                        <label class="field-group" layout="column">
+                            <div class="field-group__label">Mindestpreis</div>
+                            <event-item-price-slider ref="minPrice" options={{start: selectedSponsorLevel.minPrice}}></event-item-price-slider>
+                        </label>
+                        <div class="field-group" layout="column">
+                            <div class="field-group__label field-group__label--primary">Beschreibung</div>
+                            <ssf-editor ref="editor"></ssf-editor>
+                        </div>
+                    </div>
+                    <div flex-gt-sm="20">
+                        <h3>Items</h3>
+                        <label each={item in items}>
+                            <input type="checkbox" checked={selectedSponsorLevel.items.has(item)} onchange={addItemToSponsorLevel}>
+                            {item.name}
+                        </label>
+                    </div>
+                </div>
             </div>
-            <ssf-editor inline></ssf-editor>
+            <div if={!selectedSponsorLevel} layout="column" layout-align="center center">
+                <p>Es gibt keine Sponsorlevel. Erstelle eines.</p>
+                <div class="button button--primary" onclick={addSponsorLevel}>
+                    +
+                </div>
+            </div>
         </div>
     </div>
     <script>
@@ -28,67 +52,79 @@
         
 
         this.sponsorlevels = DEFAULT_SPONSORLEVELS
+        this.selectedSponsorLevel = this.sponsorlevels[0] // have to set, to make if condition in render phase exist, to trigger event ready
 
-        this.selectedSponsorLevel = this.sponsorlevels[0]
-
+        
         addSponsorLevel() {
             // let nameExists = this.sponsorlevels.filter(level=>level.name=='Supporter')
             this.sponsorlevels.push({
                 name: 'Supporter',
                 minPrice: 20,
-                summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön'
+                summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön',
+                items: [],
             })
+            this.selectedSponsorLevel = this.sponsorlevels[this.sponsorlevels.length - 1]
+        }
+        
+        addItemToSponsorLevel(event) {
+            this.selectedSponsorLevel.items.has(event.item.item) 
+                ? this.selectedSponsorLevel.items.delete(event.item.item)
+                : this.selectedSponsorLevel.items.add(event.item.item)
+                
+            console.log(this.selectedSponsorLevel.items)
+        }
+
+        checkEmptyName(event) {
+            event.target.value = event.target.value.length ? event.target.value : 'Titel'
+            this.editName(event)
         }
         
         editName(event) {
             this.selectedSponsorLevel.name = event.target.value
         }
-        removeItem(e) {
+
+        deleteSponsorLevel(e) {
             e.preventDefault()
-            console.log(e.item.index);
-            this.items.splice(e.item.index, 1)
-            this.update()
-        }
-        
-        addOption(e) {
-            e.item.item.variants.push('')
+            let index = this.sponsorlevels.findIndex(level => level.name == this.selectedSponsorLevel.name)
+            this.sponsorlevels.splice(index, 1)
+            if (this.sponsorlevels[index]) {
+                this.selectedSponsorLevel = this.sponsorlevels[index]
+            } else if (this.sponsorlevels[index - 1]) {
+                this.selectedSponsorLevel = this.sponsorlevels[index - 1]
+            } else {
+                this.selectedSponsorLevel = undefined
+            }
             this.update()
         }
         
         selectSponsorLevel(event) {
-            this.selectedSponsorLevel = event.item.sponsorlevel 
+            this.trigger('select', event.item.sponsorlevel)
         }
+        
+        this.on('select', (level)=>{
+            this.selectedSponsorLevel = level
+            this.refs.editor.editor.setContent(level.summary)
+            this.update()
+        })
 
+        this.on('items-changed', items=>{
+            this.items = items
+            this.update()
+        })
+        
         this.on('mount', ()=>{
-            
+            this.refs.editor.on('ready', ()=>{
+                this.trigger('select', this.sponsorlevels[0])
+            })
         })
     </script>
     <style type="text/less">
         @import "src/less/variables.less";
         
         .sponsorlevels {
-            background-color: @color-light;
-        }
-        .sponsorlevels__menu {
-            background-color: @color-primary-light;
-            
-            &-item {
-                padding: 1em;
-                cursor: pointer;
-                background-color: @color-primary-light;
-                &:hover {
-                    background-color: @color-primary;
-                }
+            &__form {
+                min-height: 5em;
             }
-            
-            &-item--selected {
-                background-color: @color-light;
-            }
-        }
-        
-        
-        .sponsorlevels {
-            box-shadow: 0 0 .125em @color-dark-shadow;
         }
         
     </style>

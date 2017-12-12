@@ -1,17 +1,24 @@
 <event-duration-editor>
-    <div layout="row" layout-align="space-between end">
-        <label class="field-group" flex="100" flex-gt-sm="30" layout="column">
-            <span class="field-group__label field-group__label--primary">Datum</span>
-            <ssf-datepicker class-name="field-group__input" name="date" required ref="date" options={rangeOptions}></ssf-datepicker>
-        </label>
-        <label class="field-group" flex="100" flex-gt-sm="30">
-            <span class="field-group__label field-group__label--primary">Start Zeit</span>
-            <ssf-datepicker class-name="field-group__input" name="end" ref="startTime" options={timeOptions}></ssf-datepicker>
-        </label>
-        <label class="field-group" flex="100" flex-gt-sm="30">
-            <span class="field-group__label field-group__label--primary">End Zeit</span>
-            <ssf-datepicker class-name="field-group__input" name="end" ref="endTime" options={timeOptions}></ssf-datepicker>
-        </label>
+    <div layout="row" layout-align="center center">
+        <div flex-gt-sm="80" flex-gt-lg="50">
+            <label class="field-group" flex="100" flex-gt-sm="45" layout="column">
+                <div flex-nowrap class="field-group__label field-group__label--primary" layout="row">
+                    <span flex="50">Startdatum</span>
+                    <span flex="50">Enddatum</span>
+                </div>
+                <ssf-datepicker class-name="field-group__input" name="date" required ref="date" options={rangeOptions}></ssf-datepicker>
+            </label>
+            <div layout="row">
+                <label class="field-group" flex="100" flex-gt-sm="50">
+                    <span class="field-group__label field-group__label--primary">Startzeit</span>
+                    <ssf-datepicker class-name="field-group__input" name="end" ref="startTime" options={timeOptions}></ssf-datepicker>
+                </label>
+                <label class="field-group" flex="100" flex-gt-sm="50">
+                    <span class="field-group__label field-group__label--primary">Endzeit</span>
+                    <ssf-datepicker class-name="field-group__input" name="end" ref="endTime" options={timeOptions}></ssf-datepicker>
+                </label>
+            </div>
+        </div>
     </div>
     <script>
         import '../../ssf-datepicker.html'
@@ -19,6 +26,7 @@
 
         this.rangeOptions = {
             mode: 'range',
+            dateFormat: 'd.m.Y',
             allowInput: true,
             locale : {
                 firstDayOfWeek: 1,

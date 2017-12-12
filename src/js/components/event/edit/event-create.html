@@ -15,7 +15,7 @@
             <p><a class="button button--primary" href="{parent.parent.eventUrl}">Zum Event</a></p>
         </yield>
     </ssf-loader>
-    <event-editor inactive="{isIntroVisible}" ref="editor"></event-editor>
+    <event-editor inactive="{isIntroVisible}" canpublish={opts.canpublish} ref="editor"></event-editor>
     <script>
         import '../../ssf-loader.html'
         import './event-editor.html'
@@ -23,7 +23,7 @@
 
         const MIN_LOAD_TIME = 1500
 
-        this.isIntroVisible = true
+        this.isIntroVisible = !true
 
         this.on('mount', ()=>{
             this.refs.editor.on('submit', async (data)=>{
@@ -32,8 +32,8 @@
                 this.refs.loader.trigger('load')
                 await Promise.all([
                     (async ()=>{
-                        //let result = await createEvent(data)
-                        //this.eventUrl = result
+                        let result = await createEvent(data)
+                        this.eventUrl = JSON.parse(result)
                     })(),
                     (async ()=>{
                         return new Promise(resolve => setTimeout(resolve, MIN_LOAD_TIME))

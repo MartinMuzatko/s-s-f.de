@@ -1,0 +1,34 @@
+<event-roles-editor>
+    <p>Aktiviere die Rollen die Du zur Auswahl haben möchtest.</p>
+    <a click={activateAll} class="button button--primary">Alle Rollen auswählen</a>
+    <div layout="row" layout-align="start">
+        <div flex="30" class="role card card--light" each={role in roles}>
+            <div onclick={activate} class="icon-card {role.active ? 'notification--success' : ''}">
+                <span class="icon-card__title">{role.title}</span>
+                <img class="icon-card__image" src="{role.image}" alt="">
+            </div>
+            <p class="role__summary">{role.summary}</p>
+        </div>
+    </div>
+    <script>
+        import { getDefaultRoles } from '../../../api'
+        
+        this.on('mount', async ()=>{
+            this.roles = await getDefaultRoles()
+            this.roles.map(role=>{role.active = false})
+            this.update()
+        })
+        
+        getActiveRoles() {
+            return this.roles.filter(role=>role.active)
+        }
+        
+        activateAll(e) {
+            this.roles.map(role=>{role.active = true})
+        }
+        
+        activate(e) {
+            e.item.role.active = !e.item.role.active
+        }
+    </script>
+</event-roles-editor>

@@ -1,26 +1,37 @@
 <event-edit-registration>
-	<h2 class="heading text-or"><span>Teilnahme</span></h2>
+	
+	<h2 class="heading text-or">
+		<span>Teilnahme</span>
+	</h2>
 	<event-tickets-editor ref="tickets"></event-tickets-editor>
-	<event-sponsorship-editor ref="sponsorship"></event-sponsorship-editor>
-	<h2 class="heading text-or"><span>Rahmenbedingungen</span></h2>
-	<div layout="row">
-		<label class="field-group" flex="30">
-			<span class="field-group__label field-group__label--primary">Mindestalter</span>
-			<input class="field-group__input" value="18" size="30" ref="summary" name="summary" type="text">
-		</label>
-		<label class="field-group" flex="30">
-			<span class="field-group__label field-group__label--primary">Restplätze öffentlich?</span>
-			<ssf-toggle ref="ticketsPublic"></ssf-toggle>
-		</label>
-		<event-registration-duration></event-registration-duration>
-	</div>
+	<h2 class="heading text-or"><span>Bedingungen</span></h2>
+    <div layout="row">
+        <label class="field-group" flex="30">
+            <span class="field-group__label field-group__label--primary">Mindestalter</span>
+            <input class="field-group__input" value="18" size="30" ref="summary" name="summary" type="number" min="0" max="100">
+        </label>
+    </div>
+    <h3>Registrierungszeitraum</h3>
+    <p>Wähle einen Zeitraum, in dem sich Teilnehmer registrieren dürfen</p>
+    <event-duration-editor></event-duration-editor>
+    <h2 class="heading text-or"><span>Rollen</span></h2> 
+    <event-roles-editor ref="roles"></event-roles-editor>
 	<h2 class="heading text-or"><span>Items</span></h2>
 	<event-items-editor ref="items"></event-items-editor>
+	<event-sponsorship-editor ref="sponsorship"></event-sponsorship-editor>
 	<script>
 		import './event-tickets-editor.html'
+        import './event-roles-editor.html'
 		import '../../ssf-dialog.html'
 		import './event-items-editor.html'
 		import './event-sponsorship-editor.html'
-		import './event-registration-duration.html'
+		import './event-duration-editor.html'
+		import './event-tickets-editor.html'
+		
+		this.on('mount', ()=>{
+			this.refs.items.on('items-changed', (items)=>{
+				this.refs.sponsorship.trigger('items-changed', items)
+			})
+		})
 	</script>
 </event-edit-registration>
