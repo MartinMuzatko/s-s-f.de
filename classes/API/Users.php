@@ -14,45 +14,84 @@ class Users extends Resource
     }
 
     public function doesUserExist($username) {
-        $existingUser = $this->users->get($username);
+        $existingUser = $this->users->get($this->sanitizer->username($username));
         return $existingUser instanceof ProcessWire\User;
     }
     
     public function getUser($username)
     {
         if ($this->doesUserExist($username)) {
-            return new User($this->users->get($username));
+            return new User($this->users->get($this->sanitizer->username($username)));
         }
     }
 
-    public function getAllSpecies()
-    {
-        $users = $this->users->find('template=user');
-        $species = [];
-        foreach ($users as $user) {
-            if ($user->species->title) {
-                array_push($species, $user->species->title);
-            }
+    public function updateUser(ProcessWire\WireInputData $submission, $user) {
+        $errors = $this->validateUser($submission);
+        if (count($errors)) {
+            return $errors;
+        } else {
+            $this->setUserFields($user, $submission);
+            return [];
         }
-        return array_values(array_unique($species));
     }
 
+    public function setUserFields($user, $data, $create = false) {
+        $user->of(false);
+        $user->email = $this->sanitizer->text($data->email);
+        $user->species = $this->sanitizer->text($data->species);
+        $user->firstname = $this->sanitizer->text($data->firstname);
+        $user->lastname = $this->sanitizer->text($data->lastname);
+        $user->pass = $this->sanitizer->text($data->password);
+        $user->email = $this->sanitizer->text($data->email);
+        $user->street = $this->sanitizer->text($data->street);
+        $species = $this->sanitizer->text($data->species);
+        $speciesPage = $this->pages->get('/resources/species');
+        $specieExists = $speciesPage->get("title=$species");
+        if ($specieExists instanceof \ProcessWire\NullPage) {
+            $specie = new \ProcessWire\Page;
+            $specie->parent = $speciesPage;
+            $specie->template = 'user-specie';
+            $specie->title = $species;
+            $specie->save();
+        }
+        $user->species = $this->sanitizer->text($data->species);
+        $user->zip = $this->sanitizer->text($data->zip);
+        $user->city = $this->sanitizer->text($data->city);
+        $user->country = $this->sanitizer->text($data->country);
+        if ($create) {
+            $user->birthdate = $this->sanitizer->text($data->birthdate);
+        }
+        $user->save();
+        return $user;
+    }
+    
     private function createUser($data)
     {
-        $newUser = $this->users->add($data->username);
-        $newUser->email = $email;
-        $newUser->species = $species;
-        $newUser->firstname = $firstname;
-        $newUser->lastname = $lastname;
-        $newUser->password = $password;
-        $newUser->email = $email;
-        $newUser->street = $street;
-        $newUser->zip = $zip;
-        $newUser->city = $city;
-        $newUser->country = $country;
-        $newUser->birthday = $birthday;
-        $newUser->save();
-        $session->login($username, $password);
+        $username = $this->sanitizer->text($data->username);
+        $newUser = $this->users->add($this->sanitizer->pageName($data->username));
+        $newUser->username = $username;
+        $newUser->addRole('user');
+        $this->setUserFields($newUser, $data, true);
+
+        // Send notification
+        $context = new ProcessWire\WireData();
+        $context->setArray([
+            'user' => $newUser
+        ]);
+        array_map(
+            function($notification) use ($newUser, $context) {
+                \ProcessWire\sendNotification($notification, $newUser, $context);
+            },
+            $this->wire->pages->get("/resources/notifications")->find("trigger=UserCreated")->getArray()
+        );
+        // Redirect to redirect page or user profile
+        $this->session->login($newUser->name, $data->password);
+        $redirectPage = $this->pages->get($this->input->get->redirect);
+        if($redirectPage instanceof \ProcessWire\NullPage) {
+            $this->session->redirect($this->pages->get('/')->url.'users/'.$newUser->name);
+        } else {
+            $this->session->redirect($redirectPage->url);
+        }
     }
 
     public function doesUserWithSameMailExist($email)
@@ -63,11 +102,11 @@ class Users extends Resource
 	public function isUsernameAllowed($username)
 	{
 		$blacklist = [
-			'/^page\d+$/gi',
-			'/^delete$/gi',
-			'/^login$/gi',
-			'/^logout$/gi',
-			'/^register$/gi',
+			'/^page\d+$/i',
+			'/^delete$/i',
+			'/^login$/i',
+			'/^logout$/i',
+			'/^register$/i',
 		];
 		foreach ($blacklist as $regex) {
 			if(preg_match($regex, $username)) {
@@ -75,20 +114,20 @@ class Users extends Resource
 			}
 		}
 		return true;
-	}
-
-    public function registerUser(ProcessWire\WireInputData $submission)
-    {
-        $fields = $this->templates->get('user')->fields;
+    }
+    
+    public function validateUser(ProcessWire\WireInputData $submission) {
         $errors = [];
-
         $form = $this->modules->get("InputfieldForm");
         $form->attr("id+name",'subscribe-form');
-
+    
         if (!count($submission)) {
             $form->error('no submission data');
             return;
         }
+
+        $fields = $this->templates->get('user')->fields;
+
         foreach ($submission as $key => $value) {
             $field = $fields->{$key};
             if ($field instanceof ProcessWire\Field) {
@@ -97,31 +136,37 @@ class Users extends Resource
             }
         }
         $form->processInput($submission);
+        if ($submission->username && \ProcessWire\Wire('user')->name == 'guest') {
+            if (strlen($submission->username) && $this->doesUserExist($submission->username)) {
+                $form->username->error("Der Benutzer $submission->username existiert bereits");
+            }
+            if (strlen($submission->username) && !$this->isUsernameAllowed($submission->username)) {
+                $form->username->error("Der Benutzername $submission->username ist nicht erlaubt.");
+            }
+            if (strlen($submission->email) && $this->doesUserWithSameMailExist($submission->email)) {
+                $form->email->error("Die Email $submission->email wird bereits verwendet");
+            }
+        }
+        
+        if ($form->pass) {
+            if ($submission->pass == $submission->email) {
+                $form->pass->error('Please pick another password than your email');
+            }
+            if ($submission->pass == $submission->username) {
+                $form->pass->error('Please pick another password than your username');
+            }
+        }
+        return $form->getErrors();
+    }
 
-        if (strlen($submission->username) && $this->doesUserExist($submission->username)) {
-            $form->username->error("User $submission->username already exists");
+    public function registerUser(ProcessWire\WireInputData $submission)
+    {
+        $errors = $this->validateUser($submission);
+        if (count($errors)) {
+            return $errors;
+        } else {
+            $this->createUser($submission);
         }
-		if (strlen($submission->username) && $this->isUsernameAllowed($submission->username)) {
-            $form->username->error("Username $submission->username is blacklisted");
-        }
-        if (strlen($submission->email) && $this->doesUserWithSameMailExist($submission->email)) {
-            $form->email->error("Email $submission->email already used");
-        }
-        if ($submission->pass != $submission->_pass) {
-            $form->pass->error('Password not same');
-        }
-        if ($submission->pass == $submission->email) {
-            $form->pass->error('Please pick another password than your email');
-        }
-        if ($submission->pass == $submission->username) {
-            $form->pass->error('Please pick another password than your username');
-        }
-        $x = $form->getErrors();
-        var_dump($x);
-        //var_dump(get_class_methods($form));
-        //var_dump($form->firstname);
-
-
     }
 
     public function getPostData()

@@ -1,0 +1,75 @@
+<user-edit>
+    <h2>Profil bearbeiten</h2>
+    <p class="notification notification--warning">
+        Du kannst deinen <strong>Usernamen</strong> nicht selbst ändern. Bitte schreibe hierfür einen <a href="mailto:infurmation@s-s-f.de">Admin</a> an.
+    </p>
+    <user-avatar-upload user="{opts.user}"></user-avatar-upload>
+    <form action="" method="post">
+        <div layout="row" layout-align="space-between">
+            <div flex="100" flex-gt-sm="45">
+                <h3>Anmeldedaten</h3>
+                <label class="field-group">
+                    <span class="field-group__label field-group__label--primary">Email</span>
+                    <input class="field-group__input" type="email" name="email" value="{opts.postdata.email}">
+                </label>
+                <label class="field-group">
+                    <span class="field-group__label field-group__label--primary">Passwort</span>
+                    <input class="field-group__input" type="password" name="password">
+                </label>
+            </div>
+            <div flex="100" flex-gt-sm="45">
+                <h3>Community Einstellungen</h3>
+                <p class="notification notification--warning">
+                    Wenn dein Profil öffentlich ist, können andere User lediglich Nicknamen, Registrierdatum, Spezies sowie deinen Avatar sehen. 
+                    Persönlichere Daten wie Adressen werden wir niemals für andere User sichtbar machen. 
+                    Eventveranstalter können dich immer benachrichtigen und dein komplettes Profil einsehen.
+                </p>
+                <ssf-toggle checked={!opts.postdata.isInvisible} ref="public" label="Profil öffentlich"></ssf-toggle>
+                <ssf-toggle checked={opts.postdata.isQueryable} ref="public" label="Nachrichten von User erhalten"></ssf-toggle>
+                <ssf-toggle checked={opts.postdata.isSubscribedOfficial} ref="public" label="Über neue Events der SSF informiert werden"></ssf-toggle>
+                <ssf-toggle checked={opts.postdata.isSubscribedAll} ref="public" label="Über neue Partnerevents informiert werden"></ssf-toggle>
+            </div>
+        </div>
+        <h3>Personendaten</h3>
+        <div layout="row" layout-align="space-between">
+            <label flex="100" flex-gt-sm="45" class="field-group">
+                <span class="field-group__label field-group__label--primary">Vorname</span>
+                <input class="field-group__input" type="text" required name="firstname" value="{opts.postdata.firstname}">
+            </label>
+            <label flex="100" flex-gt-sm="45" class="field-group">
+                <span class="field-group__label field-group__label--primary">Nachname</span>
+                <input class="field-group__input" type="text" required name="lastname" value="{opts.postdata.lastname}">
+            </label>
+        </div>
+        <ssf-map-editor street={opts.postdata.street} city="{opts.postdata.city}" zip="{opts.postdata.zip}" country="{opts.postdata.country}"
+        ref="address"></ssf-map-editor>
+        <div layout="row" layout-align="space-between">
+            <!-- <label flex="100" flex-gt-sm="45" class="field-group">
+                <span class="field-group__label field-group__label--primary">Geburtsdatum</span>
+                <ssf-datepicker class-name="field-group__input" name="birthdate" options={dataInput} required ref="date" val="{opts.postdata.birthdate}"></ssf-datepicker>
+            </label> -->
+            <ssf-species-select val="{postdata.species}" name="species" ref="species" flex="100" flex-gt-sm="45"></ssf-species-select>
+            <div flex="100" flex-gt-sm="45" class="notification notification--warning">
+                Das Geburtsdatum kann im Nachhinein nicht von dir geändert werden.
+            </div>
+        </div>
+        <input type="hidden" id="_post_token" name="{CSRFToken}" value="{CSRFValue}" />
+        <div class="actions">
+            <input type="submit" class="button button--primary" value="Profil updaten">
+        </div>
+    </form>
+    <script>
+        import './ssf-species-select.html'
+        import '../ssf-datepicker.html'
+        import '../ssf-toggle.html'
+        import '../ssf-map-editor.html'
+
+        this.dataInput = {
+            dateFormat: 'd.m.Y',
+            allowInput: true,
+            locale: {
+                firstDayOfWeek: 1,
+            },
+        }
+    </script>
+</user-edit>

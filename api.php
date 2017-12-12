@@ -48,6 +48,9 @@ $router = new Router([
         );
         return $pages;
     }),
+    new Route('GET', 'countries', function() {
+        return $this->fields->get('name=country')->getInputfield($this->user)->options;
+    }),
     new Route('GET', 'modules', function($path) {
         $modules = array_map(
             function($module) {

@@ -1,0 +1,65 @@
+<ssf-map-editor>
+    <div layout="row" layout-align="space-between">
+        <div flex="100" flex-gt-sm="30">
+            <label class="field-group">
+                <span class="field-group__label field-group__label--primary">Strasse</span>
+                <input value={opts.street} oninput={updateMap} class="field-group__input" type="text" ref="street" name="street">
+            </label>
+            <label class="field-group">
+                <span class="field-group__label field-group__label--primary">PLZ</span>
+                <input value={opts.zip} oninput={updateMap} class="field-group__input" type="text" ref="zip" name="zip">
+            </label>
+            <label class="field-group">
+                <span class="field-group__label field-group__label--primary">Ort</span>
+                <input value={opts.city} oninput={updateMap} class="field-group__input" type="text" ref="city" name="city">
+            </label>
+            <label class="field-group">
+                <span class="field-group__label field-group__label--primary">Land</span>
+                <select value={opts.country} name="country" ref="country" oninput={updateMap} class="field-group__input">
+                    <optgroup label={countries[1]}>
+                        <option each={country, index in countries} if={index < 17 && index > 1} value="{country}">{country}</option>
+                    </optgroup>
+                    <option each={country, index in countries} if={index >= 17} value="{country}">{country}</option>
+                </select>
+            </label>
+        </div>
+        <div flex="100" flex-gt-sm="65">
+            <ssf-map ref="map" zoom="12"></ssf-map>
+        </div>
+    </div>
+    <script>
+    import './ssf-map.html'
+    import debounce from 'debounce'
+    import { getCountries } from '../api'
+    this.countries = ['Deutschland', 'Österreich', 'Schweiz']
+    
+    this.on('mount', async ()=>{
+        this.countries = await getCountries()
+        this.update()
+        this.refs.map.on('droppedMarker', (event) => {
+            console.log(event);
+            try {
+                console.log(event.results);
+                let address = event.results[0].formatted_address.split(',')
+                this.refs.street.value = address[0]
+                this.refs.zip.value = address[1].trim().split(' ')[0]
+                this.refs.city.value = address[1].trim().split(' ')[1]
+                // this.refs.country.value = address[1].trim().split(' ')[2]
+            } catch (e) {
+
+            }
+            this.update()
+
+        })
+    })
+
+    this.debouncedUpdate = debounce(()=>{
+        let address = `${this.refs.street.value} ${this.refs.city.value} ${this.refs.zip.value} ${this.refs.country.value}`
+        this.refs.map.geocodeAddress(address)
+    }, 500)
+    
+    updateMap(e) {
+        this.debouncedUpdate()
+    }        
+    </script>
+</ssf-map-editor>
