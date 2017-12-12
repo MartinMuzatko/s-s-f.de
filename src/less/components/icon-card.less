@@ -1,0 +1,40 @@
+.icon-card {
+    cursor: pointer;
+    width: 12.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: .25em solid @color-dark-shadow;
+    padding: .5em;
+    margin: 1em;
+    border-radius: 2em;
+    &__image {
+        height: 8em;
+    }
+    &--small {
+        font-size: .6em;
+    }
+    &--smaller {
+        font-size: .6em;
+        padding: .2em;
+    }
+    
+    &--selectable {
+        transition: all .2s ease;
+        &:hover {
+            background-color: fadeout(@color-success-subtle, 20%);
+        }
+        &:active {
+            transform: scale(1.1);
+        }
+    }
+    
+    &__title {
+        font-size: @font-size-h3 - .2em;
+        text-align: center;
+    }
+    &__editable:hover {
+        background-image: repeating-linear-gradient(45deg, @color-primary, @color-primary .25em, @color-primary-light .25em, @color-primary-light .5em);
+    }
+}

@@ -309,27 +309,6 @@
     background-color: @color-primary-light-shadow;
 }
 
-.notification {
-    border-radius: @radius-small;
-    border: 1px solid;
-    padding: 1em 2em;
-    margin: 2em 0;
-    &--error {
-        background-color: @color-error-subtle;
-        border-color: @color-error;
-        box-shadow: 0 0 0 .25em @color-error-subtle;
-        color: @color-dark;
-        text-shadow: 1px 0 .25em @color-light-shadow;
-    }
-    &--success {
-        background-color: @color-success-subtle;
-        border-color: @color-success;
-        box-shadow: 0 0 0 .25em @color-success-subtle;
-        color: @color-dark;
-        text-shadow: 1px 0 .25em @color-light-shadow;
-    }
-}
-
 .show, .hide {
     transition: all .5s ease;
 }
@@ -418,7 +397,6 @@
 }
 
 .dropzone {
-    padding: 4.8em 2em;
     border: .25em solid @color-primary;
     text-align: center;
     background-position: center;
@@ -434,6 +412,9 @@
     }
 
     &__label {
+        padding: 4.8em 2em;
+        color: @color-light;
+        text-shadow: 0 1px 1px rgba(38,38,38,1), 0 1px 1px rgba(38,38,38,.5), 0 2px 4px rgba(38,38,38,.5), 0 0 4px rgba(38,38,38,.75);
         cursor: pointer;
     }
 }
@@ -443,6 +424,9 @@
     &--padded {
         padding: 1em;
         clear: both;
+    }
+    &--margin { 
+        margin: .5em;
     }
     &--seamless {
 
@@ -466,6 +450,19 @@
     }
 }
 
+.event-heading {
+    text-align: center;
+    &__title, &__summary {
+        margin: 1em;
+    }
+    &__title {
+        margin: 0;
+    }
+    &__logo {
+        
+    }
+}
+
 .event-view {
     &__content {
         display: flex;
@@ -474,14 +471,6 @@
 
     }
 
-    &__heading {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    &__title, &__summary {
-        margin: 1em;
-    }
 }
 
 .actions {
@@ -490,5 +479,112 @@
     justify-content: center;
     &--centered {
 
+    }
+}
+
+.counter {
+    &--exceeded {
+        color: @color-error;
+    }
+    
+}
+
+.col-grid-3 {
+    display: grid;
+    grid-template-columns: 100%;
+    @media screen and (min-width: @breakpoint-sm) {
+        grid-template-columns: repeat(2, 50%);
+    }
+    @media screen and (min-width: @breakpoint-md) {
+        grid-template-columns: repeat(3, 33.33%);
+    }
+    grid-gap: 1em; 
+}
+
+.col-grid-5 {
+    display: grid;
+    grid-template-columns: repeat(2, 50%);
+    @media screen and (min-width: @breakpoint-sm) {
+        grid-template-columns: repeat(3, 33.33%);
+    }
+    @media screen and (min-width: @breakpoint-md) {
+        grid-template-columns: repeat(5, 20%);
+    }
+    grid-gap: 1em; 
+}
+
+.col-grid-6 {
+    display: grid;
+    grid-template-columns: repeat(3, 33.33%);
+    @media screen and (min-width: @breakpoint-sm) {
+        grid-template-columns: repeat(4, 25%);
+    }
+    @media screen and (min-width: @breakpoint-md) {
+        grid-template-columns: repeat(6, 16.66%);
+    }
+    grid-gap: 1em; 
+}
+
+.placeholder {
+    position: relative;
+    &::after {
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        pointer-events: none;
+        font-size: @font-size-h1; 
+        content: 'Platzhalter';
+        color: @color-primary;
+        text-shadow: 
+            0 1px 1px @color-dark-shadow,
+            0 0 1px @color-dark-shadow,
+            0 1px 0 @color-light,
+            0 1px 4px @color-dark-shadow;
+            
+        transform: rotate(35deg);
+    }
+    &__image {
+        border: .25em solid @color-primary;
+    }
+}
+
+.ct-chart svg {
+    overflow: visible;
+}
+
+.ct-series- {
+    &a {
+        .ct-bar, .ct-line, .ct-point, .ct-slice-donut {
+            stroke: @color-warning;
+        }
+    }
+    &b {
+        .ct-bar, .ct-line, .ct-point, .ct-slice-donut {
+            stroke: @color-success;
+        }
+    }
+    &c {
+        .ct-bar, .ct-line, .ct-point, .ct-slice-donut {
+            stroke: @color-error;
+        }
+    }
+}
+
+.badge {
+    padding: .25em .5em;
+    border-radius: @radius-medium;
+    &--error {
+        background-color: @color-error-subtle;
+        color: @color-dark;
+    }
+    &--success {
+        background-color: @color-success-subtle;
+        color: @color-dark;
+    }
+    &--warning {
+        background-color: @color-warning-subtle;
+        color: @color-dark;
     }
 }
