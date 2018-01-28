@@ -35,6 +35,9 @@
                 </td>
                 <td style={getPaidThreshold(user)}>{getUserRegdate(user) == -1 ? '✓' : getUserRegdate(user)}</td>
                 <td>{moneyFormat.to(user.paysum)}</td>
+                <td>
+                    <img each={role in user.attendeeRoles} title="{role.title}" src="{role.image}" alt="" width="32">
+                </td>
                 <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'new'} data-status="new" active={user.attendeeStatus == 'new'}></ssf-toggle></td>
                 <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'pending'} data-status="pending" active={user.attendeeStatus == 'pending'}></ssf-toggle></td>
                 <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'accepted'} data-status="accepted" active={user.attendeeStatus == 'accepted'}></ssf-toggle></td>
@@ -164,14 +167,10 @@
             this.users.sort((a,b)=>{
                 a = label.sort(a)
                 b = label.sort(b)
-                let comparison = typeof a == 'string' ? a.localeCompare(b) : a<b
-                if (comparison) {
+                if (a < b)
                     return mode ? -1 : 1
-                }
-                comparison = typeof a == 'string' ? a.localeCompare(b) : a>b
-                if (comparison) {
+                if (a > b)
                     return mode ? 1 : -1
-                }
                 return 0
             })
         }
@@ -179,11 +178,11 @@
         this.sortMode = 'Nick'
 
         this.labels = [
-            {name: 'Nick', sort: user=>user.username},
+            {name: 'Nick', sort: user=>user.profile.username},
             {name: 'Bezahlt', sort: user=>this.getUserRegdate(user)},
             {name: 'Betrag', sort: user=>user.paysum},
             // {name: 'Items', sort: user=>user.items },
-            // {name: 'Rollen', sort: user=>user.attendeeRoles},
+            {name: 'Rollen', sort: user=>user.attendeeRoles},
             {name: STATUS[STATUS_NEW], sort: user=>user.attendeeStatus==STATUS_NEW},
             {name: STATUS[STATUS_PENDING], sort: user=>user.attendeeStatus==STATUS_PENDING},
             {name: STATUS[STATUS_ACCEPTED], sort: user=>user.attendeeStatus==STATUS_ACCEPTED},

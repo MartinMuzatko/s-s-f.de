@@ -35,7 +35,7 @@ class Event extends Page {
 	    );
 	    $dateRange = [];
 	    foreach ($period as $date) {
-	        $dateRange[$date->format('d.m.Y')] = count($dates[$date->format('d.m.Y')]);
+	        $dateRange[$date->format('d.m.Y')] = count(@$dates[$date->format('d.m.Y')]);
 	    }
 		return $dateRange;
 	}
