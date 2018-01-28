@@ -90,7 +90,7 @@ module.exports = {
             port: 3000,
             files: ['**/*.php', '*.php'],
             //server: { baseDir: ['public'] }
-            proxy: 'http://localhost:8888/'
+            proxy: 'http://localhost/'
         }),
 		new WebpackPwaManifest({
 			fingerprints: false,

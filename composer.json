@@ -16,6 +16,5 @@
         "psr-4": {"API\\": "classes/API", "ProcessWire\\": "classes/PageTypes"}
     },
     "require": {
-        "google/apiclient": "^2.2"
     }
 }
