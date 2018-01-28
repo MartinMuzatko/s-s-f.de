@@ -10,18 +10,62 @@ export const moneyFormat = wNumb({
 
 export const DEFAULT_SPONSORLEVELS = [
     {
+        name: 'Kein Sponsor',
+        minPrice: 0,
+        summary: '',
+        items: new Set,
+    },
+    {
         name: 'Fennek',
-        minPrice: 10,
-        summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön'
+        minPrice: 5,
+        summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön',
+        items: new Set,
     },
     {
         name: 'Wolf',
-        minPrice: 20,
-        summary: ''
+        minPrice: 10,
+        summary: '',
+        items: new Set,
     },
     {
         name: 'Tiger',
-        minPrice: 30,
-        summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön'
+        minPrice: 20,
+        summary: 'Danke für deine Unterstützung! Dich erwartet ein kleines Dankeschön',
+        items: new Set,
+    }
+]
+
+export const DEFAULT_ITEMS = [
+    {
+        name: 'Badge',
+        sellPrice: 2,
+        buyPrice: 2,
+        variants: [],
+        variantsActive: false,
+        included: false
+    },
+    {
+        name: 'T-Shirt',
+        sellPrice: 16,
+        buyPrice: 16,
+        variants: ['S','M','L','XL','XXL','3XL'],
+        variantsActive: true,
+        included: false
+    },
+    {
+        name: 'Early Bird',
+        sellPrice: 20,
+        buyPrice: 20,
+        variants: [],
+        variantsActive: false,
+        included: false
+    },
+    {
+        name: 'Dead Dog',
+        sellPrice: 20,
+        buyPrice: 20,
+        variants: [],
+        variantsActive: false,
+        included: false
     }
 ]
