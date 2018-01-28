@@ -1,11 +1,14 @@
-<event-list-item class="event-preview" layout="row" layout-align="start center">
-    <a flex-auto href="" layout="row" layout-align="space-between center">
-        <img width="64" class="event-preview__logo" src="https://s-s-f.de/images/SSF-LOGO-NOLOGO.png" alt="">
+<event-list-item class="event-preview">
+    <a class="event-preview__division" href="{opts.link}" layout="row" layout-align="space-between center">
+        <img width="64" class="event-preview__logo" src="{opts.logo ? opts.logo : 'https://s-s-f.de/images/SSF-LOGO-NOLOGO.png'}" alt="">
         <span class="event-preview__heading">{opts.title}</span>
         <span class="event-preview__date">{opts.date}</span>
     </a>
-    <div flex-end class="actions">
-        <a href="#">Edit</a>
-    </div>
+    <yield></yield>
     <script></script>
+    <style>
+        :scope {
+            display: block;
+        }
+    </style>
 </event-list-item>

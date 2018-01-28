@@ -1,72 +1,236 @@
 <event-register>
-    <form ref="form" onsubmit={register} action="" method="POST" layout="column" layout-align="center center">
+    <form ref="form" onsubmit={register} action="" method="POST">
         <input type="hidden" name="method" value="POST">
         <div class="fieldset">
-            <label class="field-group">
-                <span class="field-group__label field-group__label--primary">
-                    Items
-                </span>
-                <div>
-                    <p each={item in items}>
-                        {item.title} - {item.sellPrice} €
-                        <input class="field-group__input" type="checkbox" onchange={checkItem} name="items[{item.name}]">
-                    </p>
+            <p>Basispreis: {parseFloat(this.opts.ticketPrice)} €</p>
+            <h2>Wähle deine Teilnehmerart/en</h2>
+            <p>Wenn Du dich für eine Helferrolle gemeldet hast, wird deine Anfrage geprüft und Du wirst anschließend vom jeweiligen Event-staff kontaktiert.</p>
+            <div layout="row">
+                <div class="card card--light content--margin content--padded" flex="100" flex-gt-sm="45" flex-gt-md="30" each={role in roles} layout="column" layout-align="start center">
+                    <div onclick={selectRole} class="icon-card icon-card--selectable {role.active ? 'notification--success' : ''}">
+                        <span ref="labels" class="icon-card__title">{role.title}</span>
+                        <img class="icon-card__image" src="{role.image}">
+                        <input hidden type="checkbox" checked={role.active} name="roles[{role.name}]">
+                    </div>
+                    <p>{role.summary}</p>
                 </div>
-            </label>
-            <label class="field-group">
-                <span class="field-group__label field-group__label--primary">Auf Gasteliste sichtbar?</span>
-                <input class="field-group__input" checked type="checkbox" name="isGuest">
-            </label>
-            Confee: {conFee} €
-            <input class="button button--primary button--block button--big" type="submit" value="Für {opts.eventTitle} registrieren">
+            </div>
+
+
+            <h2>Sponsor</h2>
+            <div layout="column" style="min-height: 20em">
+                <div class="card card--light content--padded">
+                    <div>
+                        <input type="hidden" name="donation" value={sponsorFee}>
+                        <p>Dein Beitrag: {sponsorFee} €</p>
+                        <ssf-rangeslider ref="sponsorSlider" options={rangeOptions}></ssf-rangeslider>
+                    </div>
+                </div>
+                <div>
+                    <ssf-carousel ref="carousel" options={carouselOptions}>
+                        <div class="carousel__item" style="background-color: rgb(238, 113, 113)" each={sponsorlevel in sponsorlevels}>
+                            <img src="{sponsorlevel.image}" alt="" class="carousel__image">
+                            <div class="carousel__content">
+                                <h3>{sponsorlevel.title}</h3>
+                                <raw content="{sponsorlevel.text}"></raw>
+                            </div>
+                        </div>
+                    </ssf-carousel>
+                </div>
+            </div>
+
+            <h2>Optionen & Goodies</h2>
+            <p>Wähle hier deine gewünschten Zusatzoptionen.</p>
+            <div layout="row">
+                <div class="card card--light content--margin content--padded" 
+                    flex="100" flex-gt-sm="45" flex-gt-md="30" 
+                    layout="column" layout-align="start center"
+                    each={item in items} 
+                    if={!(item.isMembersOnly && !api.user.clubMemberID)}>
+                    <div onclick={selectItem} class="icon-card icon-card--selectable {item.active ? 'notification--success' : ''} {item.sponsorActive ? 'notification--warning' : ''}">
+                        <span ref="labels" class="icon-card__title">{item.title}</span>
+                        <img class="icon-card__image" src="{item.image}">
+                        <input hidden type="checkbox" checked={item.active} name="items[{item.name}]">
+                    </div>
+                    <strong>
+                        <span if={item.sponsorActive}>In Sponsorbetrag enthalten</span>
+                        <span if={!item.sponsorActive}>{item.sellPrice} €</span>
+                    </strong>
+                    <p>{item.summary}</p>
+                </div>
+            </div>
+
+            <div layout="row" layout-align="center center">
+                <div flex="100" flex-gt-sm="80" flex-gt-md="70" flex-gt-lg="60">
+                    <h2>Kommentar</h2>
+                    <p>Wenn Du besondere Wünsche oder Bemerkungen zu deiner Registrierung hast, dann teile sie uns mit.</p>
+                    <textarea name="comment" maxlength="300" rows="3"></textarea>
+                    <ssf-toggle ref="isGuest" label="Auf Gasteliste sichtbar?" active name="isVisible"></ssf-toggle>
+                    <div class="notification notification--error" if={!canRegister && submit}>
+                        Bitte akzeptiere die Teilnahmebedingungen, um am Event teilnehmen zu können. 
+                    </div>
+                    <ssf-toggle label=" " ref="hasRead" name="hasRead">
+                        <yield to="label">
+                            Ich habe den&nbsp;<a target="_blank" href="{parent.opts.terms}">Haftungsausschluss</a>&nbsp;gelesen und akzeptiert
+                        </yield>
+                    </ssf-toggle>
+                    <p>Deine Confee beträgt <strong>{conFee} €</strong></p>
+                    <input class="button button--primary button--block button--big {!canRegister ? 'button--disabled' : ''}" type="submit" value="Für {opts.eventTitle} {conFee ? 'zahlungspflichtig' : ''} registrieren">
+                </div>
+            </div>
         </div>
     </form>
-    <ssf-dialog ref="dialog" size="small" type="success">
+    <ssf-dialog ref="dialog" size="medium" type="success">
         <div style="text-align:center">
-            <h2>Yay, du bist dabei!</h2>
+            <h2>Yay, deine Registrierung wurde abgesendet!</h2>
             <p>
-                Wir freuen uns, dass du beim {parent.opts.eventTitle} teilnimmst!
+                Wir freuen uns, dass Du beim {parent.opts.eventTitle} teilnehmen möchtest!
             </p>
-            <p>Auf der nachsten Seite findest du alle Informationen wie Bezahlungsstatus.</p>
+            <p>Auf der nächsten Seite findest Du alle weiteren Informationen wie Bezahlungsstatus.</p>
             <p><a class="button button--primary" href="">{parent.ok}</a></p>
         </div>
     </ssf-dialog>
     <script>
+        import '../ssf-toggle.html'
         import '../ssf-dialog.html'
+        import '../ssf-carousel.html'
+        import '../ssf-rangeslider.html'
+        import '../raw.html'
+        import fittier from 'fitter-happier-text'
         import {registerUser} from '../../api'
-        this.conFee = this.opts.ticketPrice
+        
+        this.conFee = parseFloat(this.opts.ticketPrice)
+        this.sponsorFee = 0
+
+        this.activeSponsorlevel = sponsorlevels[0]
+
+        this.carouselOptions = {
+            autoPlay: 0,
+            update: false,
+            pageDots: false,
+            draggable: false,
+        }
+
+        // sponsorlevels.unshift(this.activeSponsorlevel)
+        
+        this.canRegister = false
+
+        this.rangeOptions = {
+            step: 1,
+            pips: {
+                density: 5,
+                values: 6
+            }
+        }
+        
         this.items = this.opts.items
-        this.items.map(item=>{item.checked = false})
-        this.ok = ['Cool!', 'Aye!', 'Genial!', 'Super!', 'Top!', 'Yay!', 'Ausgezeichnet!', 'Exzellent!', 'Phantastisch!', 'Fabelhaft!', 'Grandios!', 'Klasse!', 'Prachtvoll!', 'Wunderbar!']
+        this.items.map(item=>{item.active = false})
+        
+        this.roles = this.opts.roles
+        this.roles.map(role=>{role.active = false})
+        
+        this.ok = ['Furtastisch!', 'Cool!', 'Aye!', 'Genial!', 'Super!', 'Top!', 'Yay!', 'Ausgezeichnet!', 'Exzellent!', 'Phantastisch!', 'Fabelhaft!', 'Grandios!', 'Klasse!', 'Prachtvoll!', 'Wunderbar!']
         this.ok = this.ok[Math.random()*this.ok.length | 0]
 
-        checkItem(e) {
-            e.item.item.checked = e.target.checked
-            console.log(this.items);
+        this.submit = false
+
+        selectSponsorLevel(sponsorlevel) {
+            this.activeSponsorlevel = sponsorlevel
+            let index = sponsorlevels.findIndex(lvl=>lvl.name == sponsorlevel.name)
+            console.log(index)
+            this.refs.carousel.carousel.select(index)
+            // this.sponsorFee = sponsorlevels.buyPrice
+            // this.refs.sponsorSlider.trigger('set', this.sponsorFee)
+            this.items
+                .filter(item => item.sponsorActive)
+                .map(item => {
+                    item.sponsorActive = false
+                    item.active = false
+                })
+            sponsorlevel.items.map(
+                itemName => {
+                    let item = this.items.find(item => item.name == itemName)
+                    item.sponsorActive = true
+                    item.active = true
+                }
+            )
+            this.recalculate()
+        }
+
+        getSponsorlevelByMoney(money) {
+            return sponsorlevels.reduce(
+                (acc, lvl, index, lvls) => {
+                    return lvl.buyPrice <= money && money < (lvls[index + 1] ? lvls[index + 1].buyPrice : Infinity) ? lvl : acc 
+                }
+            )
+        }
+
+        selectItem(e) {
+            e.item.item.active = !e.item.item.active
+            this.recalculate()
+        }
+        
+        selectRole(e) {
+            e.item.role.active = !e.item.role.active
             this.recalculate()
         }
 
         recalculate() {
-            console.log(this.items.filter(item=>item.checked));
-            this.conFee = parseInt(this.opts.ticketPrice) + this.getItemPriceSum()
+            this.conFee = parseFloat(this.opts.ticketPrice) + this.getItemPriceSum() + this.sponsorFee
+            this.update()
         }
 
         getItemPriceSum() {
             return this.items
-                .filter(item=>item.checked)
-                .reduce((sum,item)=>{return sum+parseInt(item.sellPrice)},0)
+                .filter(item=>item.active && !item.sponsorActive)
+                .reduce((sum,item)=>{return sum+parseFloat(item.sellPrice)},0)
+        }
+
+        getItemByName(name) {
+            return items.find(item=>item.name == name)
         }
 
         this.on('mount', ()=>{
+            sponsorlevels = sponsorlevels.sort((a,b) => {
+                return a.buyPrice - b.buyPrice
+            })
+            // fittier(this.refs.labels)
+            items.map(
+                item => {
+                    item.active = item.isPreSelected && !(item.isMembersOnly && !api.user.clubMemberID)
+                    item.sponsorActive = false
+                }
+            )
+            this.recalculate()
+            this.update()
+
+            this.refs.sponsorSlider.on('change', (value)=>{
+                this.sponsorFee = parseFloat(value[0])
+                if (this.refs.carousel.carousel) {
+                    this.selectSponsorLevel(this.getSponsorlevelByMoney(this.sponsorFee))
+                }
+                this.recalculate()
+            })
+
             this.refs.dialog.on('closed', ()=>{
                 location.reload()
             })
+            
+            this.refs.hasRead.on('toggle', state=>{
+                this.canRegister = state
+                this.update()
+            })
         })
-
+        
         async register(e) {
             e.preventDefault()
-            this.refs.dialog.open()
-            await registerUser(this.opts.eventName, api.user.name, new FormData(this.refs.form))
+            if (this.canRegister) {
+                this.refs.dialog.open()
+                await registerUser(this.opts.eventName, api.user.name, new FormData(this.refs.form))
+            } else {
+                this.submit = true
+                this.update()
+            }
         }
 
     </script>

@@ -1,29 +1,22 @@
 <?php namespace ProcessWire; ?>
-<?if($user->hasPermission('event-manage')):?>
+<?if($user->hasPermission('event-user-manage')):?>
 	<a href="<?=$pages->get('/events/create')->url?>" class="button button--primary">Neues Event erstellen</a>
 <?endif?>
 <?
 	$sort = $input->get->sort ? trim($sanitizer->name($input->get->sort), ', ') : 'startDate';
 	$input->whitelist('sort', $sort);
-	$filter = $input->get->filter ? trim($sanitizer->name($input->get->filter), ', ') : 'open';
+	$filter = $input->get->filter ? trim($sanitizer->name($input->get->filter), ', ') : 'all';
 	$input->whitelist('filter', $filter);
 	switch ($filter) {
 		case 'open':
-		$eventPages = $events->getOpenEvents();
-		break;
+    		$eventPages = $events->getOpenEvents();
+		    break;
 		case 'all':
 		default:
-		$eventPages = $events->getEvents();
-		break;
+		    $eventPages = $events->getEvents();
+		    break;
 	}
 ?>
-
-<div>
-	Neue Events
-	Events in Planung
-	Vergangene Events
-</div>
-
 <div class="actions">
 	<div class="actions__filter">
 		<a class="button button--<?=$filter == 'all' ? 'secondary' : 'primary' ?>" href="<?=$page->url?>?filter=all">Alle Events</a>
@@ -39,15 +32,19 @@
 		<?
 			$event->guestlist = $event->getPageByModule('event-guestlist');
 			$event->registration = $event->getPageByModule('event-registration');
+			$event->terms = $event->getPageByModule('event-terms');
 		?>
 		<article class="event-list__event event" layout="row">
-			<div class="event__column event__logo" flex="15" layout="row" layout-align="center center">
+			<div class="event__column event__logo" hide-sm hide-md flex-gt-md="15" layout="row" layout-align="center center">
 				<a href="<?=$event->url?>">
 					<img src="<?=$event->logo ? $event->logo->url : ''?>" alt="<?=$event->title?>">
 				</a>
 			</div>
-			<div class="event__column event__name" flex="45">
+			<div class="event__column event__name" flex="100" flex-gt-md="45">
 				<h2 layout="row">
+					<a hide-gt-md href="<?=$event->url?>">
+						<img src="<?=$event->logo ? $event->logo->url : ''?>" alt="<?=$event->title?>">
+					</a>
 					<a href="<?=$event->url?>">
 						<?=$event->title?>
 					</a>
@@ -55,7 +52,6 @@
 				<p><?=$event->summary?></p>
 				<p><?=$event->getAddress()?></p>
 				<ssf-location-distance from="<?=$user->getAddress()?>" to="<?=$event->getAddress()?>"></ssf-location-distance>
-
 				<p>
 					<div>
 						<div>
@@ -67,7 +63,7 @@
 					</div>
 				</p>
 			</div>
-			<div class="event__column" flex="40">
+			<div class="event__column" flex="100" flex-gt-md="40">
 				<? require('./partials/event/registerstate.php') ?>
 			</div>
 		</article>

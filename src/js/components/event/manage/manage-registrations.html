@@ -2,11 +2,15 @@
     <div>
 
     </div>
-    <p>Aktion für <strong>{getMarkedUsers()}</strong> markierte</p>
+    <p>Aktion für <strong>{getMarkedUsersAmount()}</strong> markierte</p>
+    <h4>Registrierter Status</h4>
     <div class="actions">
-        <button class="button button--primary">Auf Geldeingang setzen</button>
-        <button class="button button--primary">Auf Warteliste setzen</button>
-        <button class="button button--primary">Auf Aktiv setzen</button>
+        <button onclick={setMarkedUserStatus} data-status="new" class="button button--primary">Auf Neu setzen</button>
+        <button onclick={setMarkedUserStatus} data-status="pending" class="button button--primary">Auf Bezahlung ausstehend setzen</button>
+        <button onclick={setMarkedUserStatus} data-status="accepted" class="button button--primary">Auf Akzeptiert setzen</button>
+        <button onclick={setMarkedUserStatus} data-status="waiting" class="button button--primary">Auf Warteliste setzen</button>
+        <button onclick={setMarkedUserStatus} data-status="signedoff" class="button button--primary">Auf Abgemeldet setzen</button>
+        <button onclick={setMarkedUserStatus} data-status="dismissed" class="button button--primary">Auf Verbannt setzen</button>
         <button class="button button--primary">Nachricht verfassen</button>
     </div>
     <table>
@@ -22,30 +26,108 @@
         <tbody>
             <tr each={user in users}>
                 <td><input onchange={selectUser} type="checkbox" checked={user.checked}></td>
-                <td>{user.username}</td>
-                <td>{user.role}</td>
+                <td>
+                    <div layout="row" layout-align="start center">
+                        <img class="avatar avatar--small avatar--round" src="{user.profile.avatar}" alt="{user.profile.username}">
+                        {user.profile.username}
+                        {user.donation ? '(Sponsor)' : ''}
+                    </div>
+                </td>
                 <td style={getPaidThreshold(user)}>{getUserRegdate(user) == -1 ? '✓' : getUserRegdate(user)}</td>
-                <td>{moneyFormat.to(user.price)}</td>
-                <td><input type="radio" checked={user.status == 'Neu'} onchange={setStatus} data-status="Neu" name="{user.username}"></td>
-                <td><input type="radio" checked={user.status == 'Geldliste'} onchange={setStatus} data-status="Geldliste" name="{user.username}"></td>
-                <td><input type="radio" checked={user.status == 'Barzahler'} onchange={setStatus} data-status="Barzahler" name="{user.username}"></td>
-                <td><input type="radio" checked={user.status == 'Aktiv'} onchange={setStatus} data-status="Aktiv" name="{user.username}"></td>
-                <td><input type="radio" checked={user.status == 'Warteliste'} onchange={setStatus} data-status="Warteliste" name="{user.username}"></td>
+                <td>{moneyFormat.to(user.paysum)}</td>
+                <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'new'} data-status="new" active={user.attendeeStatus == 'new'}></ssf-toggle></td>
+                <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'pending'} data-status="pending" active={user.attendeeStatus == 'pending'}></ssf-toggle></td>
+                <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'accepted'} data-status="accepted" active={user.attendeeStatus == 'accepted'}></ssf-toggle></td>
+                <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'waiting'} data-status="waiting" active={user.attendeeStatus == 'waiting'}></ssf-toggle></td>
+                <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'signedoff'} data-status="signedoff" active={user.attendeeStatus == 'signedoff'}></ssf-toggle></td>
+                <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'dismissed'} data-status="dismissed" active={user.attendeeStatus == 'dismissed'}></ssf-toggle></td>
             </tr>
         </tbody>
     </table>
+    <button disabled={submissionLoading} onclick={submit} class="button button--primary">
+        Übernehmen
+    </button>
+    <div>
+        <ssf-pawloader if={submissionLoading}></ssf-pawloader>
+    </div>
+    <div if={submissionComplete && !submissionLoading} class="notification notification--success">
+        Die Daten wurden erfolgreich übernommen.
+    </div>
     <script>
         import differenceInDays from 'date-fns/difference_in_days'
-        import {moneyFormat} from '../../../constants'
+        import { moneyFormat } from '../../../constants'
+        import { getRegistrations, updateRegistrations } from '../../../api'
+        import '../../ssf-toggle.html'
+        import '../../ssf-pawloader.html'
+        import '../../ssf-dialog.html'
+        
+        const STATUS_NEW = 'new'
+        const STATUS_PENDING = 'pending'
+        const STATUS_ACCEPTED = 'accepted'
+        const STATUS_WAITING = 'waiting'
+        const STATUS_SIGNEDOFF = 'signedoff'
+        const STATUS_DISMISSED = 'dismissed'
 
+        const STATUS = {
+            [STATUS_NEW]: 'Neu',
+            [STATUS_PENDING]: 'Zahlung ausstehend',
+            [STATUS_ACCEPTED]: 'Bezahlt',
+            [STATUS_WAITING]: 'Warteliste',
+            [STATUS_SIGNEDOFF]: 'Abgemeldet',
+            [STATUS_DISMISSED]: 'Verbannt',
+        }
+        
+        this.users = []
+        this.submissionLoading = false
+
+        async submit() {
+            try {
+                this.submissionLoading = true
+                this.update()
+                await updateRegistrations(opts.event, this.users)
+                this.submissionComplete = true
+                this.submissionDetails = []
+            } catch (error) {
+                this.submissionComplete = false
+            }
+            this.submissionLoading = false
+            this.update()
+        }
+        
+        this.on('mount', async () => {
+            this.users = await getRegistrations(opts.event)
+            this.users.map(
+                user => {
+                    user.checked = false
+                    user.modified = parseInt(user.modified)
+                    user.created = parseInt(user.created)
+                }
+            )
+            this.update()
+            this.refs.statusSwitch.map(toggle=>{
+                toggle.on('toggle', (status)=>{
+                    toggle.opts.user.attendeeStatus = toggle.opts.dataStatus
+                    this.update()
+                })
+            })
+        })
+
+        getMarkedUsersAmount() {
+            return this.getMarkedUsers().length
+        }
+        
+        setMarkedUserStatus(e) {
+            this.getMarkedUsers().map(user=>{user.attendeeStatus=e.target.dataset.status})
+        }
+        
         getMarkedUsers() {
-            return this.users.filter(user=>user.checked).length
+            return this.users.filter(user=>user.checked)
         }
 
         getUserRegdate(user) {
-            if (user.status == 'Geldliste') {
-                return differenceInDays(new Date(), user.created)
-            } else if (user.status == 'Aktiv') {
+            if (user.attendeeStatus == STATUS_PENDING) {
+                return differenceInDays(new Date(), user.modified)
+            } else if (user.attendeeStatus == STATUS_ACCEPTED) {
                 return -1
             } else {
                 return '-'
@@ -53,14 +135,14 @@
         }
 
         getPaidThreshold(user) {
-            if (user.status == 'Bezahlt') {
+            if (user.attendeeStatus == STATUS_ACCEPTED) {
                 return `background-color: hsl(180, 50%, 70%)`
-            } else if (user.status == 'Aktiv') {
+            } else if (user.attendeeStatus == STATUS_NEW) {
                 return `background-color: hsl(120, 50%, 70%)`
-            } else if (user.status == 'Geldliste') {
+            } else if (user.attendeeStatus == STATUS_PENDING) {
                 let hueGradient = [0, 120]
                 let maxDays = 42
-                let hue = hueGradient[0] + hueGradient[1] / maxDays * (maxDays - differenceInDays(new Date(), user.created))
+                let hue = hueGradient[0] + hueGradient[1] / maxDays * (maxDays - differenceInDays(new Date(), user.modified))
                 let background = `background-color: hsl(${hue}, 50%, 50%)`
                 return background
             }
@@ -68,10 +150,6 @@
 
         selectUser(e) {
             e.item.user.checked = e.target.checked
-        }
-
-        setStatus(e) {
-            e.item.user.status = e.item
         }
 
         checkAll(e) {
@@ -86,10 +164,12 @@
             this.users.sort((a,b)=>{
                 a = label.sort(a)
                 b = label.sort(b)
-                if (a<b) {
+                let comparison = typeof a == 'string' ? a.localeCompare(b) : a<b
+                if (comparison) {
                     return mode ? -1 : 1
                 }
-                if (a>b) {
+                comparison = typeof a == 'string' ? a.localeCompare(b) : a>b
+                if (comparison) {
                     return mode ? 1 : -1
                 }
                 return 0
@@ -100,69 +180,20 @@
 
         this.labels = [
             {name: 'Nick', sort: user=>user.username},
-            {name: 'Rolle', sort: user=>user.role},
             {name: 'Bezahlt', sort: user=>this.getUserRegdate(user)},
-            {name: 'Betrag', sort: user=>user.price},
-            {name: 'Neu', sort: user=>user.status=='Neu'},
-            {name: 'Geldliste', sort: user=>user.status=='Geldliste'},
-            {name: 'Barzahler', sort: user=>user.status=='Barzahler'},
-            {name: 'Aktiv', sort: user=>user.status=='Aktiv'},
-            {name: 'Warteliste', sort: user=>user.status=='Warteliste'},
+            {name: 'Betrag', sort: user=>user.paysum},
+            // {name: 'Items', sort: user=>user.items },
+            // {name: 'Rollen', sort: user=>user.attendeeRoles},
+            {name: STATUS[STATUS_NEW], sort: user=>user.attendeeStatus==STATUS_NEW},
+            {name: STATUS[STATUS_PENDING], sort: user=>user.attendeeStatus==STATUS_PENDING},
+            {name: STATUS[STATUS_ACCEPTED], sort: user=>user.attendeeStatus==STATUS_ACCEPTED},
+            {name: STATUS[STATUS_WAITING], sort: user=>user.attendeeStatus==STATUS_WAITING},
+            {name: STATUS[STATUS_SIGNEDOFF], sort: user=>user.attendeeStatus==STATUS_SIGNEDOFF},
+            {name: STATUS[STATUS_DISMISSED], sort: user=>user.attendeeStatus==STATUS_DISMISSED},
         ]
 
         this.moneyFormat = moneyFormat
 
         this.status = ['']
-
-        this.users = [
-            {
-                username: 'Misan',
-                role: 'Teilnehmer',
-                created: 1506100000000,
-                price: 40.5,
-                checked: false,
-                status: 'Geldliste',
-            },
-            {
-                username: 'Pum',
-                role: 'Suiter',
-                created: 1505300000000,
-                price: 45,
-                checked: false,
-                status: 'Geldliste',
-            },
-            {
-                username: 'BerkWolf',
-                role: 'Staff',
-                created: 1503300000000,
-                price: 63,
-                checked: false,
-                status: 'Geldliste',
-            },
-            {
-                username: 'Milan',
-                role: 'Staff',
-                created: 1504600000000,
-                price: 49,
-                checked: false,
-                status: 'Geldliste',
-            },
-            {
-                username: 'Minn',
-                role: 'Teilnehmer',
-                created: 1504600000000,
-                price: 40,
-                checked: false,
-                status: 'Aktiv',
-            },
-            {
-                username: 'Lunos',
-                role: 'Security',
-                created: 1504600000000,
-                price: 40,
-                checked: false,
-                status: 'Neu',
-            }
-        ]
     </script>
 </manage-registrations>

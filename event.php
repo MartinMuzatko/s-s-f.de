@@ -1,21 +1,9 @@
 <?php namespace ProcessWire;
     $event = $page;
+    $this->wire('event', $event);
     $event->guestlist = $event->getPageByModule('event-guestlist');
     $event->registration = $event->getPageByModule('event-registration');
 ?>
-
-<?if($user->hasPermission('page-edit') && !isset($input->get->edit)):?>
-    <a href="<?=$page->url?>?edit" class="button button--primary">Seite bearbeiten</a>
-<?endif?>
-<? if($user->hasPermission('page-edit') && isset($input->get->edit)): ?>
-    <page-editor
-        page-modules="<?=($page->parent->template->name == 'event' || $page->template->name == 'event') ? 'module event' : 'module'?>" page-title="<?=$page->title?>"
-        page-id="<?=$page->id?>"></page-editor>
-<? else: ?>
-    <? foreach($page->pageModules as $pageModule):?>
-        <?=$pageModule->render()?>
-    <? endforeach ?>
-<? endif ?>
 
 <div class="content content--padded">
     <?if($user->hasPermission('event-user-manage')):?>
@@ -41,5 +29,16 @@
 <? elseif($input->urlSegment == 'manage-registrations'):?>
     <? require('./partials/event/manage-registrations.php')?>
 <? else: ?>
-    <? require('./partials/event/view.php')?>
+    <?if($user->hasPermission('page-edit') && !isset($input->get->edit)):?>
+        <a href="<?=$page->url?>?edit" class="button button--primary">Seite bearbeiten</a>
+    <?endif?>
+    <? if($user->hasPermission('page-edit') && isset($input->get->edit)): ?>
+        <page-editor
+            page-modules="<?=($page->parents("(template=event), (name=templates)")->count || $page->template->name == 'event') ? 'module event' : 'module'?>" page-title="<?=$page->title?>"
+            page-id="<?=$page->id?>"></page-editor>
+    <? else: ?>
+        <? foreach($page->pageModules as $pageModule):?>
+            <?=$pageModule->render()?>
+        <? endforeach ?>
+    <? endif ?>
 <? endif; ?>

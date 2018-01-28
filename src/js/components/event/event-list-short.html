@@ -1,22 +1,18 @@
 <event-list-short>
     <ssf-expander heading="{opts.heading}" max-items="5" expanded-max-items="6" action-label-expanded="Weniger Events" action-label-reduced="Mehr Events">
         <yield to="items">
-            <event-list-item title={item.title} date={item.date} each={item in parent.items}></event-list-item>
+            <yield></yield>
         </yield>
         <yield to="more">
-            10 sind zu wenig? <a href="#">Hier findest du mehr</a>
+            10 sind zu wenig? <a href="#">Hier findest Du mehr</a>
         </yield>
     </ssf-expander>
     <script>
         import '../ssf-expander.html'
         import './event-list-item.html'
-
-        this.items = [
-            {date: '06.07.2017', title: 'UFurryA 2017'},
-            {date: '09.09.2017', title: '5. Esslinger Suitwalk'},
-            {date: '28.10.2017', title: 'Halloween Suitwalk Stuttgart'},
-            {date: '18.11.2017', title: 'Lasertag-Night #3'},
-            {date: '21.04.2018', title: 'SSFD Vol. 4'},
-        ]
+        
+        this.on('mount', ()=>{
+            
+        })
     </script>
 </event-list-short>
