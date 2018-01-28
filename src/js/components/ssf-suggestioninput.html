@@ -1,6 +1,7 @@
 <ssf-suggestioninput>
-    <input type="text" ref="input" oninput={needSuggestions} onfocus={showSuggestions} onblur={hideSuggestions}>
-    <ssf-dropdown orientation="left" ref="dropdown">
+    <input autocomplete="off" value="{opts.val}" pattern=".\{0,\}" name={opts.name} class="field-group__input" type="text" ref="input" oninput={needSuggestions} onfocus={showSuggestions} onblur={hideSuggestions}>
+    <ssf-dropdown limited orientation="left" ref="dropdown">
+        <ssf-pawloader if={parent.loading}></ssf-pawloader>
         <div class="dropdown__item" each={field in parent.suggestedData} onclick={parent.parent.setInput}>
             <raw content="{parent.parent.opts.getResultHtml ? parent.parent.opts.getResultHtml(field) : field}"></raw>
         </div>
@@ -8,9 +9,11 @@
     <div>
     </div>
     <script>
+        import './ssf-pawloader.html'
         import './ssf-dropdown.html'
         import './raw.html'
-
+        import debounce from 'debounce'
+        
         showSuggestions(event) {
             event.preventDefault()
             this.refs.dropdown.trigger('open')
@@ -24,6 +27,8 @@
         }
 
         this.suggestedData = []
+        this.previousInput = ''
+        this.loading = false
         this.suggestions = this.opts.suggestions || []
 
         this.on('mount', ()=>{
@@ -37,19 +42,37 @@
             this.suggestions = suggestions || []
             let value = this.refs.input.value
             if (value.length) {
-                this.suggestedData = this.suggestions.filter((item)=>{
+                this.suggestedData = this.suggestions.filter(item=>{
                     return ~item.toLowerCase().indexOf(value.toLowerCase())
                 })
             } else {
                 this.suggestedData = []
             }
+            this.loading = false
             this.update()
         }
 
         needSuggestions() {
-            this.suggest()
-            this.trigger('suggest', this.refs.input.value)
+            this.refs.dropdown.trigger('open')
+            this.loading = true
+            this.requireSuggestions()
         }
+        
+        this.requireSuggestions = debounce(
+            ()=>{
+                if (this.refs.input.value.length) {
+                    this.suggest(this.suggestions)
+                    // if 
+                    console.log(`${this.previousInput} - ${this.refs.input.value}`)
+                    if (!~this.refs.input.value.indexOf(this.previousInput) || !this.previousInput.length) {
+                        this.trigger('suggest', this.refs.input.value)
+                    }
+                }
+                this.previousInput = this.refs.input.value 
+            }, 
+            250
+        )
+        
 
         setInput(e) {
             this.refs.input.value = e.item.field

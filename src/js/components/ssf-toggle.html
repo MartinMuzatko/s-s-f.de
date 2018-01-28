@@ -1,21 +1,41 @@
 <ssf-toggle>
-    <label>
-        {opts.label}
+    <label if={opts.label} class="field-group" layout="row">
         <div class="switch">
-            <input onchange={toggleCheckbox} ref="switch" type="checkbox" {checked: checked}>
+            <input onchange={toggleCheckbox} disabled={opts.disabled} name="{opts.name}" ref="switch" type="checkbox" checked={checked}>
             <span class="slider"></span>
         </div>
+        <span class="field-group__label field-group__label--primary" layout="row">
+            {opts.label}
+            <yield from="label" />
+        </span>
         {opts.description}
     </label>
-
+    <label if={!opts.label}>
+        <div class="switch">
+            <input onchange={toggleCheckbox} disabled={opts.disabled} name="{opts.name}" ref="switch" type="checkbox" checked={checked}>
+            <span class="slider"></span>
+        </div>
+    </label>
+    
     <script>
     this.on('mount', () => {
-        this.checked = (opts.checked == '' || true) ? true : false
+        this.init()
+        this.update()
     })
+    
+    this.on('update', ()=>{this.init()})
+    
+    init() {
+        this.checked = opts.active === '' || opts.active == true || opts.checked ? true : false
+        this.item = opts.item
+    }
 
     toggleCheckbox(e) {
         this.checked = this.refs.switch.checked
         this.trigger('toggle', this.checked)
+        if (this.opts.onchange) {
+            this.opts.onchange({item: this.opts.item, checked: this.checked}) 
+        }
     }
 
     this.toggle = () => {
@@ -29,13 +49,16 @@
     <style type="text/less">
         @import "src/less/variables.less";
 
+        @color-on: @color-success;
+        @color-off: @color-error;
+
         .switch {
             position: relative;
-            display: inline-block;
+            display: block;
             font-size: 1em;
             padding: .25em;
             width: 3em;
-            height: 1.5em;
+            min-height: 1.5em;
         }
 
         /* Hide default HTML checkbox */
@@ -49,7 +72,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: @color-off;
             transition: .4s;
         }
 
@@ -64,11 +87,11 @@
         }
 
         input:checked + .slider {
-            background-color: @color-primary;
+            background-color: @color-on;
         }
 
         input:focus + .slider {
-            box-shadow: 0 0 1px @color-primary;
+            box-shadow: 0 0 1px @color-on;
         }
 
         input:checked + .slider:before {

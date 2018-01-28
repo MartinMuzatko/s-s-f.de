@@ -1,9 +1,12 @@
 <ssf-datepicker>
-    <input name="{opts.name}" ref="datepicker">
+    <div layout="row">
+        <input placeholder="03.04.2018" value={opts.val} name="{opts.name}" class="{opts.className}" required="{required}" ref="datepicker">
+    </div>
     <script>
         import extend from 'extend'
         import flatpickr from 'flatpickr'
         this.date = 0
+        this.required = opts.required == ''
         this.on('mount', ()=>{
             this.options = {
                 onChange: (selectedDates)=>{

@@ -1,11 +1,11 @@
 <ssf-dropdown
-    class="dropdown dropdown--orientation-{opts.orientation || 'right'} {open ? 'dropdown--open' : '' }"
+    class="dropdown {opts.limited == '' ? 'dropdown--limited' : '' } dropdown--orientation-{opts.orientation || 'right'} {isOpen ? 'dropdown--open' : '' }"
     onmouseover={resetCloseTimer} onmouseout={startCloseTimer}>
     <yield>
     <script>
         this.on('mount', () => {
             this.dropdownItems = Array.from(this.root.querySelectorAll('.dropdown__item'))
-            this.open = false || this.opts.open
+            this.isOpen = false || this.opts.open == ''
             this.update()
         })
 
@@ -20,21 +20,21 @@
         startCloseTimer() {
             console.log('startCloseTimer');
             this.closeTimer = setTimeout(() => {
-                if (!this.getSelectedNode()) {
+                if (!this.getSelectedNode() && this.opts.closeOnMouseOut == '') {
                     this.close()
                 }
             }, TIMEOUT);
         }
 
         open() {
-            this.open = true
+            this.isOpen = true
             this.setBindings()
             this.update()
             this.trigger('opened')
         }
 
         close() {
-            this.open = false
+            this.isOpen = false
             this.deselect()
             this.clearBindings()
             this.update()
@@ -42,7 +42,7 @@
         }
 
         toggle() {
-            this.open ? this.open() : this.close()
+            this.isOpen ? this.close() : this.open()
         }
 
         navigateUp() {

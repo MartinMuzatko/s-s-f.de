@@ -1,5 +1,5 @@
 <ssf-dropzone>
-    <form drop={prepareFiles} class="dropzone" ref="dropzone" style="background-image: url({multiple ? '' : fileData[0].data })">
+    <form drop={prepareFiles} class="dropzone" ref="dropzone" style="background-image: url({!multiple && fileData.length ? fileData[0].data : '' })">
         <label for="file" class="dropzone__label">
             Wähle ein Bild aus, oder ziehe es in die Box
         </label>
@@ -15,6 +15,7 @@
     <script>
 
         this.files = []
+        this.fileData = []
         this.multiple = this.opts.multiple == ''
         this.show = this.opts.show == ''
         console.log(this.opts);

@@ -1,6 +1,7 @@
 <ssf-editor>
     <div if={(opts.inline == '')} ref="editor" contenteditable="true"></div>
     <textarea if={!(opts.inline == '')} ref="editor"></textarea>
+    <div ref="limit" class="counter {charsleft < 0 ? 'counter--exceeded' : ''}" if={opts.limit}>{charsleft}</div>
     <script>
         // Import TinyMCE
         import tinymce from 'tinymce/tinymce'
@@ -24,13 +25,17 @@
 				menu: {},
                 add_form_submit_trigger: false,
                 submit_patch: false,
+                block_formats: 'Paragraph=p1;Überschrift 2=h2;Überschrift 3=h3;Überschrift 4=h4;',
 				toolbar:
 					'bold italic underline strikethrough | '+
-					'alignleft aligncenter alignright alignjustify | '+
-					'formatselect | bullist numlist | outdent indent | blockquote, undo, redo',
+					'alignleft aligncenter alignright | '+
+					'formatselect | bullist numlist | blockquote, undo, redo',
 				plugins: [],
 				init_instance_callback: (editor) => {
                     this.editor = editor
+                    if(this.opts.limit) {
+                        this.setupWordCount()
+                    }
                     this.trigger('ready', editor)
                     if (this.opts.content) {
                         editor.setContent(this.opts.content)
@@ -39,6 +44,26 @@
 			})
 
 		})
+        
+        this.charsleft = this.opts.limit
+        setupWordCount() {
+            this.editor.on('KeyUp', () => {
+                let text = this.editor.getContent()
+                    .replace(/<[^>]*>/g, '')
+                    .replace(/\s+/g, ' ')
+                    .replace(/^\s\s*/, '')
+                    .replace(/\s\s*$/, '')
+                this.charsleft = parseInt(this.opts.limit) - text.length
+                this.update()
+            })
+        }
+        
+        isExceeded() {
+            if (this.opts.limit) {
+                return this.charsleft >= 0
+            }
+            return true
+        }
 
         getContent() {
             return this.editor.getContent()

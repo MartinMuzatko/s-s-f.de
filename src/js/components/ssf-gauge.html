@@ -1,0 +1,29 @@
+<ssf-gauge>
+    <canvas ref="gauge"></canvas>
+    <script>
+    import { Gauge } from 'gaugeJS'
+    this.on('mount', ()=>{
+        let opts = {
+            angle: .08, // The span of the gauge arc
+            lineWidth: .1, // The line thickness
+            radiusScale: .5, // Relative radius
+            pointer: {
+                length: .6, // // Relative to gauge radius
+                strokeWidth: .035, // The thickness
+                color: '#000000' // Fill color
+            },
+            limitMax: parseInt(this.opts.max),     // If false, max value increases automatically if value > maxValue
+            limitMin: parseInt(this.opts.min),     // If true, the min value of the gauge will be fixed
+            strokeColor: '#989391',  // to see which ones work best for you
+            highDpiSupport: true,     // High resolution support
+            animationSpeed : 32, // set animation speed (32 is default value)
+        }
+        this.gauge = new Gauge(this.refs.gauge).setOptions(opts)
+        this.gauge.maxValue = this.opts.max | 0
+        this.gauge.set(parseInt(this.opts.value))
+    })
+    this.on('set', (value)=>{
+        this.gauge.set(parseInt(value))
+    })
+    </script>
+</ssf-gauge>

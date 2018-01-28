@@ -7,7 +7,7 @@
         <div if={isExpanded && this.items.length > this.expandedMaxItems}>
             <yield from="more" />
         </div>
-        <div class="expander__actions" if={maxItems < expandedMaxItems}>
+        <div class="expander__actions" if={!isExpanded && this.items.length > maxItems}>
             <div onclick={toggle} class="button button--subtle">{isExpanded ? opts.actionLabelExpanded : opts.actionLabelReduced }</div>
         </div>
     </div>
@@ -22,7 +22,7 @@
             // slide maybe someday
             // var height = this.refs.container.getBoundingClientRect().height
             // this.refs.container.style.height = height+'px'
-            this.items.map((item, index)=>{
+            this.items.map((item, index) => {
                 if (index <= parseInt(this.expandedMaxItems)) {
                     item.root.style.display = this.initialDisplay
                 }
@@ -46,7 +46,8 @@
         this.on('mount', ()=>{
             this.initialDisplay = 'block'
             this.isExpanded = false
-            this.items = Object.values(this.tags)[0]
+            this.items = Object.values(this.tags)
+            this.items = this.items[0].length ? this.items[0] : this.items
             this.reduce()
         })
     </script>

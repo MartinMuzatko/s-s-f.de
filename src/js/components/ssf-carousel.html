@@ -5,6 +5,7 @@
     <script>
         import Flickity from 'flickity'
         this.on('mount', ()=>{
+            this.options = {}
             this.initCarousel()
         })
 
@@ -14,17 +15,21 @@
                     wrapAround: true,
                     cellSelector: '.carousel__item',
                     autoPlay: 6000,
-                    prevNextButtons: false
+                    prevNextButtons: false,
+                    update: true,
                 },
                 this.opts.options
             )
+            this.options = options
             this.carousel = new Flickity(this.refs.carousel, options)
 
         }
 
         this.on('updated', ()=>{
-            this.carousel && this.carousel.destroy()
-            this.initCarousel()
+            if (this.options.update) {
+                this.carousel && this.carousel.destroy()
+                this.initCarousel()
+            }
         })
     </script>
 </ssf-carousel>

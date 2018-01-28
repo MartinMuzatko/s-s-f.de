@@ -1,9 +1,12 @@
 <ssf-map>
     <div class="map" ref="map"></div>
     <script>
-        this.on('mount', ()=>{
+        this.on('mount', async ()=>{
             console.log('mount map');
             this.latLng = [48.7758, 9.1829] || opts.latLng
+            if (opts.address) {
+                this.geocodeAddress(opts.address)
+            }
             this.zoom = 10 || opts.zoom
             // this.markerZoom = 15 || opts.markerZoom
             this.markers = []
@@ -13,7 +16,8 @@
                 window.api.google.on('initApi', this.setupMap)
             }
         })
-        this.setupMap = () => {
+
+        setupMap() {
             this.geocoder = new google.maps.Geocoder()
             var latlng = new google.maps.LatLng(...this.latLng)
             var mapOptions = {
@@ -22,32 +26,38 @@
             }
             this.map = new google.maps.Map(this.refs.map, mapOptions)
         }
-        this.geocodeAddress = (address) => {
-            this.geocoder.geocode({address}, (results,status)=>{
-                if (status == 'OK') {
-                    this.map.setCenter(results[0].geometry.location)
-                    console.log(results[0]);
-                    // this.map.setZoom(15)
-                    this.resetMarkers()
-                    let marker = new google.maps.Marker({
-                        map: this.map,
-                        draggable: true,
-                        animation: google.maps.Animation.DROP,
-                        position: results[0].geometry.location
-                    })
-                    marker.addListener('dragend', (event)=>{
-                        this.reverseGeocodeAddress(event.latLng, (results)=>{
-                            this.trigger('droppedMarker', {marker, results, event})
+
+        geocodeAddress(address) {
+            return new Promise((resolve, reject) => {
+                this.geocoder.geocode({address}, (results, status)=>{
+                    if (status == 'OK') {
+                        let location = results[0].geometry.location
+                        resolve(location)
+                        this.map.setCenter(location)
+                        console.log(results[0]);
+                        // this.map.setZoom(15)
+                        this.resetMarkers()
+                        let marker = new google.maps.Marker({
+                            map: this.map,
+                            draggable: true,
+                            animation: google.maps.Animation.DROP,
+                            position: location,
                         })
-                    })
-                    this.markers.push(marker)
-                } else {
-                    //alert('Geocode was not successful for the following reason: ' + status);
-                }
+                        marker.addListener('dragend', (event)=>{
+                            this.reverseGeocodeAddress(event.latLng, (results)=>{
+                                this.trigger('droppedMarker', {marker, results, event})
+                            })
+                        })
+                        this.markers.push(marker)
+                    } else {
+                        reject()
+                        //alert('Geocode was not successful for the following reason: ' + status);
+                    }
+                })
             })
         }
 
-        this.reverseGeocodeAddress = (position, callback) => {
+        reverseGeocodeAddress(position, callback) {
             console.log(position);
             this.geocoder.geocode({'location': position}, (results, status) => {
                 console.log(status);

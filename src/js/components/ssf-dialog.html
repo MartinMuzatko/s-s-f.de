@@ -29,8 +29,13 @@
             }
             Object.assign(this.dialog, opts.dialog, dialog)
         }
+
+        this.dialog = {
+            isVisible: false,
+            heading: '',
+        }
+
 		this.on('mount', () => {
-            this.dialog = {}
             this.dialog.isVisible = this.opts.visible == '' || false
             this.setup()
             if (this.dialog.isVisible) {

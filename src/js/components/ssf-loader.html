@@ -101,14 +101,14 @@
         }
 
         this.on('load', ()=>{
-            this.moveBackgroundInterval = setInterval(this.moveBackground, 500);
+            //this.moveBackgroundInterval = setInterval(this.moveBackground, 500);
             this.loading = true
             this.type = ''
             this.update()
             this.refs.dialog.open()
         })
         this.on('success', ()=>{
-            clearInterval(this.moveBackgroundInterval)
+            //clearInterval(this.moveBackgroundInterval)
             this.loading = false
             this.type = 'success'
             this.update()
