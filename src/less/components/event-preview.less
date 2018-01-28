@@ -1,6 +1,11 @@
 .event-preview {
-    padding: .5em;
     ~ .event-preview {
+        border-top: 1px solid @color-dark-shadow;
+    }
+    &__division {
+        padding: .5em;
+    }
+    &__division + &__division {
         border-top: 1px solid @color-dark-shadow;
     }
     &__logo {

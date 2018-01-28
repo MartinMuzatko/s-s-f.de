@@ -16,6 +16,7 @@
     }
 
     &__module {
+        cursor: move;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -29,6 +30,12 @@
         background-color: @color-light;
         &:hover {
             box-shadow: 0 0 0 .25em @color-primary-light;
+        }
+        &--disabled {
+            cursor: default;
+            &:hover {
+                box-shadow: none;
+            }
         }
     }
     &__icon {

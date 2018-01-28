@@ -9,7 +9,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 1050;
+    z-index: @z-index-backdrop;
     display: none;
     //overflow: hidden;
     justify-content: center;
@@ -17,13 +17,22 @@
     outline: 0;
 
     &--small .dialog__content {
-        width: 20vw;
+        @media screen and (min-width: @breakpoint-md) {
+            width: 40vw;
+        }
+        @media screen and (min-width: @breakpoint-lg) {
+            width: 20vw;
+        }
     }
     &--medium .dialog__content {
-        width: 40vw;
+        @media screen and (min-width: @breakpoint-sm) {
+            width: 40vw;
+        }
     }
     &--large .dialog__content {
-        width: 60vw;
+        @media screen and (min-width: @breakpoint-sm) {
+            width: 60vw;
+        }
     }
     &--full .dialog__content {
         width: 100vw;
@@ -39,7 +48,7 @@
         background-size: 50%;
         background-position: 0;
         transition: all .5s linear;
-        width: auto;
+        width: 100vw;
         min-width: 20vw;
         margin: 1em;
         position: relative;
@@ -59,7 +68,7 @@
         right: 0;
         bottom: 0;
         left: 0;
-        z-index: 1040;
+        z-index: @z-index-backdrop;
         background-color: @color-dark;
         &.fade {
             opacity: 0;

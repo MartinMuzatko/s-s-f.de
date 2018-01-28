@@ -3,9 +3,12 @@
     @media screen and (min-width: @breakpoint-md) {
         column-count: 2;
     }
+    page-break-inside: avoid;
+    break-inside: avoid;
     column-rule: 1px solid black;
     &__column {
         height: 100%;
+        break-inside: avoid;
         page-break-inside: avoid;
     }
     &__user {

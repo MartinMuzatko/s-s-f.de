@@ -8,50 +8,57 @@ Creates a Navigation
 Styleguide Navigation - Mixin
 */
 
-.c-navigation(@type: none) {
-
-    & when (@type = none) {
-        // Put default styling here
-        background-image: linear-gradient(
-            to top,
-            @color-dark 40%,
-            lighten(@color-dark, 10%) 80%,
-            lighten(@color-dark, 10%) 90%
-        );
-        border-bottom: 2px solid @color-primary;
-        background-color: @color-dark;
-        .navigation__image {
-            margin-right: .5em;
-            display: flex;
-        }
-        .navigation__item {
-            padding: .5em 1em;
-            @media screen and (min-width: @breakpoint-md) {
-                padding: .5em 1.5em;
-            }
-            @media screen and (min-width: @breakpoint-lg) {
-                padding: .5em 2em;
-            }
-            color: @color-primary;
-            border-bottom: none;
-            display: flex;
-            align-items: center;
-            align-content: center;
-            justify-content: space-between;
-            border-radius: 0;
-            border-left: 1px solid hsl(0, 0%, 13%);
-            border-right: 1px solid #444;
-
-            font-weight: 700;
-            &:hover {
-                color: lighten(saturate(spin(@color-primary, -20), 20%), 5%);
-            }
-            &:last-child {
-                border-right: 1px solid gray;
-
-            }
-        }
-
+.navigation {
+    // Put default styling here
+    background-image: linear-gradient(
+        to top,
+        @color-dark 40%,
+        lighten(@color-dark, 10%) 80%,
+        lighten(@color-dark, 10%) 90%
+    );
+    display: flex;
+    flex-direction: column;
+    @media screen and (min-width: @breakpoint-md) {
+        flex-direction: row;
     }
+    border-bottom: 2px solid @color-primary;
+    background-color: @color-dark;
+    &__segment {
+        display: flex;
+        flex-direction: column;
+        @media screen and (min-width: @breakpoint-md) {
+            flex-direction: row;
+        }
+    }
+    &__image {
+        margin-right: .5em;
+        display: flex;
+    }
+    &__item {
+        padding: .5em 1em;
+        @media screen and (min-width: @breakpoint-md) {
+            padding: .5em 1.5em;
+        }
+        @media screen and (min-width: @breakpoint-lg) {
+            padding: .5em 2em;
+        }
+        color: @color-primary;
+        border-bottom: none;
+        display: flex;
+        align-items: center;
+        align-content: center;
+        justify-content: space-between;
+        border-radius: 0;
+        border-left: 1px solid hsl(0, 0%, 13%);
+        border-right: 1px solid #444;
 
+        font-weight: 700;
+        &:hover {
+            color: lighten(saturate(spin(@color-primary, -20), 20%), 5%);
+        }
+        &:last-child {
+            border-right: 1px solid gray;
+
+        }
+    }
 }

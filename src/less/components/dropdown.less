@@ -9,6 +9,10 @@
     box-shadow: 0 0 .1em @color-dark-shadow;
     opacity: 0;
     z-index: @z-index-overlay;
+    &--limited {
+        overflow-y: scroll;
+        max-height: 20em;
+    }
     &--open {
         opacity: 1;
         pointer-events: all;
