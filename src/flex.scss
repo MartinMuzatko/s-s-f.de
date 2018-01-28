@@ -1,7 +1,7 @@
 $breakpoints: (
-    (sm, 40em)
-    (md, 60em)
-    (lg, 80em)
+    (sm, 640px)
+    (md, 960px)
+    (lg, 1280px)
 );
 
 $ie: false;
@@ -10,12 +10,14 @@ $features: (
   'layout'
   'flex'
   'layout-align'
+  'visibility'
 );
 
 // Features for each breakpoint
 $breakpoint-features: (
   'flex'
   'order'
+  'visibility'
 );
 
 $layout-gutter-width: 1em;
