@@ -9,29 +9,39 @@
             </menu>
             <div ref="module" data-is={pageModule.template} content={pageModule}></div>
         </div>
-        <a href="#" onclick={save} class="button button--primary">Speichern</a>
         <a href="#" onclick={saveAndView} class="button button--primary">Speichern und Ansehen</a>
     </div>
     <script>
         import '../ssf-editor.html'
         import './modules-library.html'
         import './module/page-module-content.html'
+        import './module/page-module-club-members.html'
         import './module/page-module-map.html'
         import './module/page-module-carousel.html'
+        import './module/page-module-gallery.html'
         import './module/page-module-event-registration.html'
         import './module/page-module-event-guestlist.html'
+        import './module/page-module-event-navigation.html'
+        import './module/page-module-event-header.html'
+        import './module/page-module-event-terms.html'
         import arrayMove from 'array-move'
-        import {getPageModules} from '../../api'
+        import { getPageModules, updatePage } from '../../api'
+        
+        this.modules = []
 
         this.on('mount', async () => {
             window.addEventListener('beforeunload', function () {
                 return true
             })
+            this.refs.library.on('received', modules=>{
+                this.modules = modules
+                this.update()
+            })
             this.pageModules = await getPageModules(this.opts.pageId)
             this.update()
 
-            this.refs.library.on('module-added', template=>{
-                this.pageModules.push({template})
+            this.refs.library.on('module-added', data=>{
+                this.pageModules.push(data)
                 this.update()
             })
         })
@@ -49,20 +59,14 @@
         async save(e) {
             e.preventDefault()
             this.update()
-            if (this.refs.module.length > 1) {
+            if (this.refs.module) {
+                let modules = this.refs.module.length ? this.refs.module : [this.refs.module]
                 this.pageModules.map((item,index)=>{
-                    Object.assign(item, this.getModuleContent(this.refs.module[index]))
+                    Object.assign(item, this.getModuleContent(modules[index]))
                 })
-            } else if(!this.refs.module.length) {
-                this.pageModules = [this.getModuleContent(this.refs.module)]
             }
-            const response = await fetch(
-                `/s-s-f.de/api/pages/${opts.pageId}`,
-                {
-                    credentials: 'same-origin',
-                    method: 'PUT',
-                    body: JSON.stringify(this.pageModules)})
-            return await response.text()
+            await updatePage(opts.pageId, this.pageModules)
+            
         }
 
         remove(e) {

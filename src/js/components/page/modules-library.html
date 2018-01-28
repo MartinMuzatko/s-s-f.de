@@ -3,7 +3,7 @@
         <h2 class="modules-library__heading">Inhalts-Module</h2>
         <span>Einfach per Drag & Drop in den Inhaltsbereich schieben</span>
         <div ref="moduleList" class="modules-library__list">
-            <div data-template="{module.associatedTemplate}" class="modules-library__module" each={module in modules}>
+            <div data-template="{module.associatedTemplate}" data class="modules-library__module" each={module in modules}>
                 <img src="{module.moduleIcon}" alt="" class="modules-library__icon">
                 <p class="modules-library__name">{module.title}</p>
             </div>
@@ -16,6 +16,7 @@
         this.on('mount', async () => {
             this.allowedModulesCategories = this.opts.allowedModules.split(' ')
             this.modules = await getModules()
+            this.trigger('received', this.modules)
             this.modules = this.modules.filter(module=>{
                 return module.templateType
                     .map(type=>!!~this.allowedModulesCategories.indexOf(type))
@@ -53,7 +54,7 @@
                 //el.classList.remove('modules-library__module')
                 setTimeout(()=>{
                     el.remove()
-                    this.trigger('module-added', el.dataset.template)
+                    this.trigger('module-added', el.dataset)
                 }, 100);
             })
         }
