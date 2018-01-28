@@ -28,9 +28,20 @@ class Events extends PagesType {
         return $events;
     }
 
+    public function getFutureEvents()
+    {
+        $pages = $this->getEvents()->getArray();
+        $pages = array_filter($pages, function($page) {
+            return !$page->isEventOver();
+        } );
+        $events = new PageArray();
+        $events->add($pages);
+        return $events;
+    }
+
     public function getEvents()
     {
-        return parent::find('template=event, status!=hidden');
+        return parent::find('template=event, status!=hidden')->sort('startDate');
     }
 
     public function getOwnEvents()
@@ -83,6 +94,11 @@ class Events extends PagesType {
         $page->startDate = $this->sanitizer->text($data->startDate);
         $page->endDate = $this->sanitizer->text($data->endDate);
         $page->save();
+        $registration = $page->getRegistrationsPage();
+        $registration->of(false);
+        $registration->startDate = $this->sanitizer->text($data->registration->startDate);
+        $registration->endDate = $this->sanitizer->text($data->registration->endDate);
+        $registration->save();
     }
 
     public function createEvent($data)
@@ -121,6 +137,14 @@ class Events extends PagesType {
                             $event->addHelper($helper);
                         },
                         $data->helpers
+                    );
+                }
+                if (property_exists($data, 'notifications')) {
+                    array_map(
+                        function($notification) use ($event) {
+                            $event->addNotification($notification);
+                        },
+                        $data->notifications
                     );
                 }
                 if (property_exists($data, 'sponsorlevels')) {

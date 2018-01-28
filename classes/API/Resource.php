@@ -9,20 +9,22 @@ class Resource extends Wire
 {
     public $path;
 
-    function __construct($path)
+    function __construct($path = '')
     {
         $this->path = $path;
-        $this->config = $this->wire('config');
-        $this->pages = $this->wire('pages');
-        $this->modules = $this->wire('modules');
+        $this->config = $this->wire->config;
+        $this->pages = $this->wire->pages;
+        $this->modules = $this->wire->modules;
+        $this->events = $this->wire->events;
         $this->page = $this->pages->get('/'.$path);
-        $this->users = \ProcessWire\wire('users');
-        $this->user = \ProcessWire\wire('user');
-        $this->sanitizer = \ProcessWire\wire('sanitizer');
-        $this->session = \ProcessWire\wire('session');
-        $this->input = \ProcessWire\wire('input');
-        $this->fields = \ProcessWire\wire('fields');
-        $this->templates = \ProcessWire\wire('templates');
+        $this->users = $this->wire->users;
+        $this->user = $this->wire->user;
+        $this->sanitizer = $this->wire->sanitizer;
+        $this->session = $this->wire->session;
+        $this->input = $this->wire->input;
+        $this->fields = $this->wire->fields;
+        $this->templates = $this->wire->templates;
+        $this->languages = $this->wire->languages;
 
     }
 
@@ -73,18 +75,18 @@ class Resource extends Wire
         # code...
     }
 
-    public function getActiveSessions()
-    {
-        $sessionHandler = $this->modules->get('SessionHandlerDB');
-        $sessions = array_map(
-            function($session) {
-                $session['user_name'] = $this->users->get($session['user_id'])->name;
-                return $session;
-            },
-            $sessionHandler->getSessions(60*10)
-        );
-        return array_filter($sessions, function($session) {return $session['user_name'] != 'guest';});
-    }
+    // public function getActiveSessions()
+    // {
+    //     $sessionHandler = $this->modules->get('SessionHandlerDB');
+    //     $sessions = array_map(
+    //         function($session) {
+    //             $session['user_name'] = $this->users->get($session['user_id'])->name;
+    //             return $session;
+    //         },
+    //         $sessionHandler->getSessions(60*10)
+    //     );
+    //     return array_filter($sessions, function($session) {return $session['user_name'] != 'guest';});
+    // }
 
     public function setFields($page, $fields)
     {

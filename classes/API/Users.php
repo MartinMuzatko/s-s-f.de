@@ -44,6 +44,11 @@ class Users extends Resource
         $user->pass = $this->sanitizer->text($data->password);
         $user->email = $this->sanitizer->text($data->email);
         $user->street = $this->sanitizer->text($data->street);
+        $user->street = $this->sanitizer->text($data->street);
+        $user->isInvisible = !isset($data->isInvisible) ? true : false; // We have to invert it, since we display it as isVisible
+        $user->isQueryable = isset($data->isQueryable) ? true : false;
+        $user->isSubscribedOfficial = isset($data->isSubscribedOfficial) ? true : false;
+        $user->isSubscribedAll = isset($data->isSubscribedAll) ? true : false;
         $species = $this->sanitizer->text($data->species);
         $speciesPage = $this->pages->get('/resources/species');
         $specieExists = $speciesPage->get("title=$species");
@@ -71,7 +76,14 @@ class Users extends Resource
         $newUser = $this->users->add($this->sanitizer->pageName($data->username));
         $newUser->username = $username;
         $newUser->addRole('user');
+        $newUser->language = $this->languages->get("deutsch");
         $this->setUserFields($newUser, $data, true);
+        // defaults
+        $newUser->isInvisible = false;
+        $newUser->isQueryable = true;
+        $newUser->isSubscribedOfficial = false;
+        $newUser->isSubscribedAll = true;
+        $newUser->save();
 
         // Send notification
         $context = new ProcessWire\WireData();

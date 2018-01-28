@@ -36,10 +36,7 @@ class User extends Resource
 
     public function login($username, $password)
     {
-        var_dump($username);
-        var_dump($password);
         $this->session->login($username, $password);
-        // $this->session->redirect('/');
     }
 
     public function logout()
