@@ -10,7 +10,7 @@
             .responsiveWidth(.8);
             position: fixed;
             top: 0;
-            z-index: @z-index-overlay;
+            z-index: @z-index-navigation;
         }
     }
 
@@ -81,7 +81,8 @@
 }
 
 .noUi-target {
-    margin: 3em 0 4em;
+    height: 100%;
+    // margin: 3em 0 4em;
 }
 
 .noUi-tooltip {
@@ -97,20 +98,23 @@
 
 .field-group {
     width: 100%;
-	display: flex;
+    display: flex;
+    box-shadow: 0 0 .125em @color-dark-shadow;
+    flex-direction: column;
 	margin: 1em 0;
-    overflow: hidden;
     border-radius: .25em;
     border-bottom: 1px solid @color-primary;
     //box-shadow: 0 1px 0 1px fadeout(@color-dark-shadow, 10%);
     &__label {
-        padding: 1em 2em;
-        background-color: ;
-        min-width: 10em;
+        padding: .5em 1em;
         word-break: break-all;
         display: block;
+        font-size: .8rem;
         padding-right: 1em;
         flex-grow: 1;
+        a {
+            text-decoration: underline;
+        }
         &--dark {
             color: @color-primary;
             background-image: linear-gradient(
@@ -143,6 +147,8 @@
     text-align: center;
     text-transform: uppercase;
     color: lighten(@color-dark, 20%);
+    overflow: hidden;
+    padding: .2em 0;
     span {
         display: inline-block;
         position: relative;
@@ -257,6 +263,9 @@
         }
         &--bottom {
             bottom: 0;
+        }
+        &--contain {
+            position: relative;
         }
     }
     &__messages {
@@ -587,4 +596,43 @@
         background-color: @color-warning-subtle;
         color: @color-dark;
     }
+}
+
+.bg {
+    &--primary-light {
+        background-color: darken(@color-primary-light-shadow, 5%);
+    }
+    &--primary-dark {
+        background-color: darken(@color-primary-light-shadow, 15%);
+    }
+    &--success {
+        background-color: @color-success;
+        &--shadow {
+            box-shadow: 0 0 0 .25em @color-success-subtle;
+        }
+    }
+    &--warning {
+        background-color: @color-warning;
+        &--shadow {
+            box-shadow: 0 0 0 .25em @color-warning-subtle;
+        }
+    }
+    &--error {
+        background-color: @color-error;
+        &--shadow {
+            box-shadow: 0 0 0 .25em @color-error-subtle;
+        }
+    }
+}
+
+.group {
+    &__item + &__item {
+        margin-left: 1em;
+    }
+}
+
+.status-bubble {
+    border-radius: 100%;
+    height: 1em;
+    width: 1em;
 }

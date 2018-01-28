@@ -8,6 +8,10 @@
 
 @color-primary-light-shadow: lighten(fadeout(@color-primary-light, 40%), 12.5%);
 
+@color-secondary: hsl(226, 95%, 58%);
+@color-secondary-dark: darken(@color-secondary, 20%);
+@color-secondary-light: lighten(@color-secondary, 20%);
+
 @color-member: hsl(0, 95%, 58%);
 @color-member-light: lighten(@color-member, 20%);
 @color-member-light-shadow: lighten(fadeout(@color-member-light, 40%), 12.5%);
@@ -18,11 +22,14 @@
 @color-success: hsl(120, 95%, 68%);
 @color-success-subtle: lighten(@color-success, 20%);
 
+@color-warning: hsl(45, 95%, 58%);
+@color-warning-subtle: lighten(@color-warning, 20%);
+
+@color-info: @color-secondary;
+@color-info-subtle: @color-secondary-light;
+
 @color-background: lighten(fadeout(desaturate(@color-primary-light, 30%), 40%), 15%);
 
-@color-secondary: hsl(226, 95%, 58%);
-@color-secondary-dark: darken(@color-secondary, 20%);
-@color-secondary-light: lighten(@color-secondary, 20%);
 
 @color-dark: hsl(0, 0, 15%);
 @color-gray: #444;
@@ -38,7 +45,10 @@
 @font-body: "Times New Roman";
 @font-heading: SuedFurs;
 
-@font-size-h1: 2em;
+@font-size-h1: 2.5em;
+@font-size-h2: 1.75em;
+@font-size-h3: 1.5em;
+@font-size-h4: 1rem;
 
 /*  ========================================
     BREAKPOINTS
@@ -53,11 +63,9 @@
     Z-INDEXES
     ======================================== */
 
-@z-index-background: 1000;
-@z-index-overlay: 2000;
-@z-index-searchbar: 3000;
-@z-index-header: 4000;
-@z-index-modal: 5000;
+@z-index-overlay: 1000;
+@z-index-navigation: 2000;
+@z-index-backdrop: 3000;
 
 /*  ========================================
     DURATIONS
