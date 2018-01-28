@@ -1,77 +1,59 @@
 <user-register>
-    <div layout="row" layout-align="space-between center">
-        <div class="" layout="row" layout-align="center center" flex="100" flex-gt-sm="50">
-            <img src="http://localhost:3000/s-s-f.de/site/assets/files/1/logo.0x160.png" alt="">
-        </div>
-        <div layout="row" layout-align="center center" flex="100" flex-gt-sm="50">
-            <div class="g-signin2" data-onsuccess=googleSignIn></div>
-        </div>
-    </div>
+    <h2>Registrierung</h2>
     <form action="" method="post">
-        <div class="field-group">
-            <label for="username">username</label>
-            <input type="text" required name="username" value="{opts.postdata.username}">
+        <h3>Anmeldedaten</h3>
+        <div layout="row" layout-align="space-between">
+            <label flex="30" class="field-group">
+                <span class="field-group__label field-group__label--primary">Nickname</span>
+                <input oninput={update} class="field-group__input" ref="username" type="text" required name="username" value="{opts.postdata.username}">
+            </label>
+            <label flex="30" class="field-group">
+                <span class="field-group__label field-group__label--primary">Email</span>
+                <input placeholder="deine@e.mail" class="field-group__input" type="email" name="email" value="{opts.postdata.email}">
+            </label>
+            <label flex="30" class="field-group">
+                <span class="field-group__label field-group__label--primary">Passwort</span>
+                <input class="field-group__input" type="password" required name="password" value="{opts.postdata.password}">
+            </label>
         </div>
-        <div class="field-group">
-            <ssf-species-select></ssf-species-select>
-            <input type="text" required name="species" value="{opts.postdata.species}">
+        <ssf-species-select name="species" val={opts.postdata.species}></ssf-species-select>
+        <h3>Personendaten</h3>
+        <p class="notification notification--warning">
+            Damit Du an Events teilnehmen kannst, benötigen wir deinen Namen, dein Geburtsdatum und deine Adresse.<br>
+            Diese Daten sind <strong>nicht öffentlich zugänglich</strong> und werden ausschließlich für die Registrierung bei Events verwendet.
+        </p>
+        <div layout="row" layout-align="space-between">
+            <label flex="45" class="field-group">
+                <span class="field-group__label field-group__label--primary">Vorname</span>
+                <input class="field-group__input" type="text" required name="firstname" value="{opts.postdata.firstname}">
+            </label>
+            <label flex="45" class="field-group">
+                <span class="field-group__label field-group__label--primary">Nachname</span>
+                <input class="field-group__input" type="text" required name="lastname" value="{opts.postdata.lastname}">
+            </label>
         </div>
-        <div class="field-group">
-            <label for="firstname">firstname</label>
-            <input type="text" required name="firstname" value="{opts.postdata.firstname}">
+        <ssf-map-editor street={opts.postdata.street} city="{opts.postdata.city}" zip="{opts.postdata.zip}" country="{opts.postdata.country}" ref="address"></ssf-map-editor>
+        <label class="field-group">
+            <span class="field-group__label field-group__label--primary">Geburtsdatum</span>
+            <ssf-datepicker class-name="field-group__input" name="birthdate" options={dataInput} required ref="date" value="{opts.postdata.birthdate}"></ssf-datepicker>
+        </label>
+        <input type="hidden" id="_post_token" name="{CSRFToken}" value="{CSRFValue}"/>
+        <div class="actions">
+            <input type="submit" class="button button--primary" value="Werde Teil der Events">
         </div>
-        <div class="field-group">
-            <label for="lastname">lastname</label>
-            <input type="text" required name="lastname" value="{opts.postdata.lastname}">
-        </div>
-        <div class="field-group">
-            <label for="password">password</label>
-            <input type="password" required name="password" value="{opts.postdata.password}">
-        </div>
-        <div class="field-group">
-            <label for="password_repeat">password_repeat</label>
-            <input type="password" required name="password_repeat" value="{opts.postdata.password_repeat}">
-        </div>
-        <div class="field-group">
-            <label for="email">email</label>
-            <input type="email" name="email" value="{opts.postdata.email}">
-        </div>
-        <div layout="row">
-            <div class="field-group">
-                <label for="street">street</label>
-                <input type="text" required name="street" value="{opts.postdata.street}">
-            </div>
-            <div class="field-group">
-                <label for="zip">zip</label>
-                <input type="text" required name="zip" value="{opts.postdata.zip}">
-            </div>
-            <div class="field-group">
-                <label for="city">city</label>
-                <input type="text" required name="city" value="{opts.postdata.city}">
-            </div>
-            <div class="field-group">
-                <label for="country">country</label>
-                <input type="text" required name="country" value="{opts.postdata.country}">
-            </div>
-        </div>
-        <div class="field-group">
-            <label for="birthday">birthday</label>
-            <input type="date" name="birthday" value="{opts.postdata.birthday}">
-        </div>
-
-        <input type="submit" value="Register">
     </form>
     <script>
-    import '../user/ssf-species-select.html'
+        import './ssf-species-select.html'
+        import '../ssf-datepicker.html'
+        import '../ssf-map-editor.html'
 
-    window.api.google.on('signIn', (user)=>{
-        console.log(user)
-        var x=  user.getBasicProfile()
-        console.log(x);
-    })
-
-    this.on('mount', ()=>{
-    })
-
+        this.dataInput = {
+            dateFormat: 'd.m.Y',
+            allowInput: true,
+            defaultDate: new Date().getTime()-60*60*24*365*18*1000,
+            locale : {
+                firstDayOfWeek: 1,
+            }
+        }
     </script>
 </user-register>

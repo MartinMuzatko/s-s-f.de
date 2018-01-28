@@ -1,20 +1,34 @@
 <ssf-species-select>
-    <label for="species">species</label>
-    <ssf-suggestioninput suggestions={suggestions}></ssf-suggestioninput>
+    <label class="field-group" layout="column">
+        <span class="field-group__label field-group__label--primary">{opts.label || 'Spezies'}</span>
+        <ssf-suggestioninput val={opts.val} name="{opts.name}" ref="input" get-result-html={getUserHtml} suggestions={suggestions}></ssf-suggestioninput>
+    </label>
     <script>
         import '../ssf-suggestioninput.html'
-        this.getSpecies = async function() {
-            let response = await fetch('/s-s-f.de/api/users/getSpecies')
-            let data = await response.json()
-            return data
+        import { getSpecies } from '../../api'
+
+        this.species = []
+
+        this.getUserHtml = field => {
+            let specie = this.species.find(specie => specie.title == field)
+            return `
+                ${specie.title}
+            `
         }
-        this.on('mount', ()=>{
-            this.getSpecies().then(
-                (data) => {
-                    this.suggestions = data
-                    this.tags.ssfSuggestioninput.update()
-                }
-            )
+        
+        this.on('mount', () => {
+            this.refs.input.on('suggest', this.updateSuggestionInput)
         })
+        
+        this.updateSuggestionInput = async (name) => {
+            let data = await getSpecies(name, 20)
+            this.species = data
+            this.refs.input.suggest(data.map(specie => specie.title))
+        }
+
+        getUser() {
+            return this.refs.input.getInput()
+        }
+
     </script>
 </ssf-species-select>

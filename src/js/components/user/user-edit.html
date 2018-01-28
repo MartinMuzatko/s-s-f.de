@@ -24,10 +24,10 @@
                     Persönlichere Daten wie Adressen werden wir niemals für andere User sichtbar machen. 
                     Eventveranstalter können dich immer benachrichtigen und dein komplettes Profil einsehen.
                 </p>
-                <ssf-toggle checked={!opts.postdata.isInvisible} ref="public" label="Profil öffentlich"></ssf-toggle>
-                <ssf-toggle checked={opts.postdata.isQueryable} ref="public" label="Nachrichten von User erhalten"></ssf-toggle>
-                <ssf-toggle checked={opts.postdata.isSubscribedOfficial} ref="public" label="Über neue Events der SSF informiert werden"></ssf-toggle>
-                <ssf-toggle checked={opts.postdata.isSubscribedAll} ref="public" label="Über neue Partnerevents informiert werden"></ssf-toggle>
+                <ssf-toggle checked={!opts.postdata.isInvisible} name="isInvisible" label="Profil öffentlich"></ssf-toggle>
+                <ssf-toggle checked={opts.postdata.isQueryable} name="isQueryable" label="Nachrichten von User erhalten"></ssf-toggle>
+                <ssf-toggle checked={opts.postdata.isSubscribedOfficial} name="isSubscribedOfficial" label="Über neue Events der SSF informiert werden"></ssf-toggle>
+                <ssf-toggle checked={opts.postdata.isSubscribedAll} name="isSubscribedAll" label="Über neue Partnerevents informiert werden"></ssf-toggle>
             </div>
         </div>
         <h3>Personendaten</h3>

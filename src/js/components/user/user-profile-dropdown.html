@@ -1,13 +1,13 @@
 <user-profile-dropdown>
-    <a onclick={openDropdown} href="#" class="user-profile" layout="row" layout-align="center center">
+    <a onclick={toggleDropdown} href="#" class="user-profile" layout="row" layout-align="center center">
         <span class="user-profile__name">{opts.name}</span>
-        <span class="user-profile__select {refs.dropdown && refs.dropdown.open || 0 ? 'user-profile__select--active' : '' }">▾</span>
+        <span class="user-profile__select {refs.dropdown && refs.dropdown.isOpen || 0 ? 'user-profile__select--active' : '' }">▾</span>
         <div class="presence">
-            <img class="user-profile__avatar presence__item avatar avatar--round avatar--small" src="{opts.avatar}" alt="{opts.name}">
+            <img class="user-profile__avatar avatar avatar--round avatar--small" src="{opts.avatar}" alt="{opts.name}">
             <span if={messagesCount} class="presence__messages presence__bubble presence__bubble--bottom presence__bubble--right">{messagesCount}</span>
         </div>
     </a>
-    <ssf-dropdown orientation="right" ref="dropdown">
+    <ssf-dropdown close-on-mouse-out orientation="right" ref="dropdown">
         <yield>
     </ssf-dropdown>
     <script>
@@ -20,11 +20,21 @@
             console.log(amount);
             this.update()
         })
+        
+        this.on('mount', ()=>{
+            this.refs.dropdown.on('closed', ()=>{this.update()})
+        })
 
         openDropdown(event) {
             event.preventDefault()
             this.refs.dropdown.trigger('open')
         }
+        
+        toggleDropdown(event) {
+            event.preventDefault()
+            this.refs.dropdown.toggle()
+        }
+        
         closeDropdown() {
             setTimeout(() => {
                 this.refs.dropdown.trigger('close')

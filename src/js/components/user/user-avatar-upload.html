@@ -1,0 +1,51 @@
+<user-avatar-upload>
+    <h2>Avatar upload</h2>
+    <div layout="row" layout-align="space-between">
+        <div flex="100" flex-gt-sm="45">
+            <div class="notification notification--warning">
+                <p>Hier kannst Du deinen eigenen Avatar hochladen.</p>
+                <p><strong>Einschränkungen:</strong>JPG/PNG/SVG/GIF und max 500kb</p>
+            </div>
+        </div>
+        <div flex="100" flex-gt-sm="45">
+            <ssf-dropzone ref="dropzone"></ssf-dropzone>
+            <div layout="row" layout-align="space-around center" class="content--padded" if={image}>
+                <div layout="column" layout-align="space-between center">
+                    <img class="avatar avatar--round avatar--small content--margin" src="{image.data[0].data}" alt="{image.files[0].name}">
+                    32x32
+                </div>
+                <div layout="column" layout-align="space-between center">
+                    <img class="avatar avatar--round avatar--big content--margin" src="{image.data[0].data}" alt="{image.files[0].name}">
+                    128x128
+                </div>
+            </div>
+            <p class="notification notification--success" if={done}>
+                Avatar wurde erfolgreich hochgeladen :)
+            </p>
+            <button if={image} onclick={upload} class="button button--primary">Upload</button>
+        </div>
+    </div>
+    <script>
+        import { uploadAvatar } from '../../api'
+        import '../ssf-dropzone.html'
+
+        this.image = false
+        this.done = false
+
+        this.on('mount', ()=>{
+            this.refs.dropzone.on('prepared', async data => {
+                this.image = data
+                console.log(data)
+                this.update()
+            })
+        })
+        
+        async upload() {
+            await uploadAvatar(this.image.files[0], opts.user)
+            await uploadAvatar(this.image.files[0], opts.user)
+            this.done = true
+            this.update()
+        }
+
+    </script>
+</user-avatar-upload>

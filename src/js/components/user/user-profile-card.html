@@ -1,18 +1,18 @@
 <user-profile-card>
-    <div class="user-profile-card {opts.clubNumber.length ? 'user-profile-card--club-member' : ''}">
+    <div class="user-profile-card {opts.clubMemberID.length ? 'user-profile-card--club-member' : ''}">
         <a href="{opts.link}" title="zum Profil von {opts.username}">
             <h3 class="user-profile-card__name">{opts.username}</h3>
             <img class="user-profile-card__avatar" src="{opts.avatar}" alt="">
         </a>
-        <div each={event in events}>
-            {event}
-        </div>
-        <div class="actions">
-            Nachricht | Edit
+        <div>
+            <p>{opts.country}</p>
+            <div each={event in events}>
+                {event}
+            </div>
         </div>
     </div>
     <script>
-        this.events = opts.events.split(',')
+        // this.events = opts.events.split(',')
     </script>
     <style type="text/less">
         @import "src/less/variables.less";

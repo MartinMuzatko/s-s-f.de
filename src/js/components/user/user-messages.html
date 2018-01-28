@@ -1,8 +1,8 @@
 <user-messages>
     <div>
-        <a href="#inbox" class="button button--primary">Inbox</a>
-        <a href="#outbox" class="button button--primary">Outbox</a>
-        <a href="#compose" class="button button--primary">Compose</a>
+        <a href="#inbox" class="button button--primary">Posteingang</a>
+        <a href="#outbox" class="button button--primary">Gesendet</a>
+        <a href="#compose" class="button button--primary">Nachricht verfassen</a>
     </div>
     <div if={activeRoute != 'compose'} class="message-list">
         <table>
@@ -17,7 +17,7 @@
             <tbody>
                 <tr each={message in messages} class="message-list__message { message.read ? 'message-list__message--read' : 'message-list__message--unread'}">
                     <td><a href="#{activeRoute}/{message.id}">{message.title}</a></td>
-                    <td>{new Date(parseInt(message.created)).toISOString()}</td>
+                    <td>{getFormattedDate(parseInt(message.created))}</td>
                     <td>{message.receiver}</td>
                     <td>{message.sender}</td>
                 </tr>
@@ -25,16 +25,22 @@
         </table>
     </div>
     <user-message-send ref="messagesend"></user-message-send>
-    <div if={messageShown}>
+    <div if={messageShown} class="card card--light content--padded">
         <h2>{messageShown.title}</h2>
-        <p>{new Date(parseInt(messageShown.created)).toISOString()}</p>
+        <hr>
+        <p>Erhalten am: {getFormattedDate(parseInt(messageShown.created))}</p>
         <raw content={messageShown.text}></raw>
     </div>
     <script>
         import route from 'riot-route'
+        import format from 'date-fns/format'
         import './user-message-send.html'
         import '../raw.html'
         import {readMessage, getMessages} from '../../api'
+
+        getFormattedDate(date) {
+            return format(date, 'DD.MM.YYYY HH:mm:ss')
+        }
 
         const COMPOSE_RETURN_ROUTE = 'inbox'
 

@@ -1,6 +1,7 @@
 <user-filter>
-    <label>
-        {opts.label || 'Username'}
+
+    <label class="field-group" layout="column">
+        <span class="field-group__label field-group__label--primary">{opts.label || 'Username'}</span>
         <ssf-suggestioninput ref="input" get-result-html={getUserHtml} suggestions={suggestions}></ssf-suggestioninput>
     </label>
     <script>
@@ -24,7 +25,7 @@
         })
 
         this.updateSuggestionInput = async (name) => {
-            let data = await getUsers(name)
+            let data = await getUsers(name, 100)
             this.users = data
             this.refs.input.suggest(data.map(user=>user.username))
         }
