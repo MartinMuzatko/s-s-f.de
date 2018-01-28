@@ -1,6 +1,8 @@
 <?php namespace ProcessWire;
 
+
 use \API\Response;
+use \API\Resource;
 use \API\Request;
 use \API\Router;
 use \API\Route;
@@ -40,7 +42,10 @@ $router = new Router([
         $page = $this->pages->get("id=$pageId");
         $pages = array_map(
             function($page) {
-                $data = ["template" => $page->template->name];
+                $data = [
+                    "template" => $page->template->name,
+                    "id" => $page->id,
+                ];
                 $fields = getFieldValues($page, $page->fields->getArray());
                 return array_merge($data, ...$fields);
             },
@@ -56,7 +61,8 @@ $router = new Router([
             function($module) {
                 return [
                     "title" => $module->title,
-                    "moduleIcon" => $module->moduleIcon ? $module->moduleIcon->size(128,128)->httpUrl : '',
+                    "moduleIcon" => $module->moduleIcon ? $module->moduleIcon->size(128,128)->url : '',
+                    "placeholderImage" => $module->placeholderImage ? $module->placeholderImage->height(512)->url : '',
                     "summary" => $module->summary,
                     "associatedTemplate" => $module->associatedTemplate,
                     "templateType" => explode(' ', $this->templates->{$module->associatedTemplate}->tags),
@@ -93,54 +99,59 @@ $router = new Router([
         );
         return $roles;
     }),
-    new Route('GET', 'items', function() {
-        $roles = array_map(
-            function($role) {
+    new Route('GET', 'notifications', function() {
+        $notifications = array_map(
+            function($notification) {
                 return [
-                    "title" => $role->title,
-                    "summary" => $role->summary,
-                    "included" => $role->included,
-                    "buyPrice" => $role->buyPrice,
-                    "sellPrice" => $role->sellPrice,
-                    "image" => $role->image->first->url,
+                    "title" => $notification->title,
+                    "text" => $notification->text,
+                    "trigger" => $notification->trigger->title
+                ];
+            },
+            $this->pages->get('/events/resources/notifications')->children->getArray()
+        );
+        return $notifications;
+    }),
+    new Route('GET', 'items', function() {
+        $items = array_map(
+            function($item) {
+                return [
+                    "title" => $item->title,
+                    "summary" => $item->summary,
+                    "included" => $item->included,
+                    "buyPrice" => $item->buyPrice,
+                    "sellPrice" => $item->sellPrice,
+                    "image" => $item->image->first->url,
                 ];
             },
             $this->pages->get('/events/resources/items')->children->getArray()
         );
-        return $roles;
+        return $items;
     }),
-
-
-    new Route('POST', 'pages/([0-9]+)', function($path, $pageId) {
-        $data = Request::getPayload();
-        if (!$data) {
-            return 'no data';
-            http_response_code(415);
-        }
-        $page = $this->pages->get("id=$pageId");
-        $contentPage = $this->pages->get('template=page-contents');
-        if (!$page instanceof Page) {
-            return 'no page with ID found';
-            http_response_code(415);
-        }
-        $module = new Page();
-        $module->parent = $contentPage;
-        $module->of(false);
-        $module->title = $page->title.'_'.$data->template;
-        $validTemplates = [''];
-        $module->template = $data->template;
-        array_map(
-            function($key, $value) use ($module) {
-                //get_class($module->{$key});
-                $module->{$key} = html_entity_decode($value);
+    new Route('GET', 'templates', function() {
+        $templates = array_map(
+            function($template) {
+                return [
+                    "title" => $template->title,
+                    "summary" => $template->summary,
+                    "image" => $template->image->first->url,
+                    "pageModules" => array_map(
+                        function($pagemodule) {
+                            return array_merge(
+                                call_user_func_array(
+                                    'array_merge',
+                                    getFieldValues($pagemodule, $pagemodule->fields->getArray())
+                                ),
+                                ["template" => $pagemodule->template->name]
+                            );
+                        },
+                        $template->pageModules->getArray()
+                    )
+                ];
             },
-            array_keys((array) $data),
-            (array) $data
+            $this->pages->get('/events/resources/templates')->children->getArray()
         );
-        $module->save();
-        $page->of(false);
-        $page->pageModules->add($module);
-        $page->save();
+        return $templates;
     }),
 
     new Route('PUT', 'pages/([0-9]+)', function($path, $pageId) {
@@ -150,72 +161,14 @@ $router = new Router([
             http_response_code(415);
         }
         $page = $this->pages->get("id=$pageId");
-        $contentPage = $this->pages->get('template=page-contents');
         if (!$page instanceof Page) {
-            return 'no page with ID found';
             http_response_code(415);
+            return 'no page with ID found';
         }
-        $page->of(false);
-        $pages = $page->pageModules;
-        //$page->pageModules->removeAll();
-        foreach ($pages as $pageModule) {
-            $pageModule->delete(true);
-        }
-        // page deletion has to be made as a second call BEFORE creating page with same name again.
-        $page->save();
-
-        function setFieldValues($data, $page)
-        {
-            return array_map(
-                function($key, $value) use ($page) {
-                    if ($page->{$key} instanceof RepeaterPageArray) {
-                        $page->save();
-                        $repeaterItem = $page->{$key}->getNew();
-                        //$repeaterItem->of(false);
-                        array_map(function($val) use ($repeaterItem) {
-                            setFieldValues($val, $repeaterItem);
-                        }, $value);
-                        //$repeaterItem->parent = $page;
-                        $repeaterItem->save();
-                        $page->{$key}->add($repeaterItem);
-                        //$page->
-                    } else {
-                        $page->{$key} = html_entity_decode($value);
-                    }
-                },
-                array_keys((array) $data),
-                (array) $data
-            );
-        }
-
-        foreach ($data as $moduleData) {
-            $module = new Page();
-            $module->parent = $contentPage;
-            $module->of(false);
-            $validTemplates = [''];
-            $module->template = $moduleData->template;
-            $module->title = $page->title.'_'.$moduleData->template;
-            $module->save();
-            $page->pageModules->add($module);
-            $page->save();
-            setFieldValues($moduleData, $module);
-            $module->save();
-        }
-        $page->save();
+        setPageModules($page, $data, $this->pages->get('template=page-contents'));
     }),
 
-    new Route('POST', 'test', function($path) {
-        \TD::dump($this->pages->get('/')->logo->pagefiles->path());
-        die;
-        $x = new WireUpload('image');
-        $x->setMaxFiles(1);
-        $x->setOverwrite(false);
-        $x->setValidExtensions(['jpg','png', 'jpeg', 'svg', 'pdf']);
-        $x->setDestinationPath('/Users/martinmuzatko/dev/http/s-s-f.de/site/assets/files/');
-        $y = $x->execute();
-        var_dump($y);
-        //var_dump($this->wire->input->post);
-    }),
+
 
     new Route('GET', 'events', function($path) {
         return $this->events->listEvents();
@@ -226,8 +179,7 @@ $router = new Router([
 
         // EVENT
         new Route('GET', 'events/([\w-]+)', function($path, $eventName) {
-
-            return $this->events->getEvent($eventName);
+            return $this->events->get($eventName);
         }),
         new Route('PUT', 'events/([\w-]+)', function($path, $eventName) {
             $eventData = $this->events->getEvent($eventName);
@@ -321,13 +273,46 @@ $router = new Router([
 		} else {
             $users = $this->users->find("limit=$limit");
         }
-        return array_map(function($user) {return ["username"=>$user->username, "avatar"=>$user->avatar->size(32,32)->url];}, $users->getArray());
+        return array_map(
+            function($user) {
+                return [
+                    "username" => $user->username,
+                    "name" => $user->name,
+                    "avatar" => $user->avatar->size(32,32)->url,
+                ];
+            },
+            $users->getArray()
+        );
     }),
         new Route('GET', 'users/getAvatar', function($path) {
             $name = $this->input->get->name;
             $user = $this->users->get("username|name|email=$name");
             $user = $user instanceof NullPage ? $this->users->getGuestUser() : $user;
             return $user->getAvatar(256);
+        }),
+
+        new Route('POST', 'users/([\w-]+)/avatar', function($path, $username) {
+            $user = $this->users->get("name=$username");
+            $upload = new WireUpload('file');
+            $upload->setMaxFiles(1);
+            $upload->setOverwrite(true);
+            $upload->setValidExtensions(['jpg','png', 'jpeg', 'svg', 'gif']);
+            $upload->setDestinationPath($user->avatar->pagefiles->path);
+            $upload->setAllowAjax(true);
+            // $user->filesManager->createPath();
+            // delete before uploading
+            $user->of(false);
+            $user->avatar->deleteAll();
+            $user->save();
+            $files = $upload->execute();
+            if (count($files)) {
+                // use first file
+                $user->of(false);
+                $user->avatar = $files[0];
+                $user->save();
+            } else {
+                http_response_code(415);
+            }
         }),
         // MESSAGES
         new Route('GET', 'users/([\w-]+)/messages', function($path, $user) {
@@ -382,64 +367,52 @@ $router = new Router([
             $resource = new \API\Resource($path);
             $data = $resource->getPayload();
             $sender = $this->user;
-            try {
-                $message = new Page();
-                $message->parent = $this->pages->get('template=messages');
-                $message->template = 'message';
-                $message->title = $this->sanitizer->text($data->title);
-                $message->text = $this->sanitizer->textarea(
-                    $data->text,
-                    ["allowableTags" => "<h2><h3><h4><h5><h6><pre><code><small><del><br><hr><cite><abbr><p><a><b><strong><i><em><u><sup><sub><ul><ol><li><dd><dl><dt><table><tr><td><tbody><thead><th><blockquote><q>"]
-                );
-                $message->receiver = $this->sanitizer->username($receiver);
-                if (property_exists($data, 'sender')) {
-                    $message->sender = $this->sanitizer->username($data->sender);
-                } else {
-                    $message->sender = $this->sanitizer->username($this->user->name);
-                }
-                $message->save();
-                return $message->id;
-            } catch (\Exception $e) {
-                return false;
+            $receiver = $this->users->get("name=$receiver");
+            if (!$receiver instanceof NullPage) {
+                $message = new WireData();
+                $message->setArray([
+                    'title' => $data->title,
+                    'text' => $data->text,
+                    'sender' => $data->sender,
+                    'read' => $data->read,
+                ]);
+                return $receiver->sendMessage($message);
             }
+            return false;
         }),
 
     new Route('GET', 'sessions', function($path) {
         $user = new \API\User();
         return $user->getActiveSessions();
     }),
-    new Route('POST', 'session', function($path) {
-        $user = new \API\User();
-        $credentials = $user->getPayload();
-        return $user->login($credentials->username, $credentials->password);
-    }),
-    new Route('DELETE', 'session', function($path) {
-        $user = new \API\User();
-        return $user->logout();
-    }),
     new Route('GET', 'users/getSpecies', function($path) {
-        $users = new \API\Users();
-        return $users->getAllSpecies();
+        $nameFilter = $this->input->get->name;
+		$limit = $this->input->get->limit ? $this->input->get->limit : 10;
+		if ($nameFilter) {
+			$species = $this->pages->get('/resources/species')->children("title^=$nameFilter, limit=$limit");
+		} else {
+            $species = $this->pages->get('/resources/species')->children("limit=$limit");
+        }
+        return array_map(
+            function($specie) {
+                return [
+                    "title" => $specie->title
+                ];
+            },
+            $species->getArray()
+        );
 
     }),
 ]);
 $data = true;
 try {
-    $data = $router->execute($input->urlSegmentStr);
-    try {
-        if (!$user->isLoggedIn()) {
-            if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
-                if (!$session->login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])) {
-                    throw new \Exception('wrong credentials');
-                }
-            } else {
-                throw new \Exception('not logged in');
-            }
+    // If user is not logged in, attempt to login
+    if (!$user->isLoggedIn()) {
+        if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+            $session->login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
         }
-    } catch(\Exception $e) {
-        header('WWW-Authenticate: Basic realm="SüdStaaten Furs"');
-        http_response_code(401);
     }
+    $data = $router->execute($input->urlSegmentStr);
 } catch (\Exception $e) {
     $data = false;
     if ($config->debug) {
@@ -456,39 +429,3 @@ try {
     echo json_encode($data);
 }
 die;
-
-//example string:
-// GET events
-// GET events/ufurrya
-// GET events/ufurrya/registrations
-// $pages->get('/events/ufurrya/registrations')
-// Events->getEvent('ufurrya')->getRegistration('misan')
-/*  Resources
-        Events
-            GET - list
-            POST - create
-            Event
-                GET - show
-                PUT - update
-                Registrations
-                    GET - list
-                    POST - create
-                    Registration
-                        GET - show
-                        PUT - update
-
-
-                Items
-                Tickets
-        Users
-
-
-*/
-// Events->get('ufurrya')
-// GET events/ufurrya/registrations/misan
-// POST events
-// POST events/ufurrya/registrations
-// POST events/ufurrya/tickets
-// GET sessions - list active sessions
-// POST sessions
-// DELETE sessions
