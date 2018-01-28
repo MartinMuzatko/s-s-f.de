@@ -10,20 +10,32 @@
     <? if($event->getRegistrationsPage()->endDate): ?>Die Registrierung schließt am <?=$event->getRegistrationsPage()->endDate?><?endif?>
     <div layout="row" layout-align="space-around">
         <a href="<?=$event->guestlist->url?>" class="button button--secondary">Gästeliste</a>
-        <a href="<?=$event->registration->url?>" class="button button--primary">Jetzt Registrieren</a>
+        <a href="<?=$event->registration->url?>" class="button button--primary">
+            <? if($event->isUserRegistered($user)): ?>
+                Registrierdaten ansehen
+            <? else: ?>
+                Jetzt Registrieren
+            <? endif; ?>
+        </a>
     </div>
 <? elseif(!$event->isRegistrationOpen() && !$event->isRegistrationOver() && !$event->isEventOver()): ?>
     <ssf-countdown size="small" to="<?=$event->getRegistrationsPage()->getUnformatted('startDate')?>000">
         <yield to="before">
             <p>
                 Die Registrierung ist noch nicht offen.
-                <? if($event->getRegistrationsPage()->startDate): ?>Sie offnet am <?=$event->getRegistrationsPage()->startDate?><?endif?>
+                <? if($event->getRegistrationsPage()->startDate): ?>Sie öffnet am <?=$event->getRegistrationsPage()->startDate?><?endif?>
             </p>
         </yield>
         <yield to="after">
             <p hidden ref="after">
                 Du kannst dich nun Registrieren.
-                <a href="<?=$event->registration->url?>" class="button button--primary">Jetzt Registrieren</a>
+                <a href="<?=$event->registration->url?>" class="button button--primary">
+                    <? if($event->isUserRegistered($user)): ?>
+                        Registrierdaten ansehen
+                    <? else: ?>
+                        Jetzt Registrieren
+                    <? endif; ?>
+                </a>
             </p>
         </yield>
     </ssf-countdown>

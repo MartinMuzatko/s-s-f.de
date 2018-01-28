@@ -1,32 +1,77 @@
+<?php namespace ProcessWire;?>
 <?php
-    if ($profile->isInvisible) {
+    if (!$isMe && !$isAdmin && $isInvisible) {
         $session->redirect($pages->get('name=404')->url);
     }
     $userLink = $this->config->urls->root.'users/'.$profile->name;
-    $profileImage = $profile->avatar->size(128,128);
 ?>
 <div class="profile-info">
-    <div class="profile-info__column">
-        <div layout="row" layout-nowrap>
-            <h1><?=$profile->username?></h1>
-            <img flex-end class="avatar avatar--big avatar--round" src="<?=$profileImage->url?>" alt="Profilbild von <?=$profile->username?>">
-        </div>
-        <div class="actions">
-            <? if($profile->name == $user->name || $user->hasRole('superuser')):?>
-                <a href="<?=$profile->editUrl?>">Profil bearbeiten</a>
-            <? endif?>
-        </div>
+    <div class="profile-info__column content content--padded">
+        <? if($isMe || $isAdmin):?>
+            <a class="button button--primary" href="<?=$config->urls->root?>users/<?=$user->name?>/edit">Profil bearbeiten</a>
+        <? endif?>
+        <? if(!$isMe):?>
+            <a class="button button--primary" href="">Nachricht senden</a>
+        <? endif?>
+        <? require('user-info.php'); ?>
+        <? if($isMe || $isAdmin):?>
+        <p class="notification notification--warning">Folgende Daten sind <strong>privat</strong>. Nur Du und Eventmanager können diese Daten einsehen</p>
+            <? require('user-private-info.php'); ?>
+        <? endif?>
         <?php
-            $events = $user->getAttendedEvents();
-            foreach ($events as $event) {
-                echo $event->title;
-            }
+            $upcomingEvents = $profile->getUpcomingEvents();
+            $attendedEvents = $profile->getAttendedEvents();
+            $recommendedEvents = $profile->getRecommendedEvents();
         ?>
-        <?=$profile->renderFields()?>
     </div>
-    <div class="profile-info__column">
-        <event-list-short heading="Du nimmst teil an diesen Events"></event-list-short>
-        <event-list-short heading="Du warst bei diesen Events dabei"></event-list-short>
-        <event-list-short heading="Diese Events empfehlen wir dir"></event-list-short>
+    <div class="profile-info__column content--padded">
+        <? if($isMe): ?>
+            <h2>Deine Events</h2>
+        <? endif; ?>
+        <? if(($upcomingEvents->count + $attendedEvents->count == 0) && $isMe && $recommendedEvents->count): ?>
+            <p class="notification notification--warning">
+                Du warst noch bei keinem Event dabei? Wage den ersten Schritt und werde Teil eines unserer kommenden Events.
+            </p>
+            <event-list-short heading="Unsere Empfehlung">
+                <? foreach ($recommendedEvents as $event): ?>
+                    <event-list-item logo="<?=$event->logo->width(128, ["upscaling"=>false])->url?>" title="<?=$event->title?>" date="<?=strftime('%d.%m.%Y', $event->getUnformatted('startDate'))?>" link="<?=$event->url?>"></event-list-item>
+                <? endforeach; ?>
+            </event-list-short>
+        <? endif; ?>
+        <? if($upcomingEvents->count): ?>
+            <event-list-short heading="<?=$isMe?'Du nimmst teil an diesen Events':'Du kannst mich hier antreffen'?>">
+                <? foreach ($upcomingEvents as $event): ?>
+                    <?
+                        $attendee = $event->getRegisteredUser($profile);
+                    ?>
+                    <event-list-item 
+                        logo="<?=$event->logo->width(128, ["upscaling"=>false])->url?>" 
+                        title="<?=$event->title?>" 
+                        date="<?=strftime('%d.%m.%Y', $event->getUnformatted('startDate'))?>" 
+                        link="<?=$event->url?>">
+                        <? if($isMe || $isAdmin):?>
+                            <div layout="row" layout-align="space-between center" class="event-preview__division bg--primary-dark">
+                                <div layout="row" layout-align="start center">
+                                    <span class="status-bubble group__item bg--<?=getAttendeeStatusColor($attendee->attendeeStatus->title)?> bg--<?=getAttendeeStatusColor($attendee->attendeeStatus->title)?>--shadow"></span>
+                                    <span class="group__item">
+                                        <?=getAttendeeStatusLabel($attendee->attendeeStatus->title)?>
+                                    </span>
+                                </div>
+                                <? if($event->hasRegistrationPage()): ?>
+                                    <a href="<?=$event->getPageByModule('event-registration')->url?>" class="group__item button button--primary">Registrierdaten</a>
+                                <? endif ?>
+                            </div>
+                        <? endif;?>
+                    </event-list-item>
+                <? endforeach; ?>
+            </event-list-short>
+        <? endif; ?>
+        <? if($attendedEvents->count): ?>
+            <event-list-short heading="<?=$isMe?'Du warst bei diesen Events dabei':'Bei diesen Events war ich bereits'?>">
+                <? foreach ($attendedEvents as $event): ?>
+                    <event-list-item logo="<?=$event->logo->width(128, ["upscaling"=>false])->url?>" title="<?=$event->title?>" date="<?=strftime('%d.%m.%Y', $event->getUnformatted('startDate'))?>" link="<?=$event->url?>"></event-list-item>
+                <? endforeach; ?>
+            </event-list-short>
+        <? endif; ?>
     </div>
 </div>

@@ -2,17 +2,34 @@
     $event = $this->wire->event;
     $attendee = $this->wire->attendee;
 ?>
+
 <div class="content content--padded">
     <? if($event->isEventRunning()): ?>
-        <p>Das Event läuft gerade. Sieh dir an wer teilnimmt.</p>
-        <a href="" class="button button--secondary">Gästeliste</a>
+        <div layout="column" layout-align="center center">
+            <p>Das Event läuft gerade. Sieh dir an wer teilnimmt.</p>
+            <a href="" class="button button--secondary">Gästeliste</a>
+        </div>
     <? elseif($event->isEventOver()): ?>
-        <p>Das Event ist bereits gelaufen. Schau dir an, wer dabei war.</p>
-        <a href="" class="button button--secondary">Gästeliste</a>
-    <? elseif($event->isRegistrationOpen() && !$event->isEventOver()):?>
-        <p>Es sind bereits <strong><?=$event->getRegistrations()->count?></strong> von <strong><?=$event->ticketLimit?></strong> Plätzen reserviert.</p>
-        <progress value="<?=str_replace(',','.',100*($event->getRegistrations()->count/$event->ticketLimit))?>" max="100"></progress><br>
-        <? if($event->getRegistrationsPage()->endDate): ?>Die Registrierung schließt am <?=$event->getRegistrationsPage()->endDate?><?endif?>
+        <div layout="column" layout-align="center center">
+            <p>Das Event ist bereits vorbei. Aber das nächste ist sicher nicht fern.</p>
+        </div>
+        <? if($event->isUserRegistered($user)): ?>
+            <div layout="row" layout-align="center">
+                <div flex="100" flex-gt-sm="80" flex-gt-md="70" flex-gt-lg="60" class="card card--light content--padded">
+                    <h2>Wie hat es dir bei uns gefallen?</h2>
+                    Dem Veranstalter des Events ist es wichtig einen guten Überblick über die Zufriedenheit der Besucher zu erlangen.
+                    <ssf-rating></ssf-rating>
+                    <a href="" class="button button--primary">Meinung Absenden</a>
+                </div>
+            </div>
+        <? endif ?>
+        <? elseif($event->isRegistrationOpen() && !$event->isEventOver()):?>
+        <div layout="column" layout-align="center center" class="content--padded">
+            <p>Es sind bereits <strong><?=$event->getRegistrations()->count?></strong> von <strong><?=$event->ticketLimit?></strong> Plätzen reserviert.</p>
+            <progress value="<?=str_replace(',','.',100*($event->getRegistrations()->count/$event->ticketLimit))?>" max="100"></progress><br>
+            <? if($event->getRegistrationsPage()->endDate): ?>Die Registrierung schließt am <?=$event->getRegistrationsPage()->endDate?><?endif?>
+        </div>
+        <h3>Du registrierst dich mit diesen Daten:</h3>
         <? require('./partials/event/register.php')?>
     <? elseif(!$event->isRegistrationOpen() && !$event->isEventOver()): ?>
         <ssf-countdown to="<?=$event->getRegistrationsPage()->getUnformatted('startDate')?>000">

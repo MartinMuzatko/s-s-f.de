@@ -6,8 +6,8 @@
                 <h2 class="text--centered heading heading--underlined">
                     <a href="<?=$page->url?>"><?=$page->title?></a>
                 </h2>
-                <p>Wie jedes Jahr gibt es ein ausgedehntes Programm. Darunter Freiluftkino, Redneck-Pool und Burger essen.</p>
-                <a href="" class="button button--primary">Mehr erfahren</a>
+                <p><?=$page->summary?></p>
+                <a href="" class="button button--subtle">Mehr erfahren</a>
             </div>
         <? endforeach; ?>
         <!-- <div flex="45" class="text--centered">

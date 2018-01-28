@@ -22,7 +22,7 @@
             </div>
             <div flex="45" class="text--centered">
                 <h2 class="text--centered heading heading--underlined">Anfahrt</h2>
-                <p>Details zur Location und wie du zu uns kommst.</p>
+                <p>Details zur Location und wie Du zu uns kommst.</p>
                 <img style="height: 140px" class="image--fit-cover" src="https://i.imgur.com/3Lgf8rS.png" alt="">
             </div>
         </div>
