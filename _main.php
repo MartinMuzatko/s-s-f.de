@@ -1,40 +1,56 @@
 <?php namespace ProcessWire;
 $content = ob_get_clean();
+$documentTitle = isset($documentTitle) ? $documentTitle : $page->title;
+$documentTitle .= $isEvent && !$isEventHome ? ' - '.$event->title : '';
+$documentTitle .= ' | SSF - Die SüdstaatenFurs';
 ?>
 <!DOCTYPE html>
+<!-- 
+    Hallo lieber Source-code schnüffler :)
+    Ich setze bei der Entwicklung auf freie Software wie ProcessWire und RiotJS.
+    Finde mehr über mich heraus: https://happy-css.com
+ -->
 <html itemscope itemtype="http://schema.org/Website">
+<!-- Global site tag (gtag.js) - Google Analytics -->
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<?=$homepage->googleAnalyticsID?>"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', '<?=$homepage->googleAnalyticsID?>');
+    </script>
     <meta charset="utf-8">
     <link rel="manifest" href="<?=$config->urls->templates?>dist/manifest.json">
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title><?=$page->title?> | <?=$homepage->title?> - <?=$homepage->summary?></title>
+    <title><?=$documentTitle?></title>
     <meta name="description" content="<?=$page->summary?>" />
 
     <meta name="google-signin-client_id" content="953795431714-qpap9svob48gbto79f3sun0dfir2apck.apps.googleusercontent.com">
 
     <!-- Schema.org markup for Google+ -->
-    <meta itemprop="name" content="<?=$page->title?>">
+    <meta itemprop="name" content="<?=$documentTitle?>">
     <meta itemprop="description" content="<?=$page->summary?>">
     <meta itemprop="image" content="<?=$favicon?>">
 
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@<?=$author->twitterHandle?>">
-    <meta name="twitter:title" content="<?=$page->title?>">
+    <meta name="twitter:title" content="<?=$documentTitle?>">
     <meta name="twitter:description" content="<?=$page->summary?>">
     <meta name="twitter:creator" content="@<?=$author->twitterHandle?>">
     <!-- Twitter Summary card images must be at least 120x120px -->
     <meta name="twitter:image" content="<?//$page->image->first->httpUrl?>">
 
     <!-- Open Graph data -->
-    <meta property="og:title" content="<?=$page->title?>" />
-    <meta property="og:type" content="article" />
+    <meta property="og:title" content="<?=$documentTitle?>" />
+    <meta property="og:type" content="website" />
     <meta property="og:url" content="<?=$page->httpUrl?>" />
     <meta property="og:image" content="<?=$homepage->logo->size(128,128)->httpUrl?>" />
     <meta property="og:description" content="<?=$page->summary?>" />
-    <meta property="og:site_name" content="<?=$homepage->title?> - <?=$homepage->summary?>" />
+    <meta property="og:site_name" content="<?=$documentTitle?>" />
     <meta property="og:locale" content="de_DE" />
     <meta property="article:published_time" content="<?=date('c', $page->published)?>" />
     <meta property="article:modified_time" content="<?=date('c', $page->modifed)?>" />
@@ -53,12 +69,12 @@ $content = ob_get_clean();
                 </div>
             </a>
             <!-- <img src="<?=$config->urls->templates?>dist/images/home.svg" alt=""> -->
-            <nav layout="row" layout-align="space-between" class="site__nav navigation">
-                <div layout="row">
+            <nav layout-align="space-between" class="site__nav navigation">
+                <div class="navigation__segment">
                     <? foreach($homepage->and($homepage->children) as $child):?>
                         <a class="button navigation__item" href="<?=$child->url?>">
                             <span class="navigation__image">
-                                <?=file_get_contents('dist/images/'.$child->name.'.svg')?>
+                                <?=file_get_contents('dist/images/menue_'.$child->name.'.svg')?>
                             </span>
                             <span class="navigation__page"><?=$child->title?></span>
                         </a>
@@ -66,16 +82,23 @@ $content = ob_get_clean();
                 </div>
                 <div layout="row" layout-align="center center" class="navigation--item">
                     <?if($user->isLoggedin()):?>
-                        <user-profile-dropdown messages="<?=$user->hasUnreadMessages()?>" name="<?=$user->username?>" avatar="<?=$user->avatar instanceof Pageimages ? $user->avatar->first->size(64,64)->url : $user->avatar->size(64,64)->url?>">
+                        <user-profile-dropdown 
+                            messages="<?=$user->hasUnreadMessages()?>" 
+                            name="<?=$user->username?>" 
+                            avatar="<?=$user->getAvatar(64)?>">
                             <div class="dropdown__group">
                                 <a class="dropdown__item" href="<?=$config->urls->root?>users/<?=$user->name?>">Profil anzeigen</a>
                                 <a class="dropdown__item" href="<?=$config->urls->root?>users/<?=$user->name?>/edit">Profil bearbeiten</a>
                                 <a class="dropdown__item" href="<?=$config->urls->root?>users/<?=$user->name?>/messages">Nachrichten (<?=$user->hasUnreadMessages()?>)</a>
-                                <a class="dropdown__item" href="<?=$config->urls->root?>admin">Admin</a>
+                                <? if($user->hasRole('admin')): ?>
+                                    <a class="dropdown__item" href="<?=$config->urls->root?>admin">Admin</a>
+                                <? endif; ?>
                             </div>
-                            <div class="dropdown__group">
-                                <a class="dropdown__item" href="<?=$config->urls->root?>events">Event Management</a>
-                            </div>
+                            <? if($user->hasRole('manager')): ?>
+                                <div class="dropdown__group">
+                                    <a class="dropdown__item" href="<?=$config->urls->root?>events">Event Management</a>
+                                </div>
+                            <? endif; ?>
                             <div class="dropdown__group">
                                 <a class="dropdown__item" href="<?=$config->urls->root?>users/logout">Logout</a>
                             </div>
@@ -96,50 +119,40 @@ $content = ob_get_clean();
             <article>
                 <?=$content?>
             </article>
-            <a href="<?=$page->editUrl?>">Edit <?=$page->title?></a>
+            <? if($user->hasRole('superuser')): ?>
+                <a href="<?=$page->editUrl?>">Edit <?=$page->title?></a>
+            <? endif ?>
         </main>
-        <footer class="site__footer">
-            <p>SSF - Südstaaten Furs &copy; 2017</p>
-            <p>Verrein zur Förderung antropomorpher Künste</p>
-            <p>
-                <?php
-                    $resource = new \API\Resource('');
-                    $sessions = $resource->getActiveSessions();
-                ?>
-                <h4>Eingeloggte User</h4>
-                <? foreach($sessions as $session): ?>
-                    <?=$session['user_name']?>
-                <? endforeach;?>
-            </p>
+        <footer class="site__footer" layout="row" layout-align="space-between">
+            <div flex="100" flex-gt-sm="45">
+                <p>SSF - Südstaaten Furs &copy; <?=strftime('%Y', time())?></p>
+                <?=$homepage->footer?>
+            </div>
+            <div flex="100" flex-gt-sm="45" layout="row" layout-align="end start">
+                <? foreach($homepage->socialmedia as $socialmedia): ?>
+                    <a class="content--margin" style="border-radius: 100%; display: block; overflow: hidden; line-height: 0;" href="<?=$socialmedia->link?>"><img width="32" src="<?=$socialmedia->image->first->url?>" alt="<?=$socialmedia->title?>"></a>
+                <? endforeach ?>
+            </div>
         </footer>
     </div>
-    <? if(!$user->isLoggedin()): ?>
-        <script>
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-            ga('create', '', 'auto');
-            ga('send', 'pageview');
-        </script>
-    <? endif; ?>
     <?php
         $itemPages = $pages->get('/events/resources/items')->children('include=all')->getArray();
         $imageKeys = array_map(function($item) { return $item->name; }, $itemPages);
         $imageValues = array_map(function($item) { return $item->image->first->url ; }, $itemPages);
         $itemImages = array_combine($imageKeys, $imageValues);
-        
+        // $user = $pages->find('template=user')->getRandom();
         $api = [
             "user" => [
                 "name" => $user->name,
                 "username" => $user->username,
+                "clubMemberID" => $user->clubMemberID,
                 "avatar" => $user->getAvatar(),
             ],
             "url" => $config->urls->root,
             "images" => $itemImages
         ];
     ?>
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
     <script>
         window.api = {}
         Object.assign(window.api, <?=json_encode($api)?>)
