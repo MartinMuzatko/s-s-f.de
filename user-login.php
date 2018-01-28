@@ -7,7 +7,12 @@
         }
         $loginUser = $session->login($username, $input->post->password);
         if($loginUser instanceof User) {
-            $session->redirect($pages->get('/')->url.'users/'.$loginUser->name);
+            $redirectPage = $pages->get($input->get->redirect);
+            if(!$redirectPage instanceof NullPage) {
+                $session->redirect($redirectPage->url);
+            } else {
+                $session->redirect($pages->get('/')->url.'users/'.$loginUser->name);
+            }
         } else {
             $error = 1;
         }
@@ -16,18 +21,19 @@
         $session->redirect($pages->get('/')->url.'users/'.$user->name);
     }
 ?>
-<form action="" method="POST" layout="column" layout-align="center center">
-    <div class="fieldset">
+<form action="" method="POST" class="content--padded content--margin" layout="row" layout-align="center center">
+    <div class="fieldset" flex="90" flex-gt-sm="70" flex-gt-md="60" flex-gt-lg="45">
         <p>
-            <a href="<?=$pages->get('/users/register')->url?>">Hast du noch keinen Account? Jetzt Registrieren.</a>
+            <a href="<?=$pages->get('/users/register')->url?>">Hast Du noch keinen Account? Jetzt Registrieren.</a>
         </p>
+        <p class="notification notification--warning">Aus Sicherheitsgründen, haben wir alle bisherigen Accounts der alten SSF Website entfernt. Wir bitten Dich einen neuen Account anzulegen.</p>
         <user-login>
             <div layout="column" layout-align="center center">
                 <img ref="avatar" class="avatar avatar--big avatar--round" src="<?=$user->getAvatar()?>" alt="">
             </div>
             <? if(isset($error)): ?>
                 <div class="notification notification--error">
-                    Der User existiert nicht oder das Passwort ist falsch.<br> Wenn du das Passwort vergessen hast, <a href="<?=$pages->get('/users/forgot-password')->url.'?name='?>">kannst du es wiederherstellen</a>.
+                    Der User existiert nicht oder das Passwort ist falsch.<br> Wenn Du das Passwort vergessen hast, <a href="<?=$pages->get('/users/forgot-password')->url.'?name='?>">kannst Du es wiederherstellen</a>.
                 </div>
             <? endif ?>
             <label class="field-group" for="username">
@@ -42,10 +48,10 @@
             <p>
                 <a href="<?=$pages->get('/users/forgot-password')->url?>">Passwort vergessen?</a>
             </p>
-            <div>
+            <!-- <div>
                 <div class="text-or"><span>Oder</span></div>
                 <div class="g-signin2" data-onsuccess="googleSignIn"></div>
-            </div>
+            </div> -->
         </user-login>
     </div>
 </form>

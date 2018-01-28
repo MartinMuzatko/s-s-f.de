@@ -4,10 +4,20 @@
 	$profile = $users->get("name=$username");
 ?>
 <? if ($profile instanceof User): ?>
+    <?
+        $isMe = $profile->name == $user->name;
+        $isAdmin = $user->hasPermission('user-admin');
+        $isInvisible = $profile->isInvisible;
+    ?>
     <? if(!$action): ?>
+        <? $documentTitle = $profile->username." Profil" ?>
         <? require('./partials/user/profile.php'); ?>
     <? elseif($action == 'messages'): ?>
+        <? $documentTitle = 'Nachrichten' ?>
         <? require('./partials/user/messages.php'); ?>
+    <? elseif($action == 'edit'): ?>
+        <? $documentTitle = 'Profil bearbeiten' ?>
+        <? require('./partials/user/edit.php'); ?>
     <? endif; ?>
 <? else: ?>
 	<?php
@@ -64,7 +74,7 @@
                     <user-profile-card flex="33"
                         joined="<?=date('Y-m-d', $profile->created)?>"
                         link="<?=$this->config->urls->root?>users/<?=$profile->name?>"
-                        club-number="<?=$profile->clubNumber?>"
+                        club-number="<?=$profile->clubMemberID?>"
                         username="<?=$profile->username?>"
                         events="<?= join(',', array_map(function($event){return $event->parent->parent->title;}, $events));?>"
                         avatar="<?=$profile->avatar->size(64,64)->url?>"></user-profile-card>
