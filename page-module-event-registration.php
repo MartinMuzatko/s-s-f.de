@@ -6,20 +6,20 @@
 <div class="content content--padded">
     <? if($event->isEventRunning()): ?>
         <div layout="column" layout-align="center center">
-            <p>Das Event läuft gerade. Sieh dir an wer teilnimmt.</p>
-            <a href="" class="button button--secondary">Gästeliste</a>
+            <p><?=__('Das Event läuft gerade. Sieh dir an wer teilnimmt.')?></p>
+            <a href="" class="button button--secondary"><?=__('Gästeliste')?></a>
         </div>
     <? elseif($event->isEventOver()): ?>
         <div layout="column" layout-align="center center">
-            <p>Das Event ist bereits vorbei. Aber das nächste ist sicher nicht fern.</p>
+            <p><?=__('Das Event ist bereits vorbei. Aber das nächste ist sicher nicht fern.')?></p>
         </div>
         <? if($event->isUserRegistered($user)): ?>
             <div layout="row" layout-align="center">
                 <div flex="100" flex-gt-sm="80" flex-gt-md="70" flex-gt-lg="60" class="card card--light content--padded">
-                    <h2>Wie hat es dir bei uns gefallen?</h2>
-                    Dem Veranstalter des Events ist es wichtig einen guten Überblick über die Zufriedenheit der Besucher zu erlangen.
+                    <h2><?=__('Wie hat es dir bei uns gefallen?')?></h2>
+                    <?=__('Dem Veranstalter des Events ist es wichtig einen guten Überblick über die Zufriedenheit der Besucher zu erlangen.')?>
                     <ssf-rating></ssf-rating>
-                    <a href="" class="button button--primary">Meinung Absenden</a>
+                    <a href="" class="button button--primary"><?=__('Meinung Absenden')?></a>
                 </div>
             </div>
         <? endif ?>
@@ -29,19 +29,19 @@
             <progress value="<?=str_replace(',','.',100*($event->getRegistrations()->count/$event->ticketLimit))?>" max="100"></progress><br>
             <? if($event->getRegistrationsPage()->endDate): ?>Die Registrierung schließt am <?=$event->getRegistrationsPage()->endDate?><?endif?>
         </div>
-        <h3>Du registrierst dich mit diesen Daten:</h3>
+        <h3><?=__('Du registrierst dich mit diesen Daten:')?></h3>
         <? require('./partials/event/register.php')?>
     <? elseif(!$event->isRegistrationOpen() && !$event->isEventOver()): ?>
         <ssf-countdown to="<?=$event->getRegistrationsPage()->getUnformatted('startDate')?>000">
             <yield to="before">
                 <p>
-                    Die Registrierung ist momentan geschlossen.
+                    <?=__('Die Registrierung ist momentan geschlossen.')?>
                     <? if($event->getRegistrationsPage()->startDate): ?>Sie öffnet am <?=$event->getRegistrationsPage()->startDate?><?endif?>
                 </p>
             </yield>
             <yield to="after">
                 <div hidden ref="after">
-                    Du kannst dich nun Registrieren.
+                    <?=__('Du kannst dich nun Registrieren.')?>
                     <? require('./partials/event/register.php')?>
                 </div>
             </yield>

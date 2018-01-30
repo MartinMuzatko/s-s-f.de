@@ -12,13 +12,13 @@ $attendee = $this->wire->attendee;
 <? if($input->post->method == 'DELETE'): ?>
     <ssf-dialog visible size="small">
         <p>
-            Schade, dass Du nicht dabei bist!
+            <?=__('Schade, dass Du nicht dabei bist!')?>
             Wir haben dich vom <?=$event->title?> abgemeldet.
         </p>
         <p>
-            Solltest Du bereits bezahlt haben, kontaktiere uns.
+            <?=__('Solltest Du bereits bezahlt haben, kontaktiere uns.')?>
         </p>
-        <p><a href="" class="button button--primary">Event-staff kontaktieren</a></p>
+        <p><a href="" class="button button--primary"><?=__('Event-staff kontaktieren')?></a></p>
 
     </ssf-dialog>
 <? endif ?>
@@ -28,57 +28,57 @@ $attendee = $this->wire->attendee;
             <? if($attendee->attendeeStatus->title == 'new'): ?>
                 <div class="notification notification--success">
                     <h2>Du hast dich für das Event <strong><?=$event->title?></strong> registriert</h2>
-                    <p>Deine Registrierung wird von uns manuell geprüft. Sobald Du im Zahlungseingang landest, geben wir dir Bescheid.</p>
+                    <p><?=__('Deine Registrierung wird von uns manuell geprüft. Sobald Du im Zahlungseingang landest, geben wir dir Bescheid.')?></p>
                     <p>Deine Con fee beträgt <strong><?=$event->getAttendeePaymentSum($user)?> €</strong>. Du erhältst die Bankdaten, sobald wir dich freigeschalten haben.</p>
                 </div>
             <? elseif($attendee->attendeeStatus->title == 'pending'): ?>
                 <div class="notification notification--success">
-                    <h2>Deine Registrierung wurde bearbeitet. Wir erwarten Deine Zahlung</h2>
+                    <h2><?=__('Deine Registrierung wurde bearbeitet. Wir erwarten Deine Zahlung.')?></h2>
                     <p>Bitte überweise den Betrag von <strong><?=$event->getAttendeePaymentSum($user)?> €</strong> auf folgendes Konto:</p>
                     <p>
                         IBAN:<strong><?=$event->bankIBAN?></strong><br>
                         BIC:<strong><?=$event->bankBIC?></strong><br>
                     </p>
                     <p>
-                        Empfänger: <br>
+                        <?=__('Empfänger:')?> <br>
                         <strong><?=$event->bankAccountName?></strong>
                     </p>
                     <!-- <?=$attendee->paymentMethod->title?> -->
                     <p>
-                        Als Betreff gib bitte das Event und Deinen Nick an: <strong><?=$event->title?> - <?=$attendee->profile->username?></strong>
+                        <?=__('Als Betreff gib bitte das Event und Deinen Nick an:')?> <strong><?=$event->title?> - <?=$attendee->profile->username?></strong>
                     </p>
                     <p>
-                        Adresse für Auslandsüberweisungen:<br>
+                        <?=__('Adresse für Auslandsüberweisungen:')?><br>
                         <strong><?=$event->bankAccountName?></strong><br>
                         <strong><?=$event->bankAccountAddress?></strong>
                     </p>
                 </div>
             <? elseif($attendee->attendeeStatus->title == 'accepted'): ?>
                 <div class="notification notification--success">
-                    <h2>Juhu! Du bist dabei</h2>
-                    <p>Wir haben deine Zahlung von <strong><?=$event->getAttendeePaymentSum($user)?> €</strong> erhalten und erwaten dich auf dem Event</p>
+                    <h2><?=__('Juhu! Du bist dabei')?></h2>
+                    <p>Wir haben deine Zahlung von <strong><?=$event->getAttendeePaymentSum($user)?> €</strong> erhalten und erwarten dich auf dem Event</p>
                 </div>
             <? elseif($attendee->attendeeStatus->title == 'waiting'): ?>
                 <div class="notification notification--warning">
-                    <h2>Warteliste</h2>
-                    <p>Leider ist das Event im Augenblick voll. Sobald ein Platz frei wird, wirst Du automatisch benachrichtigt. Du musst nichts weiter unternehmen.</p>
+                    <h2><?=__('Warteliste')?></h2>
+                    <p><?=__('Leider ist das Event im Augenblick voll. Sobald ein Platz frei wird, wirst Du automatisch benachrichtigt. Du musst nichts weiter unternehmen.')?></p>
                 </div>
             <? elseif($attendee->attendeeStatus->title == 'signedoff'): ?>
                 <div class="notification notification--error">
-                    <h2>Du hast dich vom Event abgemeldet</h2>
+                    <h2><?=__('Du hast dich vom Event abgemeldet.')?></h2>
                     <p>Schade, dass Du beim <strong><?=$event->title?></strong> nicht dabei sein kannst.</p>
-                    <p>Bei Fragen melde dich bitte an den Event-staff.</p>
+                    <p><?=__('Bei Fragen melde dich bitte an den Event-staff.')?></p>
                 </div>
             <? elseif($attendee->attendeeStatus->title == 'dismissed'): ?>
                 <div class="notification notification--error">
-                    <h2>Du wurdest von der Teilnahme am Event ausgeschlossen.</h2>
-                    <p>Bei Fragen melde dich bitte an den Event-staff.</p>
+                    <h2><?=__('Du wurdest von der Teilnahme am Event ausgeschlossen.')?></h2>
+                    <p><?=__('Bei Fragen melde dich bitte an den Event-staff.')?></p>
                 </div>
             <? endif; ?>
             <div class="card card--light content--padded">
                 <p>Du hast dich am: <strong><?=date("d.m.Y H:m", $attendee->created)?> registriert</strong></p>
                 <? if($attendee->items->count): ?>
-                    <h3>Hier sind Deine ausgewählten Optionen:</h3>
+                    <h3><?=__('Hier sind Deine ausgewählten Optionen:')?></h3>
                     <div layout="row">
                         <? foreach($attendee->items as $item): ?>
                             <div flex="30" flex-gt-sm="20" flex-gt-md="15" class=" content--margin icon-card icon-card--small">
@@ -89,7 +89,7 @@ $attendee = $this->wire->attendee;
                     </div>
                 <? endif; ?>
                 <? if($attendee->attendeeRoles->count): ?>
-                    <h3>Du nimmst beim Event teil als:</h3>
+                    <h3><?=__('Du nimmst beim Event teil als:')?></h3>
                     <div layout="row">
                         <? foreach($attendee->attendeeRoles as $attendeeRole): ?>
                             <div flex="30" flex-gt-sm="20" flex-gt-md="15" class=" content--margin icon-card icon-card--small">
@@ -106,8 +106,8 @@ $attendee = $this->wire->attendee;
             </form> -->
         <? else: ?>
             <div class="notification notification--error">
-                <h2>Die Registrierung ist leider schon geschlossen</h2>
-                <p>Du kannst keine Details mehr bearbeiten.</p>
+                <h2><?=__('Die Registrierung ist leider schon geschlossen.')?></h2>
+                <p><?=__('Du kannst keine Details mehr bearbeiten.')?></p>
             </div>
         <? endif ?>
     <? else: ?>
@@ -130,7 +130,7 @@ $attendee = $this->wire->attendee;
                             },
                             $event->getItems()->getArray()
                         ));
-                        
+
                         $rolesJson = json_encode(array_map(
                             function($item) {
                                 return [
@@ -186,8 +186,8 @@ $attendee = $this->wire->attendee;
                     </event-register>
                 <? else: ?>
                     <div class="notification notification--error">
-                        <h2>Die Registrierung ist leider schon geschlossen</h2>
-                        <p>Hier kannst Du aber die Gasteliste sehen.</p>
+                        <h2><?=__('Die Registrierung ist leider schon geschlossen.')?></h2>
+                        <p><?=__('Hier kannst Du aber die Gästeliste sehen.')?></p>
                     </div>
                 <? endif ?>
             <? else: ?>
@@ -196,16 +196,16 @@ $attendee = $this->wire->attendee;
                         Du bist leider noch nicht die erforderlichen <strong><?=$event->getRegistrationsPage()->minimumAge?> Jahre</strong> zum Zeitpunkt des Events.
                     </p>
                     <p>
-                        Wenn Du Fragen zu diesem Thema hast, informiert dich das Event-team gerne.
+                        <?=__('Wenn Du Fragen zu diesem Thema hast, informiert dich das Eventteam gerne.')?>
                     </p>
-                    <a href="mailto:<?=$event->email?>" class="button button--primary">Event-Team Kontaktieren</a>
+                    <a href="mailto:<?=$event->email?>" class="button button--primary"><?=__('Eventteam kontaktieren')?></a>
                 </div>
             <? endif ?>
         <? else: ?>
             <div class="notification notification--error">
-                <p>Es fehlen noch ein paar Account Informationen um Events beitreten zu koennen.</p>
+                <p><?=__('Es fehlen noch ein paar Account Informationen um Events beitreten zu koennen.')?></p>
                 <p>
-                    Uns fehlen folgende Daten:
+                    <?=__('Uns fehlen folgende Daten:')?>
                 </p>
                 <ul>
                     <? foreach($user->getMissingRequiredFields() as $field):?>
@@ -214,14 +214,14 @@ $attendee = $this->wire->attendee;
                         </li>
                     <? endforeach;?>
                 </ul>
-                <p><a href="<?=$pages->get('/users/')->url.'/'.$user->name.'/edit'?>">Bearbeite dein Profil</a></p>
+                <p><a href="<?=$pages->get('/users/')->url.'/'.$user->name.'/edit'?>"><?=__('Bearbeite dein Profil')?></a></p>
             </div>
         <? endif ?>
     <? endif ?>
 <? else: ?>
     <div class="notification notification--warning">
-        <p>Du benötigst einen Account, um am Event teilzunehmen</p>
-        <p><a class="button button--primary" href="<?=$pages->get("/users/register")->url?>?redirect=<?=$options['originalPage']->id?>">Jetzt registrieren</a></p>
-        <p>Hast Du bereits einen Account? <a href="<?=$pages->get("/users/login")->url?>?redirect=<?=$options['originalPage']->id?>">Jetzt einloggen</a></p>
+        <p><?=__('Du benötigst einen Account, um am Event teilzunehmen.')?></p>
+        <p><a class="button button--primary" href="<?=$pages->get("/users/register")->url?>?redirect=<?=$options['originalPage']->id?>"><?=__('Jetzt registrieren')?></a></p>
+        <p><?=__('Hast Du bereits einen Account?')?> <a href="<?=$pages->get("/users/login")->url?>?redirect=<?=$options['originalPage']->id?>"><?=__('Jetzt einloggen')?></a></p>
     </div>
 <? endif; ?>

@@ -33,7 +33,8 @@
             </div>
             <? if(isset($error)): ?>
                 <div class="notification notification--error">
-                    Der User existiert nicht oder das Passwort ist falsch.<br> Wenn Du das Passwort vergessen hast, <a href="<?=$pages->get('/users/forgot-password')->url.'?name='?>">kannst Du es wiederherstellen</a>.
+                    <?=__('Der User existiert nicht oder das Passwort ist falsch.')?><br>
+                    <?=sprintf(__('Wenn Du das Passwort vergessen hast, <a href="$s">kannst Du es wiederherstellen</a>.'), $pages->get('/users/forgot-password')->url)?>
                 </div>
             <? endif ?>
             <label class="field-group" for="username">

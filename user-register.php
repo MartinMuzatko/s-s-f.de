@@ -19,8 +19,8 @@ if(count($input->post->getArray())) {
 </script>
 <? if(count($errors)): ?>
     <div class="notification notification--error">
-        <h4>Deine Registrierung hat leider nicht geklappt</h4>
-        <p>Folgende Punkte müssen noch angepasst werden:</p>
+        <h4><?=__('Deine Registrierung hat leider nicht geklappt.')?></h4>
+        <p><?=__('Folgende Punkte müssen noch angepasst werden:')?></p>
         <ul>
             <? foreach($errors as $error): ?>
                 <li><?=$error?></li>

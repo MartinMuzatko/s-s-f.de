@@ -6,11 +6,11 @@
     <table>
         <thead>
             <tr>
-                <th>Avatar</th>
-                <th>Nick</th>
-                <th>Mitglied seit</th>
-                <th>Aufgabengebiet</th>
-                <th>Funktion</th>
+                <th><?=__('Avatar')?></th>
+                <th><?=__('Nick')?></th>
+                <th><?=__('Mitglied seit')?></th>
+                <th><?=__('Aufgabengebiet')?></th>
+                <th><?=__('Funktion')?></th>
             </tr>
         </thead>
         <tbody>

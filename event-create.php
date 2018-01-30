@@ -10,6 +10,6 @@ if(!$user->hasPermission('event-user-manage')) {
         <?=$page->text?>
     </yield>
     <yield to="accept-button">
-        Verstanden
+        <?=__('Verstanden')?>
     </yield>
 </event-create>

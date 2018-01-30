@@ -3,11 +3,11 @@
     <div>
         <h1><?=$profile->username?></h1>
         <div>
-            <strong>Spezies:</strong>
+            <strong><?=__('Spezies:')?></strong>
             <?=$profile->species->title?>
         </div>
         <div>
-            <strong>Registriert seit:</strong>
+            <strong><?=__('Registriert seit:')?></strong>
             <?=strftime('%d.%m.%Y', $profile->created)?>
         </div>
     </div>
