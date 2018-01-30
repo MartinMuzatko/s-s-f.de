@@ -5,7 +5,7 @@ $documentTitle .= $isEvent && !$isEventHome ? ' - '.$event->title : '';
 $documentTitle .= ' | SSF - Die SüdstaatenFurs';
 ?>
 <!DOCTYPE html>
-<!-- 
+<!--
     Hallo lieber Source-code schnüffler :)
     Ich setze bei der Entwicklung auf freie Software wie ProcessWire und RiotJS.
     Finde mehr über mich heraus: https://happy-css.com
@@ -82,25 +82,25 @@ $documentTitle .= ' | SSF - Die SüdstaatenFurs';
                 </div>
                 <div layout="row" layout-align="center center" class="navigation--item">
                     <?if($user->isLoggedin()):?>
-                        <user-profile-dropdown 
-                            messages="<?=$user->hasUnreadMessages()?>" 
-                            name="<?=$user->username?>" 
+                        <user-profile-dropdown
+                            messages="<?=$user->hasUnreadMessages()?>"
+                            name="<?=$user->username?>"
                             avatar="<?=$user->getAvatar(64)?>">
                             <div class="dropdown__group">
-                                <a class="dropdown__item" href="<?=$config->urls->root?>users/<?=$user->name?>">Profil anzeigen</a>
-                                <a class="dropdown__item" href="<?=$config->urls->root?>users/<?=$user->name?>/edit">Profil bearbeiten</a>
-                                <a class="dropdown__item" href="<?=$config->urls->root?>users/<?=$user->name?>/messages">Nachrichten (<?=$user->hasUnreadMessages()?>)</a>
+                                <a class="dropdown__item" href="<?=$config->urls->root?>users/<?=$user->name?>"><?=__('Profil anzeigen')?></a>
+                                <a class="dropdown__item" href="<?=$config->urls->root?>users/<?=$user->name?>/edit"><?=__('Profil bearbeiten')?></a>
+                                <a class="dropdown__item" href="<?=$config->urls->root?>users/<?=$user->name?>/messages"><?=__('Nachrichten')?> (<?=$user->hasUnreadMessages()?>)</a>
                                 <? if($user->hasRole('admin')): ?>
-                                    <a class="dropdown__item" href="<?=$config->urls->root?>admin">Admin</a>
+                                    <a class="dropdown__item" href="<?=$config->urls->root?>admin"><?=__('Admin')?>)</a>
                                 <? endif; ?>
                             </div>
                             <? if($user->hasRole('manager')): ?>
                                 <div class="dropdown__group">
-                                    <a class="dropdown__item" href="<?=$config->urls->root?>events">Event Management</a>
+                                    <a class="dropdown__item" href="<?=$config->urls->root?>events"><?=__('Event Management')?></a>
                                 </div>
                             <? endif; ?>
                             <div class="dropdown__group">
-                                <a class="dropdown__item" href="<?=$config->urls->root?>users/logout">Logout</a>
+                                <a class="dropdown__item" href="<?=$config->urls->root?>users/logout"><?=__('Logout')?></a>
                             </div>
                         </user-profile-dropdown>
                     <?else:?>

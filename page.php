@@ -4,7 +4,7 @@
 <? endif; ?>
 <!-- $options['originalPage'] -->
 <?if($user->hasPermission('page-edit') && !isset($input->get->edit)):?>
-    <a href="<?=$page->url?>?edit" class="button button--primary">Seite bearbeiten</a>
+    <a href="<?=$page->url?>?edit" class="button button--primary"><?=__('Seite bearbeiten')?></a>
 <?endif?>
 <? if($user->hasPermission('page-edit') && isset($input->get->edit)): ?>
     <p>

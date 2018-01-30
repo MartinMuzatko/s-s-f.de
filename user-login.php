@@ -24,16 +24,17 @@
 <form action="" method="POST" class="content--padded content--margin" layout="row" layout-align="center center">
     <div class="fieldset" flex="90" flex-gt-sm="70" flex-gt-md="60" flex-gt-lg="45">
         <p>
-            <a href="<?=$pages->get('/users/register')->url?>">Hast Du noch keinen Account? Jetzt Registrieren.</a>
+            <a href="<?=$pages->get('/users/register')->url?>"><?=__('Hast Du noch keinen Account? Jetzt Registrieren.')?></a>
         </p>
-        <p class="notification notification--warning">Aus Sicherheitsgründen, haben wir alle bisherigen Accounts der alten SSF Website entfernt. Wir bitten Dich einen neuen Account anzulegen.</p>
+        <p class="notification notification--warning"><?=__('Aus Sicherheitsgründen, haben wir alle bisherigen Accounts der alten SSF Website entfernt. Wir bitten Dich einen neuen Account anzulegen.')?></p>
         <user-login>
             <div layout="column" layout-align="center center">
                 <img ref="avatar" class="avatar avatar--big avatar--round" src="<?=$user->getAvatar()?>" alt="">
             </div>
             <? if(isset($error)): ?>
                 <div class="notification notification--error">
-                    Der User existiert nicht oder das Passwort ist falsch.<br> Wenn Du das Passwort vergessen hast, <a href="<?=$pages->get('/users/forgot-password')->url.'?name='?>">kannst Du es wiederherstellen</a>.
+                    <?=__('Der User existiert nicht oder das Passwort ist falsch.')?><br>
+                    <?=sprintf(__('Wenn Du das Passwort vergessen hast, <a href="$s">kannst Du es wiederherstellen</a>.'), $pages->get('/users/forgot-password')->url)?>
                 </div>
             <? endif ?>
             <label class="field-group" for="username">

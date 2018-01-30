@@ -1,2 +1,2 @@
 <?php namespace ProcessWire;?>
-Hier media thek
+Hier Mediathek

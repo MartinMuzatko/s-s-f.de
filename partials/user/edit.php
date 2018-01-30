@@ -23,13 +23,13 @@
 <div class="content--padded">
     <? if($updated && !count($errors)): ?>
         <div class="notification notification--success">
-            <h4>Dein Profil wurde aktualisiert!</h4>
+            <h4><?=__('Dein Profil wurde aktualisiert!')?></h4>
         </div>
     <? endif ?>
     <? if(count($errors)): ?>
         <div class="notification notification--error">
-            <h4>Die Änderung deines Profils hat leider nicht geklappt</h4>
-            <p>Folgende Punkte müssen noch angepasst werden:</p>
+            <h4><?=__('Die Änderung deines Profils hat leider nicht geklappt.')?></h4>
+            <p><?=__('Folgende Punkte müssen noch angepasst werden:')?></p>
             <ul>
                 <? foreach($errors as $error): ?>
                     <li><?=$error?></li>

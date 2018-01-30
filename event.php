@@ -8,15 +8,15 @@
 <div class="content content--padded">
     <?if($user->hasPermission('event-user-manage')):?>
     <div class="actions actions--centered" style="margin:1em;">
-        <a href="<?=$page->url?>" class="button button--primary">Event Ansicht</a>
+        <a href="<?=$page->url?>" class="button button--primary"><?=__('Event Ansicht')?></a>
         <? if($event->userCan('event-user-manage')):?>
-            <a href="<?=$page->url?>edit" class="button button--primary">Event bearbeiten</a>
+            <a href="<?=$page->url?>edit" class="button button--primary"><?=__('Event bearbeiten')?></a>
         <? endif ?>
         <? if($event->userCan('event-user-registration-onstage')):?>
-            <a href="<?=$page->url?>reg-on-stage" class="button button--primary">On-Stage Registrierung</a>
+            <a href="<?=$page->url?>reg-on-stage" class="button button--primary"><?=__('On-Stage Registrierung')?></a>
         <? endif ?>
         <? if($event->userCan('event-user-registration-edit')):?>
-            <a href="<?=$page->url?>manage-registrations" class="button button--primary">Registrierungen bearbeiten</a>
+            <a href="<?=$page->url?>manage-registrations" class="button button--primary"><?=__('Registrierungen bearbeiten')?></a>
         <? endif ?>
     </div>
     <?endif?>
@@ -30,7 +30,7 @@
     <? require('./partials/event/manage-registrations.php')?>
 <? else: ?>
     <?if($user->hasPermission('page-edit') && !isset($input->get->edit)):?>
-        <a href="<?=$page->url?>?edit" class="button button--primary">Seite bearbeiten</a>
+        <a href="<?=$page->url?>?edit" class="button button--primary"><?=__('Seite bearbeiten')?></a>
     <?endif?>
     <? if($user->hasPermission('page-edit') && isset($input->get->edit)): ?>
         <page-editor
