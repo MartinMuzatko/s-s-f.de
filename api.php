@@ -7,34 +7,16 @@ use \API\Request;
 use \API\Router;
 use \API\Route;
 
-function getFieldValues($page, $fields) {
-    return array_map(
-        function($field) use ($page) {
-            if ($field->type instanceof FieldtypeImage) {
-                $image = $page->{$field->name};
-                if($image->count) {
-                    $image = $image instanceof Pageimages ? $image->first->httpUrl : $image->httpUrl;
-                } else {
-                    $image = '';
-                }
-                return [$field->name => $image];
-            }
-            if ($field->type instanceof FieldtypeRepeater) {
-                $repeaterPages = $page->{$field->name};
-                $repeaterFields = array_map(
-                    function($repeaterPage) {
-                        $fields = getFieldValues($repeaterPage, $repeaterPage->fields->getArray());
-                        return call_user_func_array('array_merge', $fields);
-                    },
-                    $repeaterPages->getArray()
-                );
-                return [$field->name => $repeaterFields];
-            }
-            return [$field->name => htmlentities($page->{$field->name})];
-        },
-        $fields
-    );
-}
+// PHP Closures :(
+function hasPermission($permission = '') {
+    $wire = new Resource();
+    $isAllowed = $wire->user->hasPermission($permission);
+    if (!$isAllowed) {
+        return true;
+        http_response_code(403);
+    }
+    return $isAllowed;
+};
 
 $router = new Router([
 
@@ -192,16 +174,72 @@ $router = new Router([
 
             // REGISTRATIONS
             new Route('GET', 'events/([\w-]+)/registrations', function($path, $eventName) {
-                $events = new \API\Events($path);
-                $event = new \API\Event($events->getEvent($eventName)->page);
-                $registrations = $event->getRegistrations();
+                if (!hasPermission('event-user-manage')) return;
+                $event =  $this->events->get("name=$eventName");
+                $registrations = array_map(
+                    function($registration) use ($event) {
+                        return [
+                            'paid' => $registration->paid,
+                            'created' => $registration->created.'000',
+                            'modified' => $registration->modified.'000',
+                            'modifiedUser' => $registration->modifiedUser->name,
+                            'donation' => $registration->donation,
+                            'paysum' => $event->getAttendeePaymentSum($registration->profile),
+                            'profile' => [
+                                'username' => $registration->profile->username,
+                                'name' => $registration->profile->name,
+                                'avatar' => $registration->profile->getAvatar(),
+                            ],
+                            'items' => array_map(
+                                function($item) {
+                                    return [
+                                        'name' => $item->name,
+                                        'title' => $item->title,
+                                        'image' => $item->image->first->url,
+                                    ];
+                                },
+                                $registration->items->getArray()
+                            ),
+                            'attendeeRoles' => array_map(
+                                function($item) {
+                                    return [
+                                        'name' => $item->name,
+                                        'title' => $item->title,
+                                        'image' => $item->image->first->url,
+                                    ];
+                                },
+                                $registration->attendeeRoles->getArray()
+                            ),
+                            'attendeeStatus' => $registration->attendeeStatus->title,
+                            'paymentMethod' => $registration->paymentMethod->title,
+                        ];
+                    },
+                    $event->getRegistrations('profile!=')->getArray()
+                );
                 return $registrations;
+            }),
+            new Route('PUT', 'events/([\w-]+)/registrations', function($path, $eventName) {
+                $event =  $this->events->get("name=$eventName");
+                $resource = new \API\Resource($path);
+                $data = $resource->getPayload();
+                array_map(
+                    function($attendee) use ($event) {
+                        $event->setAttendeeState($attendee->profile->name, $attendee->attendeeStatus);
+                    },
+                    $data
+                );
+                
             }),
                 // REGISTRATION
                 new Route('POST', 'events/([\w-]+)/registrations/([\w-]+)', function($path, $eventName, $user) {
                     $user = $this->users->get("name=$user");
+                    // if ($user != $this->user) {
+                    //     http_response_code(400);
+                    //     return ["error" => "user to create registration with, is not of same session"];
+                    // }
                     if ($user instanceof NullPage) {
-                        return false;
+                        http_response_code(400);
+                        return ["error" => "user does not exist"];
                     }
                     $this->wire->events->get("name=$eventName")->registerUser($user, $this->input->post);
                 }),

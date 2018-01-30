@@ -178,7 +178,7 @@
         this.sortMode = 'Nick'
 
         this.labels = [
-            {name: 'Nick', sort: user=>user.profile.username},
+            {name: 'Nick', sort: user=>user.profile.username.toUpperCase()},
             {name: 'Bezahlt', sort: user=>this.getUserRegdate(user)},
             {name: 'Betrag', sort: user=>user.paysum},
             // {name: 'Items', sort: user=>user.items },
