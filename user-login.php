@@ -24,9 +24,9 @@
 <form action="" method="POST" class="content--padded content--margin" layout="row" layout-align="center center">
     <div class="fieldset" flex="90" flex-gt-sm="70" flex-gt-md="60" flex-gt-lg="45">
         <p>
-            <a href="<?=$pages->get('/users/register')->url?>">Hast Du noch keinen Account? Jetzt Registrieren.</a>
+            <a href="<?=$pages->get('/users/register')->url?>"><?=__('Hast Du noch keinen Account? Jetzt Registrieren.')?></a>
         </p>
-        <p class="notification notification--warning">Aus Sicherheitsgründen, haben wir alle bisherigen Accounts der alten SSF Website entfernt. Wir bitten Dich einen neuen Account anzulegen.</p>
+        <p class="notification notification--warning"><?=__('Aus Sicherheitsgründen, haben wir alle bisherigen Accounts der alten SSF Website entfernt. Wir bitten Dich einen neuen Account anzulegen.')?></p>
         <user-login>
             <div layout="column" layout-align="center center">
                 <img ref="avatar" class="avatar avatar--big avatar--round" src="<?=$user->getAvatar()?>" alt="">
