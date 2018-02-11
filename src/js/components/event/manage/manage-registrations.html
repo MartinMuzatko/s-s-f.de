@@ -13,6 +13,14 @@
         <button onclick={setMarkedUserStatus} data-status="dismissed" class="button button--primary">Auf Verbannt setzen</button>
         <button class="button button--primary">Nachricht verfassen</button>
     </div>
+    <h4>Rollen filtern</h4>
+    <div class="actions">
+        <div each={role in attendeeRoles}>
+
+        </div>
+        <button onclick={setMarkedUserStatus} data-status="new" class="button button--primary"></button>
+        <button class="button button--primary">Nachricht verfassen</button>
+    </div>
     <table>
         <thead>
             <th><input onchange={checkAll} type="checkbox"></th>
@@ -28,13 +36,18 @@
                 <td><input onchange={selectUser} type="checkbox" checked={user.checked}></td>
                 <td>
                     <div layout="row" layout-align="start center">
-                        <img class="avatar avatar--small avatar--round" src="{user.profile.avatar}" alt="{user.profile.username}">
+                        <img class="avatar avatar--small avatar--round" style="margin-right: .5em" src="{user.profile.avatar}" alt="{user.profile.username}">
                         {user.profile.username}
                         {user.donation ? '(Sponsor)' : ''}
                     </div>
                 </td>
-                <td style={getPaidThreshold(user)}>{getUserRegdate(user) == -1 ? '✓' : getUserRegdate(user)}</td>
-                <td>{moneyFormat.to(user.paysum)}</td>
+                <td style={getPaidThreshold(user)}>
+                    {getUserRegdate(user) == -1 ? '✓' : getUserRegdate(user)}
+                    <div onclick={sendWarning} if={getUserRegdate(user) >= maxDays } class="bg--warning bg--warning--shadow status-bubble warning-bubble">
+                        !
+                    </div>
+                </td>
+                <td class="text--nowrap">{moneyFormat.to(user.paysum)}</td>
                 <td>
                     <img each={role in user.attendeeRoles} title="{role.title}" src="{role.image}" alt="" width="32">
                 </td>
@@ -56,6 +69,7 @@
     <div if={submissionComplete && !submissionLoading} class="notification notification--success">
         Die Daten wurden erfolgreich übernommen.
     </div>
+    <user-message-send message={warningMessage} ref="warningMessage"></user-message-send>
     <script>
         import differenceInDays from 'date-fns/difference_in_days'
         import { moneyFormat } from '../../../constants'
@@ -63,6 +77,7 @@
         import '../../ssf-toggle.html'
         import '../../ssf-pawloader.html'
         import '../../ssf-dialog.html'
+        import '../../user/user-message-send.html'
         
         const STATUS_NEW = 'new'
         const STATUS_PENDING = 'pending'
@@ -82,6 +97,8 @@
         
         this.users = []
         this.submissionLoading = false
+        this.maxDays = 28
+        this.warningUser = false
 
         async submit() {
             try {
@@ -106,6 +123,7 @@
                     user.created = parseInt(user.created)
                 }
             )
+            // this.attendeeRoles = this.users.
             this.update()
             this.refs.statusSwitch.map(toggle=>{
                 toggle.on('toggle', (status)=>{
@@ -127,6 +145,16 @@
             return this.users.filter(user=>user.checked)
         }
 
+        sendWarning(event) {
+            console.log(event)
+            this.warningUser = event.item.user
+            this.warningMessage = {
+                text: 'du du du!',
+                title: 'miau!'
+            }
+            this.refs.warningMessage.open()
+        }
+
         getUserRegdate(user) {
             if (user.attendeeStatus == STATUS_PENDING) {
                 return differenceInDays(new Date(), user.modified)
@@ -144,8 +172,7 @@
                 return `background-color: hsl(120, 50%, 70%)`
             } else if (user.attendeeStatus == STATUS_PENDING) {
                 let hueGradient = [0, 120]
-                let maxDays = 42
-                let hue = hueGradient[0] + hueGradient[1] / maxDays * (maxDays - differenceInDays(new Date(), user.modified))
+                let hue = hueGradient[0] + hueGradient[1] / this.maxDays * (this.maxDays - Math.min(differenceInDays(new Date(), user.modified), this.maxDays))
                 let background = `background-color: hsl(${hue}, 50%, 50%)`
                 return background
             }

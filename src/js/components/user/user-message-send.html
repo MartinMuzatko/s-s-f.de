@@ -19,11 +19,6 @@
         import './user-filter.html'
         import {sendMessage} from '../../api'
 
-        this.message = {
-            title: '',
-            receiver: '',
-            text: '',
-        }
         this.dialog = {
             isVisible: opts.visible || false,
             heading: 'Nachricht verfassen',
@@ -33,8 +28,16 @@
                 action: function () { this.close() }
             }]
         }
-
+        
         this.on('mount', ()=>{
+            this.message = {
+                title: '',
+                receiver: '',
+                text: '',
+            }
+            Object.assign(this.message, opts.message || {})
+            this.refs.dialog.refs.title.value = this.message.title
+            this.refs.dialog.refs.editor.setContent(this.message.text)
             this.refs.dialog.on('closed', ()=>{
                 this.refs.dialog.refs.editor.editor.hide()
             })
