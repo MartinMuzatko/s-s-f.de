@@ -30,8 +30,14 @@
             this.refs.input.suggest(data.map(user=>user.username))
         }
 
-        getUser() {
-            return this.refs.input.getInput()
+        setUser(user) {
+            this.refs.input.setInput({item: {field: user}})
+        }
+
+        async getUser() {
+            let username = this.refs.input.getInput()
+            let user = await getUsers(username, 1)
+            if (user.length && user[0].username == username) return user[0]
         }
 
     </script>

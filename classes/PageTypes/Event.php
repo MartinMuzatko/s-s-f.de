@@ -175,6 +175,30 @@ class Event extends Page {
     	return $user->birthdate < strtotime("-$minAge year", $this->getUnformatted('startDate'));
 	}
 
+	public function warnUser($user, $message, $type)
+	{
+		if ($this->isUserRegistered($user)) {
+			$user = $this->getRegisteredUser($user);
+			// var_dump($user->warnings);
+			// die;
+			$user->of(false);
+			$warning = $user->warnings->getNew();
+			$warning->warningText = $message;
+			$warning->warningType = $type;
+			$warning->save();
+			$user->warnings->add($warning);
+			$user->save();
+		}
+	}
+
+	public function getWarnings($user, $type)
+	{
+		if ($this->isUserRegistered($user)) {
+			$user = $this->getRegisteredUser($user);
+			return $user->warnings;
+		}
+	}
+
 	public function unregisterUser($user)
 	{
 		if ($this->isUserRegistered($user)) {

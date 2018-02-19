@@ -161,7 +161,9 @@ $router = new Router([
 
         // EVENT
         new Route('GET', 'events/([\w-]+)', function($path, $eventName) {
-            return $this->events->get($eventName);
+            $event = $this->events->get($eventName);
+            $fields = getFieldValues($event, $event->fields->getArray());
+            return array_merge([], ...$fields);
         }),
         new Route('PUT', 'events/([\w-]+)', function($path, $eventName) {
             $eventData = $this->events->getEvent($eventName);
@@ -183,6 +185,8 @@ $router = new Router([
                             'created' => $registration->created.'000',
                             'modified' => $registration->modified.'000',
                             'modifiedUser' => $registration->modifiedUser->name,
+                            'lastWarning' => $registration->warnings->last ? $registration->warnings->last->created.'000' : null,
+                            'warningsReceived' => $registration->warnings->count,
                             'donation' => $registration->donation,
                             'paysum' => $event->getAttendeePaymentSum($registration->profile),
                             'profile' => [
@@ -200,7 +204,7 @@ $router = new Router([
                                 },
                                 $registration->items->getArray()
                             ),
-                            'attendeeRoles' => array_map(
+                            'attendeeRoles' => array_merge([], array_map(
                                 function($item) {
                                     return [
                                         'name' => $item->name,
@@ -209,7 +213,7 @@ $router = new Router([
                                     ];
                                 },
                                 $registration->attendeeRoles->getArray()
-                            ),
+                            )),
                             'attendeeStatus' => $registration->attendeeStatus->title,
                             'paymentMethod' => $registration->paymentMethod->title,
                         ];
@@ -260,6 +264,17 @@ $router = new Router([
                     }
                     $this->wire->events->get("name=$eventName")->unregisterUser($user);
                 }),
+
+                    // WARNINGS
+                    // $fields = getFieldValues($page, $page->fields->getArray());
+                    
+                    new Route('POST', 'events/([\w-]+)/registrations/([\w-]+)/warnings', function($path, $eventName, $userName) {
+                        $resource = new \API\Resource($path);
+                        $data = $resource->getPayload();
+                        $type = $data->type;
+                        $message = $data->text;
+                        $this->wire->events->get("name=$eventName")->warnUser($userName, $message, $type);
+                    }),
 
             // ITEMS
             new Route('GET', 'events/([\w-]+)/items', function($path, $eventName) {

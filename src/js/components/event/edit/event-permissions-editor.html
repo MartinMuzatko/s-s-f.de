@@ -28,12 +28,14 @@
         import '../../user/user-filter.html'
         import {getPermissions} from '../../../api'
         
-        addHelper(event) {
+        async addHelper(event) {
             event.preventDefault()
-            let user = this.refs.filter.users.find(user=>user.username == this.refs.filter.getUser())
+            let userFilterUser = await this.refs.filter.getUser()
+            let username = userFilterUser.username
+            let user = this.refs.filter.users.find(user=>user.username == username)
             if (!~this.findUser(user.name)) {
                 this.helpers.push({
-                    user: user,
+                    user,
                     permissions: this.getPermissionSet(false)
                 })
                 this.refs.filter.refs.input.refs.input.value = ''

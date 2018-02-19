@@ -49,6 +49,14 @@ export async function updateRegistrations(eventName, data) {
     return response.json()
 }
 
+export async function warnUser(eventName, userName, data) {
+    const response = await fetch(
+        `${BASEURL}/events/${eventName}/registrations/${userName}/warnings`,
+        { method: 'POST', body: JSON.stringify(data), credentials: 'same-origin' }
+    )
+    return response.json()
+}
+
 // PAGE EDITOR
 
 export async function getModules() {
@@ -104,6 +112,7 @@ export async function getPageModules(id) {
 // USER
 
 export async function getUsers(username, limit=10) {
+    username = encodeURIComponent(username)
     const response = await fetch(`${BASEURL}/users/?name=${username}&limit=${limit}`, {credentials: 'same-origin'})
     return response.json()
 }

@@ -11,15 +11,12 @@
         <button onclick={setMarkedUserStatus} data-status="waiting" class="button button--primary">Auf Warteliste setzen</button>
         <button onclick={setMarkedUserStatus} data-status="signedoff" class="button button--primary">Auf Abgemeldet setzen</button>
         <button onclick={setMarkedUserStatus} data-status="dismissed" class="button button--primary">Auf Verbannt setzen</button>
-        <button class="button button--primary">Nachricht verfassen</button>
     </div>
     <h4>Rollen filtern</h4>
     <div class="actions">
         <div each={role in attendeeRoles}>
 
         </div>
-        <button onclick={setMarkedUserStatus} data-status="new" class="button button--primary"></button>
-        <button class="button button--primary">Nachricht verfassen</button>
     </div>
     <table>
         <thead>
@@ -43,9 +40,17 @@
                 </td>
                 <td style={getPaidThreshold(user)}>
                     {getUserRegdate(user) == -1 ? '✓' : getUserRegdate(user)}
-                    <div onclick={sendWarning} if={getUserRegdate(user) >= maxDays } class="bg--warning bg--warning--shadow status-bubble warning-bubble">
-                        !
-                    </div>
+                    <span if={user.warningsReceived} title="{lastWarningReceived(user)} seit letzter Warnung">
+                        - {lastWarningReceived(user)}
+                    </span>
+                </td>
+                <td>
+                    <div layout="row" layout-align="space-between" layout-nowrap>
+                        {user.warningsReceived}
+                        <div title="{user.warningsReceived+1 }. Mahnung erteilen" onclick={sendWarning} if={canWarnUser(user)} class="bg--warning bg--warning--shadow status-bubble warning-bubble">
+                            !
+                        </div>
+                    </div>  
                 </td>
                 <td class="text--nowrap">{moneyFormat.to(user.paysum)}</td>
                 <td>
@@ -73,7 +78,7 @@
     <script>
         import differenceInDays from 'date-fns/difference_in_days'
         import { moneyFormat } from '../../../constants'
-        import { getRegistrations, updateRegistrations } from '../../../api'
+        import { getRegistrations, updateRegistrations, getEventData, warnUser } from '../../../api'
         import '../../ssf-toggle.html'
         import '../../ssf-pawloader.html'
         import '../../ssf-dialog.html'
@@ -98,7 +103,7 @@
         this.users = []
         this.submissionLoading = false
         this.maxDays = 28
-        this.warningUser = false
+        this.maxWarningDays = 14
 
         async submit() {
             try {
@@ -113,17 +118,26 @@
             this.submissionLoading = false
             this.update()
         }
-        
-        this.on('mount', async () => {
+
+        async getRegistrations() {
             this.users = await getRegistrations(opts.event)
-            this.users.map(
+            this.users.forEach(
                 user => {
                     user.checked = false
                     user.modified = parseInt(user.modified)
                     user.created = parseInt(user.created)
+                    user.lastWarning = parseInt(user.lastWarning)
                 }
             )
-            // this.attendeeRoles = this.users.
+        }
+        
+        this.on('mount', async () => {
+            const [users, event] = await Promise.all([
+                await this.getRegistrations(),
+                await getEventData(opts.event),
+            ])
+            this.event = event
+            this.attendeeRoles = [...new Set(this.users.reduce((roles, user) => [...roles, ...user.attendeeRoles], []))]
             this.update()
             this.refs.statusSwitch.map(toggle=>{
                 toggle.on('toggle', (status)=>{
@@ -145,24 +159,61 @@
             return this.users.filter(user=>user.checked)
         }
 
-        sendWarning(event) {
-            console.log(event)
-            this.warningUser = event.item.user
+        sendWarning(e) {
+            const user = e.item.user
+            const event = this.event
+            let deadline = new Date()
+            deadline = deadline.fp_incr(14) // flatpickr extends the date prototype with this function to add days.
+            let deadlineDate = `${deadline.getDate()}.${deadline.getMonth()+1}.${deadline.getFullYear()}`
             this.warningMessage = {
-                text: 'du du du!',
-                title: 'miau!'
+                text: `
+                    <p>Hallo ${user.profile.username}!</p>
+                    <p>Leider konnten wir von dir noch keinen Zahlungseingang für das Event vermerken.</p>
+                    <p>Wir bitten dich, innerhalb von 2 Wochen (bis ${deadlineDate}) den Betrag von ${moneyFormat.to(user.paysum)} auf das untenstehende Konto zu überweisen.</p>
+                    <strong>Empfänger:</strong> ${event.bankAccountName}<br>
+                    <strong>IBAN:</strong> ${event.bankIBAN}<br>
+                    <strong>BIC:</strong> ${event.bankBIC}<br>
+                    <strong>Betrag:</strong> ${moneyFormat.to(user.paysum)}<br>
+                    <strong>Betreff:</strong> ${event.title} - ${user.profile.username}<br>
+                    <strong>Adresse für Auslandsüberweisungen:</strong><br> ${event.bankAccountAddress}<br>
+                    <p>Solltest du Probleme mit der Bezahlung haben, bitte melde dich beim Team.</p>
+                    <p>Wir finden immer eine Lösung.</p>
+                    <p>Vielen Dank.<br>Dein Eventteam.
+                    </p>
+                `,
+                title: `Zahlungserinnerung für ${event.title}`,
+                receiver: e.item.user.profile.username,
             }
-            this.refs.warningMessage.open()
+            this.refs.warningMessage.open(this.warningMessage)
+            console.log('opened')
+            this.refs.warningMessage.one('sent', async message => {
+                console.log('warn user')
+                Object.assign(message, {type: 'paymentReminder'})
+                await warnUser(this.opts.event, user.profile.name, message)
+                await this.getRegistrations()
+                this.update()
+            })
         }
 
         getUserRegdate(user) {
             if (user.attendeeStatus == STATUS_PENDING) {
-                return differenceInDays(new Date(), user.modified)
+                return differenceInDays(new Date(), user.created)
             } else if (user.attendeeStatus == STATUS_ACCEPTED) {
                 return -1
             } else {
                 return '-'
             }
+        }
+
+        lastWarningReceived(user) {
+            return user.warningsReceived ? differenceInDays(new Date(), user.lastWarning) : 0
+        }
+
+        canWarnUser(user) {
+            if (!user.warningsReceived) {
+                return differenceInDays(new Date(), user.created) > this.maxDays
+            }
+            return this.lastWarningReceived(user) > this.maxWarningDays
         }
 
         getPaidThreshold(user) {
@@ -172,7 +223,13 @@
                 return `background-color: hsl(120, 50%, 70%)`
             } else if (user.attendeeStatus == STATUS_PENDING) {
                 let hueGradient = [0, 120]
-                let hue = hueGradient[0] + hueGradient[1] / this.maxDays * (this.maxDays - Math.min(differenceInDays(new Date(), user.modified), this.maxDays))
+                if (user.warningsReceived) {
+                    let hue = hueGradient[0] + hueGradient[1] / this.maxWarningDays * (this.maxWarningDays - Math.min(this.lastWarningReceived(user), this.maxWarningDays))
+                    let background = `background-color: hsl(${hue}, 50%, 50%)`
+                    return background
+                }
+
+                let hue = hueGradient[0] + hueGradient[1] / this.maxDays * (this.maxDays - Math.min(differenceInDays(new Date(), user.created), this.maxDays))
                 let background = `background-color: hsl(${hue}, 50%, 50%)`
                 return background
             }
@@ -207,6 +264,7 @@
         this.labels = [
             {name: 'Nick', sort: user=>user.profile.username.toUpperCase()},
             {name: 'Bezahlt', sort: user=>this.getUserRegdate(user)},
+            {name: 'Mahnungen', sort: user=>user.warningsReceived},
             {name: 'Betrag', sort: user=>user.paysum},
             // {name: 'Items', sort: user=>user.items },
             {name: 'Rollen', sort: user=>user.attendeeRoles},

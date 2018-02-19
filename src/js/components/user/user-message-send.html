@@ -1,35 +1,54 @@
 <user-message-send>
     <ssf-dialog size="medium" ref="dialog" dialog={dialog}>
-        <form onsubmit={parent.submit} action="" method="POST">
-            <label>
-                Titel
-                <input ref="title" type="text">
+        <div if={!parent.isSending && !parent.done}>
+            <label class="field-group">
+                <div class="field-group__label field-group__label--primary">Titel</div>
+                <input ref="title" type="text" class="field-group__input">
             </label>
             <user-filter label="Empfänger" ref="user"></user-filter>
             <label>
                 Nachricht
                 <ssf-editor ref="editor" inline></ssf-editor>
             </label>
-            <input type="submit" class="button button--primary" value="Absenden">
-        </form>
+        </div>
+        <div if={parent.isSending && !parent.done}>
+            <ssf-pawloader></ssf-pawloader>
+            Nachricht wird gesendet
+        </div>
+        <div if={parent.done}>
+            Gesendet!
+        </div>
     </ssf-dialog>
     <script>
         import '../ssf-dialog.html'
+        import '../ssf-pawloader.html'
         import '../ssf-editor.html'
         import './user-filter.html'
         import {sendMessage} from '../../api'
+
+        this.isSending = false
+        this.done = false
 
         this.dialog = {
             isVisible: opts.visible || false,
             heading: 'Nachricht verfassen',
             buttons: [{
-                text: 'Ok',
+                text: 'Nachricht senden',
                 type: 'dark',
-                action: function () { this.close() }
+                action: async () => {
+                    await this.submit()
+                }
             }]
         }
         
         this.on('mount', ()=>{
+            this.setup()
+            this.refs.dialog.on('closed', ()=>{
+                this.refs.dialog.refs.editor.editor.hide()
+            })
+        })
+
+        setup() {
             this.message = {
                 title: '',
                 receiver: '',
@@ -37,14 +56,20 @@
             }
             Object.assign(this.message, opts.message || {})
             this.refs.dialog.refs.title.value = this.message.title
-            this.refs.dialog.refs.editor.setContent(this.message.text)
-            this.refs.dialog.on('closed', ()=>{
-                this.refs.dialog.refs.editor.editor.hide()
+            const editor = this.refs.dialog.refs.editor
+            this.refs.dialog.refs.user.setUser(this.message.receiver)
+            editor.on('ready', () => {
+                editor.editor.setContent(this.message.text)
             })
-        })
+            if (editor.editor) {
+                editor.editor.setContent(this.message.text)
+            }
+        }
 
-        open() {
+        open(message) {
+            this.opts.message = message
             console.log('open compose');
+            this.setup()
             this.refs.dialog.open()
             this.refs.dialog.refs.editor.editor.show()
         }
@@ -52,20 +77,29 @@
         close() {
             this.refs.dialog.close()
             this.refs.dialog.refs.editor.editor.hide()
+            this.done = false
+            this.isSending = false
         }
 
-        async submit(e) {
-            e.preventDefault()
+        async submit() {
+            let receiver = await this.refs.dialog.refs.user.getUser()
             this.message.title = this.refs.dialog.refs.title.value
             this.message.text = this.refs.dialog.refs.editor.getContent()
-            this.message.receiver = this.refs.dialog.refs.user.getUser()
+            this.message.receiver = receiver.name
             this.message.sender = api.user.name
+            this.trigger('sending')
+            this.isSending = true
+            this.update()
             let success = await sendMessage(this.message)
+            this.isSending = false
+            this.done = true
+            this.update()
             if (success > 0) {
-                this.trigger('sent', success)
+                this.trigger('sent', this.message)
             } else {
                 this.trigger('failed')
             }
+            await new Promise(resolve => setTimeout(resolve, 2000))
             this.close()
         }
     </script>
