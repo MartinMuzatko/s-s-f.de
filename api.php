@@ -386,7 +386,7 @@ $router = new Router([
                 function($message) {
                     return [
                         "id" => $message->id,
-                        "title" => $message->title,
+                        "title" => strlen($message->title) ? $message->title : 'Kein Betreff',
                         "text" => $message->text,
                         "sender" => $message->sender->name,
                         "receiver" => $message->receiver->name,
