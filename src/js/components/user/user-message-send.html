@@ -45,6 +45,9 @@
             this.setup()
             this.refs.dialog.on('closed', ()=>{
                 this.refs.dialog.refs.editor.editor.hide()
+                this.done = false
+                this.isSending = false
+                this.update()
             })
         })
 
@@ -69,16 +72,17 @@
         open(message) {
             this.opts.message = message
             console.log('open compose');
-            this.setup()
             this.refs.dialog.open()
+            this.setup()
             this.refs.dialog.refs.editor.editor.show()
         }
 
         close() {
-            this.refs.dialog.close()
-            this.refs.dialog.refs.editor.editor.hide()
             this.done = false
             this.isSending = false
+            this.update()
+            this.refs.dialog.close()
+            this.refs.dialog.refs.editor.editor.hide()
         }
 
         async submit() {
@@ -90,11 +94,14 @@
             this.trigger('sending')
             this.isSending = true
             this.update()
-            let success = await sendMessage(this.message)
+            let success = true
+            if (!opts.noMessage) {
+                success = await sendMessage(this.message)
+            }
             this.isSending = false
             this.done = true
             this.update()
-            if (success > 0) {
+            if (success) {
                 this.trigger('sent', this.message)
             } else {
                 this.trigger('failed')

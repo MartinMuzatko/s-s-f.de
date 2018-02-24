@@ -74,7 +74,7 @@
     <div if={submissionComplete && !submissionLoading} class="notification notification--success">
         Die Daten wurden erfolgreich übernommen.
     </div>
-    <user-message-send message={warningMessage} ref="warningMessage"></user-message-send>
+    <user-message-send no-message="true" message={warningMessage} ref="warningMessage"></user-message-send>
     <script>
         import differenceInDays from 'date-fns/difference_in_days'
         import { moneyFormat } from '../../../constants'
@@ -188,7 +188,7 @@
             console.log('opened')
             this.refs.warningMessage.one('sent', async message => {
                 console.log('warn user')
-                Object.assign(message, {type: 'paymentReminder'})
+                Object.assign(message, {type: 'paymentReminder', sendMessage: true})
                 await warnUser(this.opts.event, user.profile.name, message)
                 await this.getRegistrations()
                 this.update()
@@ -210,6 +210,7 @@
         }
 
         canWarnUser(user) {
+            if (user.attendeeStatus != STATUS_PENDING) return false
             if (!user.warningsReceived) {
                 return differenceInDays(new Date(), user.created) > this.maxDays
             }

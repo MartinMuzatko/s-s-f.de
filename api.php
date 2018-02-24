@@ -271,9 +271,8 @@ $router = new Router([
                     new Route('POST', 'events/([\w-]+)/registrations/([\w-]+)/warnings', function($path, $eventName, $userName) {
                         $resource = new \API\Resource($path);
                         $data = $resource->getPayload();
-                        $type = $data->type;
-                        $message = $data->text;
-                        $this->wire->events->get("name=$eventName")->warnUser($userName, $message, $type);
+                        // TODO: send bad request if text, type or title is missing
+                        $this->wire->events->get("name=$eventName")->warnUser($userName, $data->text, $data->type, $data->title, $data->sendMessage);
                     }),
 
             // ITEMS

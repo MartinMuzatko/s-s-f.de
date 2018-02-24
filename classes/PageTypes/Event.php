@@ -175,7 +175,7 @@ class Event extends Page {
     	return $user->birthdate < strtotime("-$minAge year", $this->getUnformatted('startDate'));
 	}
 
-	public function warnUser($user, $message, $type)
+	public function warnUser($user, $message, $type, $title, $sendMessage = false)
 	{
 		if ($this->isUserRegistered($user)) {
 			$user = $this->getRegisteredUser($user);
@@ -185,9 +185,21 @@ class Event extends Page {
 			$warning = $user->warnings->getNew();
 			$warning->warningText = $message;
 			$warning->warningType = $type;
+			$warning->title = $title;
 			$warning->save();
 			$user->warnings->add($warning);
 			$user->save();
+			if ($sendMessage) {
+				$eventsystemUser = \ProcessWire\Wire('users')->get('name=eventsystem');
+				$messageData = new WireData();
+				$messageData->setArray([
+					'title' => $title,
+					'text' => $message,
+					'sender' => $eventsystemUser,
+					'read' => false,
+				]);
+				$user->profile->sendMessage($messageData);
+			}
 		}
 	}
 
