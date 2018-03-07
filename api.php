@@ -289,6 +289,22 @@ $router = new Router([
                 new Route('PUT', 'events/([\w-]+)/items/([\w-]+)', function($path, $eventName, $itemName) {
 
                 }),
+
+            // ITEMS
+            new Route('GET', 'events/([\w-]+)/sponsorlevels', function($path, $eventName) {
+                $event = $this->events->get("name=$eventName");
+                $sponsorlevels = array_map(
+                    function($sponsorlevel) {
+                        return [
+                            "buyPrice" => $sponsorlevel->buyPrice,
+                            "name" => $sponsorlevel->name,
+                            "title" => $sponsorlevel->title,
+                        ];
+                    },
+                    $event->getSponsorlevels()->getArray()
+                );
+                return $sponsorlevels;
+            }),
                 
             new Route('GET', 'events/([\w-]+)/helpers', function($path, $eventName) {
                 $event = $this->events->get("name=$eventName");
