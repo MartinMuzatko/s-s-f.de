@@ -301,7 +301,7 @@ $router = new Router([
                             "title" => $sponsorlevel->title,
                         ];
                     },
-                    $event->getSponsorlevels()->getArray()
+                    $event->getSponsorlevels('sort=buyPrice')->getArray()
                 );
                 return $sponsorlevels;
             }),
