@@ -41,6 +41,29 @@
                 </tr>
             </tbody>
         </table>
+        <h3>Sponsorlevel</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>User</th>
+                    <th>Davon bezahlt</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr each={level in statistics.sponsorlevels}>
+                    <td>
+                        {level.title}
+                    </td>
+                    <td>
+                        {level.amount}
+                    </td>
+                    <td>
+                        {level.amountPaid}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     <h4>Rollen filtern</h4>
     <div class="actions">
@@ -126,7 +149,7 @@
     <script>
         import differenceInDays from 'date-fns/difference_in_days'
         import { moneyFormat } from '../../../constants'
-        import { getRegistrations, updateRegistrations, getEventData, warnUser } from '../../../api'
+        import { getRegistrations, updateRegistrations, getEventData, warnUser, getSponsorlevels } from '../../../api'
         import '../../ssf-toggle.html'
         import '../../ssf-pawloader.html'
         import '../../ssf-dialog.html'
@@ -218,6 +241,27 @@
                     }
                 }
             }
+
+            let sponsorlevels = this.sponsorlevels.map((sponsorlevel, index, sponsorlevels) => {
+                const nextLevel = index + 1 < sponsorlevels.length ? sponsorlevels[index + 1] : { buyPrice: Infinity }
+                sponsorlevel.amount = this.users
+                    .filter(user => 
+                        user.donation > 0 
+                        && user.attendeeStatus != STATUS_DISMISSED
+                        && user.attendeeStatus != STATUS_WAITING
+                        && user.attendeeStatus != STATUS_NEW
+                        && user.donation >= sponsorlevel.buyPrice 
+                        && user.donation < nextLevel.buyPrice)
+                    .length
+                sponsorlevel.amountPaid = this.users
+                    .filter(user =>
+                        user.donation > 0
+                        && user.paid
+                        && user.donation >= sponsorlevel.buyPrice
+                        && user.donation < nextLevel.buyPrice)
+                    .length
+                return sponsorlevel
+            })
             
             this.statistics = {
                 status: Object.keys(STATUS).map(status => {
@@ -230,13 +274,15 @@
                 payments: {
                     attendees: getPriceAndAmount(this.users, user => !user.paid, user => user.paid, (sum, user) => sum + user.paysum),
                     donors: getPriceAndAmount(this.users.filter(user => user.donation), user => !user.paid, user => user.paid, (sum, user) => sum + user.donation),
-                }
+                },
+                sponsorlevels
             }
 
             console.log(this.statistics)
         }
         
         this.on('mount', async () => {
+            this.sponsorlevels = await getSponsorlevels(opts.event)
             const [users, event] = await Promise.all([
                 await this.getRegistrations(),
                 await getEventData(opts.event),

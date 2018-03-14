@@ -31,6 +31,11 @@ export async function getRegistrations(eventName) {
     return response.json()
 }
 
+export async function getSponsorlevels(eventName) {
+    const response = await fetch(`${BASEURL}/events/${eventName}/sponsorlevels`, { method: 'GET' })
+    return response.json()
+}
+
 // EVENT REGISTER
 
 export async function registerUser(eventName, userName, data) {
