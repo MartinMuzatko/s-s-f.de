@@ -26,7 +26,11 @@
         <p>
             <a href="<?=$pages->get('/users/register')->url?>">Hast Du noch keinen Account? Jetzt Registrieren.</a>
         </p>
-        <p class="notification notification--warning">Aus Sicherheitsgründen, haben wir alle bisherigen Accounts der alten SSF Website entfernt. Wir bitten Dich einen neuen Account anzulegen.</p>
+        <p class="notification notification--warning">
+            <strong>Wichtig:</strong>
+            Wenn Du dich vor dem 12.12.2018 registriert hast, benötigst du <a href="<?=$pages->get('/users/register')->url?>"><strong>einen neuen Account</strong></a>.
+            Aus Sicherheitsgründen, haben wir alle bisherigen Accounts der alten SSF Website entfernt.
+        </p>
         <user-login>
             <div layout="column" layout-align="center center">
                 <img ref="avatar" class="avatar avatar--big avatar--round" src="<?=$user->getAvatar()?>" alt="">
