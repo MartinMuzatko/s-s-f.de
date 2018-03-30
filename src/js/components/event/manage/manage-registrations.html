@@ -1,149 +1,169 @@
 <manage-registrations>
-    <div if={statistics}>
-        <h3>Statistiken</h3>
-        <h3>Besucher</h3>
+    <div if={!loading}>
+        <div if={statistics}>
+            <h3>Statistiken</h3>
+            <h3>Besucher</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th colspan="2">Teilnehmer</th>
+                        <th colspan="2">Sponsoren</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>Anzahl</th>
+                        <th>Betrag</th>
+                        <th>Anzahl</th>
+                        <th>Betrag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Offen</th>
+                        <td>{statistics.payments.attendees.amount.missing}</td>
+                        <td>{moneyFormat.to(statistics.payments.attendees.price.missing)}</td>
+                        <td>{statistics.payments.donors.amount.missing}</td>
+                        <td>{moneyFormat.to(statistics.payments.donors.price.missing)}</td>
+                    </tr>
+                    <tr>
+                        <th>Barzahler</th>
+                        <td>{statistics.payments.attendees.amount.cash}</td>
+                        <td>{moneyFormat.to(statistics.payments.attendees.price.cash)}</td>
+                        <td>{statistics.payments.donors.amount.cash}</td>
+                        <td>{moneyFormat.to(statistics.payments.donors.price.cash)}</td>
+                    </tr>
+                    <tr class="bg--success">
+                        <th>Bezahlt</th>
+                        <td class="bg--success">{statistics.payments.attendees.amount.paid}</td>
+                        <td class="bg--success">{moneyFormat.to(statistics.payments.attendees.price.paid)}</td>
+                        <td class="bg--success">{statistics.payments.donors.amount.paid}</td>
+                        <td class="bg--success">{moneyFormat.to(statistics.payments.donors.price.paid)}</td>
+                    </tr>
+                    <tr>
+                        <th>Gesamt</th>
+                        <td>{statistics.payments.attendees.amount.total}</td>
+                        <td>{moneyFormat.to(statistics.payments.attendees.price.total)}</td>
+                        <td>{statistics.payments.donors.amount.total}</td>
+                        <td>{moneyFormat.to(statistics.payments.donors.price.total)}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Sponsorlevel</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>User</th>
+                        <th>Davon bezahlt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr each={level in statistics.sponsorlevels}>
+                        <td>
+                            {level.title} <small>(Ab {moneyFormat.to(level.buyPrice)})</small>
+                        </td>
+                        <td>
+                            {level.amount}
+                        </td>
+                        <td>
+                            {level.amountPaid}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <h4>Rollen filtern</h4>
+        <div class="actions">
+            <div class="icon-card icon-card--selectable {filter == 'all' ? 'bg--success' : ''}" onclick={showAllUsers}>
+                <span class="icon-card__title">Alle</span>
+            </div>
+            <div class="icon-card icon-card--selectable {filter == 'donors' ? 'bg--success' : ''}" onclick={showDonors}>
+                <span class="icon-card__title">Sponsoren</span>
+            </div>
+            <div each={role in attendeeRoles} onclick={filterUserByRole} class="icon-card icon-card--selectable {filter == role.name ? 'bg--success' : ''}">
+                <span class="icon-card__title">{role.title}</span>
+                <img src="{role.image}" alt="" class="icon-card__image">
+            </div>
+        </div>
+        <p>Aktion für <strong>{getMarkedUsers().length}</strong> markierte</p>
+        <div class="actions">
+            <button onclick={setMarkedUserStatus} data-status="pending" class="button button--primary">Auf Bezahlung ausstehend setzen</button>
+            <button onclick={setMarkedUserStatus} data-status="accepted" class="button button--primary">Auf Akzeptiert setzen</button>
+            <button onclick={setMarkedUserStatus} data-status="waiting" class="button button--primary">Auf Warteliste setzen</button>
+            <button onclick={} class="button button--primary">Nachricht senden</button>
+        </div>
+        <div>
+            {getVisibleUsers().length} / {this.users.length} User
+        </div>
         <table>
             <thead>
                 <tr>
-                    <th></th>
-                    <th colspan="2">Teilnehmer</th>
-                    <th colspan="2">Sponsoren</th>
-                </tr>
-                <tr>
-                    <th></th>
-                    <th>Anzahl</th>
-                    <th>Betrag</th>
-                    <th>Anzahl</th>
-                    <th>Betrag</th>
+                    <th><input onchange={checkAll} type="checkbox"> ({getMarkedUsers().length})</th>
+                    <th onclick={sortByField} each={label in labels}>
+                        {label.name}
+                        <span if={sortMode == label.name}>V</span>
+                        <span if={sortMode == '-'+label.name}>^</span>
+                        <span if={!~sortMode.indexOf(label.name)}>-</span>
+                    </th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <th>Offen</th>
-                    <td>{statistics.payments.attendees.amount.missing}</td>
-                    <td>{moneyFormat.to(statistics.payments.attendees.price.missing)}</td>
-                    <td>{statistics.payments.donors.amount.missing}</td>
-                    <td>{moneyFormat.to(statistics.payments.donors.price.missing)}</td>
-                </tr>
-                <tr class="bg--success">
-                    <th>Bezahlt</th>
-                    <td class="bg--success">{statistics.payments.attendees.amount.paid}</td>
-                    <td class="bg--success">{moneyFormat.to(statistics.payments.attendees.price.paid)}</td>
-                    <td class="bg--success">{statistics.payments.donors.amount.paid}</td>
-                    <td class="bg--success">{moneyFormat.to(statistics.payments.donors.price.paid)}</td>
-                </tr>
-                <tr>
-                    <th>Gesamt</th>
-                    <td>{statistics.payments.attendees.amount.total}</td>
-                    <td>{moneyFormat.to(statistics.payments.attendees.price.total)}</td>
-                    <td>{statistics.payments.donors.amount.total}</td>
-                    <td>{moneyFormat.to(statistics.payments.donors.price.total)}</td>
-                </tr>
-            </tbody>
-        </table>
-        <h3>Sponsorlevel</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>User</th>
-                    <th>Davon bezahlt</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr each={level in statistics.sponsorlevels}>
+                <tr each={user in users} if={user.visible}>
+                    <td><input onchange={selectUser} type="checkbox" checked={user.checked}></td>
                     <td>
-                        {level.title}
-                    </td>
-                    <td>
-                        {level.amount}
-                    </td>
-                    <td>
-                        {level.amountPaid}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <h4>Rollen filtern</h4>
-    <div class="actions">
-        <div class="icon-card icon-card--selectable {filter == 'all' ? 'bg--success' : ''}" onclick={showAllUsers}>
-            <span class="icon-card__title">Alle</span>
-        </div>
-        <div class="icon-card icon-card--selectable {filter == 'donors' ? 'bg--success' : ''}" onclick={showDonors}>
-            <span class="icon-card__title">Sponsoren</span>
-        </div>
-        <div each={role in attendeeRoles} onclick={filterUserByRole} class="icon-card icon-card--selectable {filter == role.name ? 'bg--success' : ''}">
-            <span class="icon-card__title">{role.title}</span>
-            <img src="{role.image}" alt="" class="icon-card__image">
-        </div>
-    </div>
-    <p>Aktion für <strong>{getMarkedUsers().length}</strong> markierte</p>
-    <div class="actions">
-        <button onclick={setMarkedUserStatus} data-status="pending" class="button button--primary">Auf Bezahlung ausstehend setzen</button>
-        <button onclick={setMarkedUserStatus} data-status="accepted" class="button button--primary">Auf Akzeptiert setzen</button>
-        <button onclick={setMarkedUserStatus} data-status="waiting" class="button button--primary">Auf Warteliste setzen</button>
-    </div>
-    <div>
-        {getVisibleUsers().length} / {this.users.length} User
-    </div>
-    <table>
-        <thead>
-            <tr>
-                <th><input onchange={checkAll} type="checkbox"> ({getMarkedUsers().length})</th>
-                <th onclick={sortByField} each={label in labels}>
-                    {label.name}
-                    <span if={sortMode == label.name}>V</span>
-                    <span if={sortMode == '-'+label.name}>^</span>
-                    <span if={!~sortMode.indexOf(label.name)}>-</span>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr each={user in users} if={user.visible}>
-                <td><input onchange={selectUser} type="checkbox" checked={user.checked}></td>
-                <td>
-                    <div layout="row" layout-align="start center">
-                        <img class="avatar avatar--small avatar--round" style="margin-right: .5em" src="{user.profile.avatar}" alt="{user.profile.username}">
-                        {user.profile.username}
-                        <span if={user.donation}>[S]</span>
-                    </div>
-                </td>
-                <td style={getPaidThreshold(user)}>
-                    {getUserRegdate(user) == -1 ? '✓' : getUserRegdate(user)}
-                    <span if={user.warningsReceived && user.attendeeStatus == 'pending'} title="{lastWarningReceived(user)} seit letzter Warnung">
-                        - {lastWarningReceived(user)}
-                    </span>
-                </td>
-                <td>
-                    <div layout="row" layout-align="space-between" layout-nowrap>
-                        {user.warningsReceived}
-                        <div title="{user.warningsReceived+1 }. Mahnung erteilen" onclick={sendWarning} if={canWarnUser(user)} class="bg--warning bg--warning--shadow status-bubble warning-bubble">
-                            !
+                        <div layout="row" layout-align="start center">
+                            <img class="avatar avatar--small avatar--round" style="margin-right: .5em" src="{user.profile.avatar}" alt="{user.profile.username}">
+                            {user.profile.username}
+                            <span if={user.donation}>[S]</span>
                         </div>
-                    </div>  
-                </td>
-                <td class="text--nowrap">{moneyFormat.to(user.paysum)}</td>
-                <td>
-                    <img each={role in user.attendeeRoles} title="{role.title}" src="{role.image}" alt="" width="32">
-                </td>
-                <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'new'} data-status="new" active={user.attendeeStatus == 'new'}></ssf-toggle></td>
-                <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'pending'} data-status="pending" active={user.attendeeStatus == 'pending'}></ssf-toggle></td>
-                <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'accepted'} data-status="accepted" active={user.attendeeStatus == 'accepted'}></ssf-toggle></td>
-                <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'waiting'} data-status="waiting" active={user.attendeeStatus == 'waiting'}></ssf-toggle></td>
-                <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'signedoff'} data-status="signedoff" active={user.attendeeStatus == 'signedoff'}></ssf-toggle></td>
-                <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'dismissed'} data-status="dismissed" active={user.attendeeStatus == 'dismissed'}></ssf-toggle></td>
-            </tr>
-        </tbody>
-    </table>
-    <button disabled={submissionLoading} onclick={submit} class="button button--primary">
-        Übernehmen
-    </button>
-    <div>
-        <ssf-pawloader if={submissionLoading}></ssf-pawloader>
+                    </td>
+                    <td style={getPaidThreshold(user)}>
+                        {getUserRegdate(user) == -1 ? '✓' : getUserRegdate(user)}
+                        <span if={user.warningsReceived && user.attendeeStatus == 'pending'} title="{lastWarningReceived(user)} seit letzter Warnung">
+                            - {lastWarningReceived(user)}
+                        </span>
+                    </td>
+                    <td>
+                        <div layout="row" layout-align="space-between" layout-nowrap>
+                            {user.warningsReceived}
+                            <div title="{user.warningsReceived+1 }. Mahnung erteilen" onclick={sendWarning} if={canWarnUser(user)} class="bg--warning bg--warning--shadow status-bubble warning-bubble">
+                                !
+                            </div>
+                        </div>  
+                    </td>
+                    <td class="text--nowrap">{moneyFormat.to(user.paysum)}</td>
+                    <td>
+                        <img each={role in user.attendeeRoles} title="{role.title}" src="{role.image}" alt="" width="32">
+                    </td>
+                    <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'new'} data-status="new" active={user.attendeeStatus == 'new'}></ssf-toggle></td>
+                    <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'pending'} data-status="pending" active={user.attendeeStatus == 'pending'}></ssf-toggle></td>
+                    <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'accepted'} data-status="accepted" active={user.attendeeStatus == 'accepted'}></ssf-toggle></td>
+                    <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'waiting'} data-status="waiting" active={user.attendeeStatus == 'waiting'}></ssf-toggle></td>
+                    <!-- <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'signedoff'} data-status="signedoff" active={user.attendeeStatus == 'signedoff'}></ssf-toggle></td> -->
+                    <!-- <td><ssf-toggle ref="statusSwitch" user="{user}" disabled={user.attendeeStatus == 'dismissed'} data-status="dismissed" active={user.attendeeStatus == 'dismissed'}></ssf-toggle></td> -->
+                    <td>
+                        <select onchange={changePaymentMethod}>
+                            <option selected={user.paymentMethod == 'debit'} value="debit">Überweisung</option>
+                            <option selected={user.paymentMethod == 'cash'} value="cash">Barzahlung</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button disabled={submissionLoading} onclick={submit} class="button button--primary">
+            Übernehmen
+        </button>
+        <div>
+            <ssf-pawloader if={submissionLoading}></ssf-pawloader>
+        </div>
+        <div if={submissionComplete && !submissionLoading} class="notification notification--success">
+            Die Daten wurden erfolgreich übernommen.
+        </div>
     </div>
-    <div if={submissionComplete && !submissionLoading} class="notification notification--success">
-        Die Daten wurden erfolgreich übernommen.
+    <div if={loading} layout="column" layout-align="center center">
+        <h3>User werden geladen</h3>
+        <ssf-pawloader></ssf-pawloader>
     </div>
     <user-message-send no-message="true" message={warningMessage} ref="warningMessage"></user-message-send>
     <script>
@@ -162,6 +182,9 @@
         const STATUS_SIGNEDOFF = 'signedoff'
         const STATUS_DISMISSED = 'dismissed'
 
+        const PAYMENT_CASH = 'cash'
+        const PAYMENT_DEBIT = 'debit'
+
         const STATUS = {
             [STATUS_NEW]: 'Neu',
             [STATUS_PENDING]: 'Zahlung ausstehend',
@@ -172,6 +195,7 @@
         }
         
         this.users = []
+        this.loading = true
         this.submissionLoading = false
         this.maxDays = 28
         this.maxWarningDays = 14
@@ -206,8 +230,14 @@
             return this.users.filter(user => user.visible)
         }
 
+        changePaymentMethod(event) {
+            event.item.user.paymentMethod = event.target.value
+            event.item.user.attendeeStatus = STATUS_ACCEPTED
+        }
+
         async getRegistrations() {
             this.users = await getRegistrations(opts.event)
+            this.loading = false
             this.users.forEach(
                 user => {
                     user.checked = false
@@ -225,18 +255,21 @@
                 .map(role => userRoles.find(userRole => userRole.name == role)) // get full info back
                 
             
-            function getPriceAndAmount(items = [], filterMissing, filterDone, reducer) {
+            function getPriceAndAmount(items = [], filterMissing, filterDone, filterCash, reducer) {
                 const missingItems = items.filter(filterMissing)
                 const paidItems = items.filter(filterDone)
+                const cashItems = items.filter(filterCash)
                 return {
                     price: {
                         missing: missingItems.reduce(reducer, 0),
                         paid: paidItems.reduce(reducer, 0),
+                        cash: cashItems.reduce(reducer, 0),
                         total: items.reduce(reducer, 0),
                     },
                     amount: {
                         missing: missingItems.length,
                         paid: paidItems.length,
+                        cash: cashItems.length,
                         total: items.length,
                     }
                 }
@@ -272,8 +305,8 @@
                     }
                 }),
                 payments: {
-                    attendees: getPriceAndAmount(this.users, user => !user.paid, user => user.paid, (sum, user) => sum + user.paysum),
-                    donors: getPriceAndAmount(this.users.filter(user => user.donation), user => !user.paid, user => user.paid, (sum, user) => sum + user.donation),
+                    attendees: getPriceAndAmount(this.users, user => !user.paid && user.paymentMethod != PAYMENT_CASH, user => user.paid, user => user.paymentMethod == PAYMENT_CASH, (sum, user) => sum + user.paysum),
+                    donors: getPriceAndAmount(this.users.filter(user => user.donation), user => !user.paid && user.paymentMethod != PAYMENT_CASH, user => user.paid, user => user.paymentMethod == PAYMENT_CASH, (sum, user) => sum + user.donation),
                 },
                 sponsorlevels
             }
@@ -431,8 +464,9 @@
             {name: STATUS[STATUS_PENDING], sort: user=>user.attendeeStatus==STATUS_PENDING},
             {name: STATUS[STATUS_ACCEPTED], sort: user=>user.attendeeStatus==STATUS_ACCEPTED},
             {name: STATUS[STATUS_WAITING], sort: user=>user.attendeeStatus==STATUS_WAITING},
-            {name: STATUS[STATUS_SIGNEDOFF], sort: user=>user.attendeeStatus==STATUS_SIGNEDOFF},
-            {name: STATUS[STATUS_DISMISSED], sort: user=>user.attendeeStatus==STATUS_DISMISSED},
+            // {name: STATUS[STATUS_SIGNEDOFF], sort: user=>user.attendeeStatus==STATUS_SIGNEDOFF},
+            // {name: STATUS[STATUS_DISMISSED], sort: user=>user.attendeeStatus==STATUS_DISMISSED},
+            {name: 'Bezahlart', sort: user=>user.paymentMethod},
         ]
 
         this.moneyFormat = moneyFormat
