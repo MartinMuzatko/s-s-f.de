@@ -138,6 +138,30 @@ class Event extends Page {
 		}
 	}
 
+	public function changePaymentMethod($user, $method) {
+		if (!$this->isUserRegistered($user)) return false;
+		$attendee = $this->getRegisteredUser($user);
+		if($attendee->paymentMethod->title == $method) return false;
+		
+		$attendee->of(false);
+		$attendee->paymentMethod = $method;
+		$attendee->save();
+		
+		$triggerMethod = ucfirst($method);
+		$context = new WireData();
+		$context->setArray([
+			'event' => $this,
+			'user' => $attendee->profile
+		]);
+		array_map(
+			function($notification) use ($attendee, $context) {
+				sendNotification($notification, $attendee->profile, $context);
+			},
+			$this->getNotifications("trigger=paymentMethodChanged$triggerMethod")->getArray()
+		);
+		return true;
+	}
+
 	public function setAttendeeState($user, $status)
 	{
 		if ($this->isUserRegistered($user)) {
@@ -145,7 +169,7 @@ class Event extends Page {
 			if($attendee->attendeeStatus->title != $status) {
 				$attendee->of(false);
 				$attendee->attendeeStatus = $status;
-				if ($status == 'accepted') {
+				if ($status == 'accepted' && $attendee->paymentMethod->title != 'cash') {
 					$attendee->paid = time();
 				}
 				$attendee->save();

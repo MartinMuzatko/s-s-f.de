@@ -229,6 +229,7 @@ $router = new Router([
                 array_map(
                     function($attendee) use ($event) {
                         $event->setAttendeeState($attendee->profile->name, $attendee->attendeeStatus);
+                        $event->changePaymentMethod($attendee->profile->name, $attendee->paymentMethod);
                     },
                     $data
                 );
