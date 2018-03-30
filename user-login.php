@@ -28,7 +28,7 @@
         </p>
         <p class="notification notification--warning">
             <strong>Wichtig:</strong>
-            Wenn Du dich vor dem 12.12.2018 registriert hast, benötigst du <a href="<?=$pages->get('/users/register')->url?>"><strong>einen neuen Account</strong></a>.
+            Wenn Du dich vor dem 12.12.2017 registriert hast, benötigst du <a href="<?=$pages->get('/users/register')->url?>"><strong>einen neuen Account</strong></a>.
             Aus Sicherheitsgründen, haben wir alle bisherigen Accounts der alten SSF Website entfernt.
         </p>
         <user-login>

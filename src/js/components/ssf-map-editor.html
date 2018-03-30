@@ -17,9 +17,9 @@
                 <span class="field-group__label field-group__label--primary">Land</span>
                 <select value={opts.country} name="country" ref="country" oninput={updateMap} class="field-group__input">
                     <optgroup label={countries[1]}>
-                        <option each={country, index in countries} if={index < 17 && index > 1} value="{country}">{country}</option>
+                        <option each={country, index in countries} if={index <= 17 && index > 1} value="{country}">{country}</option>
                     </optgroup>
-                    <option each={country, index in countries} if={index >= 17} value="{country}">{country}</option>
+                    <option each={country, index in countries} if={index > 17} value="{country}">{country}</option>
                 </select>
             </label>
         </div>
