@@ -106,7 +106,7 @@ $documentTitle .= ' | SSF - Die SüdstaatenFurs';
                     <?else:?>
                         <a class="button navigation__item" href="<?=$pages->get('/users/login')->url?>">
                             <span class="navigation__image">
-                                <?=file_get_contents('dist/images/login.svg')?>
+                                <?=file_get_contents('dist/images/menue_login.svg')?>
                             </span>
                             <span class="navigation__page"><?=$pages->get('/users/login')->title?></span>
 
@@ -152,7 +152,7 @@ $documentTitle .= ' | SSF - Die SüdstaatenFurs';
             "images" => $itemImages
         ];
     ?>
-    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default,fetch"></script>
     <script>
         window.api = {}
         Object.assign(window.api, <?=json_encode($api)?>)
