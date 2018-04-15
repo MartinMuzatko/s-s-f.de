@@ -3,6 +3,9 @@
     $this->wire('event', $event);
     $event->guestlist = $event->getPageByModule('event-guestlist');
     $event->registration = $event->getPageByModule('event-registration');
+    if($input->urlSegment == 'reg.csv') {
+        require('./partials/event/csv.php');
+    }
 ?>
 
 <div class="content content--padded">
