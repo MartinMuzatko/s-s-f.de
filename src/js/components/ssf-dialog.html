@@ -12,7 +12,7 @@
                 <yield>
             </div>
             <footer class="dialog__footer">
-                <button each="{ dialog.buttons }" type="button" class="button { 'button--' + type }" onclick="{ action }" style="{ style }">
+                <button each="{ dialog.buttons }" disabled={disabled} type="button" class="button { 'button--' + type }" onclick="{ action }" style="{ style }">
     				{ text }
     			</button>
             </footer>

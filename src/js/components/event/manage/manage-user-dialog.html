@@ -1,0 +1,173 @@
+<manage-user-dialog>
+    <ssf-dialog size="medium" ref="dialog" dialog={dialog}>
+        <div if={parent.user}>
+            <div layout="row" layout-align="start center">
+                <div>
+                    <h2 layout="row">
+                        {parent.user.profile.username}
+                        <span class="stars">
+                            <span class="star" each={star in Array.from(Array(parent.sponsorlevelAmount()))}>
+                                ★
+                            </span>
+                        </span>
+                    </h2>
+                    <div>
+                        <strong>Betrag:</strong> {parent.moneyFormat.to(parent.user.paysum)}
+                    </div>
+                    <div>
+                        <strong>Sponsorlevel:</strong> {parent.user.sponsorlevel}
+                        <small>({parent.moneyFormat.to(parent.user.donation)})</small>
+                    </div>
+                    <div>
+                        <strong>Bezahlt:</strong>
+                        <span if={parent.user.paid}>
+                            Ja
+                        </span>
+                        <span if={!parent.user.paid}>
+                            Betrag ausstehend. (Zahlung per {parent.user.paymentMethod})
+                            <div class="field-group">
+                                <ssf-toggle ref="paid" label="User vor Ort bezahlt?"></ssf-toggle>
+                            </div>
+                            
+                        </span>
+                    </div>
+                    <div>
+                        <strong>Event Registrierdatum:</strong> {parent.getFormattedDate(parseInt(parent.user.created))}
+                    </div>
+                </div>
+                <img flex-end class="avatar avatar--big avatar--round" src={parent.user.profile.avatar}>
+            </div>
+            <div>
+                <h3>User Status ändern</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th each={label in parent.statusTypeLabels}>
+                                {label}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td each={status in parent.statusTypes}>
+                                <ssf-toggle 
+                                    ref="statusSwitch" 
+                                    user="{parent.parent.user}" 
+                                    disabled={parent.parent.user.attendeeStatus == status} 
+                                    data-status={status} 
+                                    active={parent.parent.user.attendeeStatus == status}></ssf-toggle>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h3>Items</h3>
+                <div class="icon-card icon-card--selectable" each={item in parent.user.items}>
+                    <span class="icon-card__title">{item.title}</span>
+                    <img width="100" class="icon-card__image" src="{item.image}">
+                </div>
+                <h3>Rollen</h3>
+                <div class="icon-card icon-card--selectable" each={item in parent.user.attendeeRoles}>
+                    <span class="icon-card__title">{item.title}</span>
+                    <img width="100" class="icon-card__image" src="{item.image}">
+                </div>
+            </div>
+        </div>
+    </ssf-dialog>
+    <script>
+        import '../../ssf-dialog.html'
+        import '../../ssf-toggle.html'
+        import { USERSTATUS, STATUS, moneyFormat } from '../../../constants'
+        import format from 'date-fns/format'
+       
+        this.moneyFormat = moneyFormat
+
+        this.loading = false
+
+        sponsorlevelAmount() {
+            return this.event.sponsorlevels.findIndex(level => level.title == this.user.sponsorlevel) || 0
+        }
+        
+        getFormattedDate(date) {
+            return format(date, 'DD.MM.YYYY HH:mm:ss')
+        }
+
+        this.user = false
+        this.statusTypes = USERSTATUS
+        this.statusTypeLabels = STATUS
+
+        
+
+        this.dialog = {
+            // isVisible: opts.visible || false,
+            isVisible: true,
+            heading: 'User managen',
+            buttons: [
+                {
+                    text: 'Abbrechen',
+                    type: 'subtle',
+                    action: async () => {
+                        // await this.submit()
+                        this.close()
+                    }
+                },
+                {
+                    text: 'Einbuchen',
+                    type: 'primary',
+                    disabled: true,
+                    action: async () => {
+                        // await this.submit()
+                        this.loading = true
+                        this.update()
+                        await this.submit()
+                        this.loading = false
+                        this.update()
+                        this.close()
+                    }
+                }
+            ]
+        }
+
+        this.on('open', () => {
+            this.dialog.buttons[1].disabled = !this.user.paid
+            
+            this.refs.dialog.refs.statusSwitch.map(toggle => {
+                toggle.on('toggle', (status) => {
+                    toggle.opts.user.attendeeStatus = toggle.opts.dataStatus
+                    this.update()
+                })
+            })
+            this.refs.dialog.refs.paid.on('toggle', paid => {
+                this.dialog.buttons[1].disabled = false
+                this.update()
+                // the user can still change paid if clicked
+                if (paid) {
+                    this.user.paid = new Date()
+                } else {
+                    this.user.paid = null
+                }
+            })
+        })
+
+        async submit() {
+            this.user.checkedIn = new Date()
+            this.trigger('checkin', this.user)
+        }
+
+        async open(user, event) {
+            this.user = user
+            this.event = event
+            this.dialog.heading = `User ${user.profile.username} für ${event.title} bearbeiten`
+            this.refs.dialog.open()
+            this.trigger('open')
+            this.update()
+        }
+
+        close() {
+            this.user = {}
+            this.refs.dialog.close()
+            this.update()
+        }
+    </script>
+</manage-user-dialog>

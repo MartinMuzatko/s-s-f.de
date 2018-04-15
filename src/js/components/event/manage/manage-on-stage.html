@@ -1,0 +1,146 @@
+<manage-on-stage>
+    <div class="content--padded">
+        <div if={loading} layout="column" layout-align="center center">
+            <h3>User werden geladen</h3>
+            <ssf-pawloader></ssf-pawloader>
+        </div>
+        <div if={!loading}>
+            <h3>Filter</h3>
+            <div class="actions">
+                <button 
+                    each={letter in filterLetters} 
+                    onclick={filterByLetter} 
+                    class="button button--big button--{activeLetter == letter ? 'secondary' : 'primary'}">
+                    {letter.toUpperCase()}
+                </button>
+            </div>
+            <div layout="row" layout-align="center center">
+                <label class="field-group" flex="80" flex-gt-sm="60" flex-gt-md="50" flex-gt-lg="40">
+                    <span class="field-group__label field-group__label--primary">Suche nach Nick, Vor oder Nachname</span>
+                    <input class="field-group__input" size="18" type="text" oninput={search}>
+                </label>
+            </div>
+            
+            <h3>Ausstehende Anmeldungen</h3>
+            <div layout="row">
+                <div 
+                    each={registration in registrations} 
+                    if={registration.visible && !registration.checkedIn} 
+                    flex="100" flex-gt-sm="50" flex-gt-md="33" flex-gt-lg="25"
+                    onclick={manageUser}>
+                    <div class="user-profile-card user-profile-card--clickable {!registration.paid ? 'bg--warning' : ''}">
+                        <h3 class="user-profile-card__name">{registration.profile.username}</h3>
+                        <img class="user-profile-card__avatar" src="{registration.profile.avatar}" alt="">
+                        <div>
+                            {registration.checkedIn + ''}
+                            <div if={registration.paid}>
+                                Hat bezahlt am {getDate(registration.paid)} per {registration.paymentMethod}.
+                            </div>
+                            <div if={!registration.paid}>
+                                Hat noch einen Betrag von {registration.paysum} ausstehend.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Angemeldete</h3>
+            <div layout="row">
+                <div 
+                    each={registration in registrations} 
+                    if={registration.visible && registration.checkedIn} 
+                    flex="100" flex-gt-sm="50" flex-gt-md="33" flex-gt-lg="25">
+                    <div class="user-profile-card bg--success">
+                        <h3 class="user-profile-card__name">{registration.profile.username}</h3>
+                        <img class="user-profile-card__avatar" src="{registration.profile.avatar}" alt="">
+                        <div>
+                            Ist auf der Con seit {getDate(registration.checkedIn)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <manage-user-dialog ref="manageUser"></manage-user-dialog>    
+    </div>
+    <script>
+        import '../../ssf-pawloader.html'
+        import './manage-user-dialog.html'
+        import { getRegistrations, updateRegistrations, getSponsorlevels } from '../../../api'
+
+        this.loading = true
+        this.registrations = []
+        this.filterLetters = []
+
+        this.on('mount', async () => {
+            this.refs.manageUser.on('checkin', user => {
+                let registration = this.registrations.find(registration => registration.profile.username == user.profile.username)
+                registration = user
+                this.update()
+            })
+            const [registrations, sponsorlevels] = await Promise.all([
+                await getRegistrations(opts.event),
+                await getSponsorlevels(opts.event),
+            ])
+            this.registrations = registrations
+            this.sponsorlevels = sponsorlevels
+            this.setAllUsersVisible()
+            this.filterLetters = this.registrations
+            .map(registration => registration.profile.name)
+            .map(username => username.slice(0, 1))
+            .sort()
+            this.filterLetters = Array.from(new Set(this.filterLetters))
+            this.loading = false
+            this.update()    
+        })
+
+        manageUser(event) {
+            this.refs.manageUser.open(
+                event.item.registration,
+                {title: opts.event, sponsorlevels: this.sponsorlevels}
+            )
+        }
+
+        search(event) {
+            let search = event.target.value
+            this.registrations.forEach(registration => {
+                registration.visible = ~registration.profile.username.toLowerCase().indexOf(search.toLowerCase())
+                || ~registration.profile.firstname.toLowerCase().indexOf(search.toLowerCase())
+                || ~registration.profile.lastname.toLowerCase().indexOf(search.toLowerCase())
+            })
+        }
+
+        getDate(date) {
+            date = new Date(date)
+            return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`
+        }
+
+        setAllUsersVisible() {
+            this.registrations.forEach(registration => {
+                registration.visible = true
+            })
+        }
+
+        clearFilters() {
+            this.activeLetter = null
+            this.search = null
+        }
+
+        filterByLetter(event) {
+            if (this.activeLetter == event.item.letter) {
+                this.setAllUsersVisible()
+                this.activeLetter = null
+                return
+            }
+            this.activeLetter = event.item.letter
+            this.registrations.forEach(registration => {
+                registration.visible = this.activeLetter == registration.profile.name.slice(0, 1)
+            })
+        } 
+
+    </script>
+    <style>
+        button {
+            margin: .5em;
+        }
+    </style>
+</manage-on-stage>

@@ -111,7 +111,7 @@
             <tbody>
                 <tr each={user in users} if={user.visible}>
                     <td><input onchange={selectUser} type="checkbox" checked={user.checked}></td>
-                    <td>
+                    <td class="user-table__user" onclick={showUserManageDialog}>
                         <div layout="row" layout-align="start center">
                             <img class="avatar avatar--small avatar--round" style="margin-right: .5em" src="{user.profile.avatar}" alt="{user.profile.username}">
                             {user.profile.username}
@@ -165,15 +165,16 @@
         <h3>User werden geladen</h3>
         <ssf-pawloader></ssf-pawloader>
     </div>
+    <manage-user-dialog ref="manageUser"></manage-user-dialog>
     <user-message-send no-message="true" message={warningMessage} ref="warningMessage"></user-message-send>
     <script>
         import differenceInDays from 'date-fns/difference_in_days'
-        import { moneyFormat } from '../../../constants'
+        import { moneyFormat, STATUS, STATUS_NEW, STATUS_PENDING, STATUS_ACCEPTED, STATUS_WAITING, STATUS_DISMISSED, STATUS_SIGNEDOFF } from '../../../constants'
         import { getRegistrations, updateRegistrations, getEventData, warnUser, getSponsorlevels } from '../../../api'
         import '../../ssf-toggle.html'
         import '../../ssf-pawloader.html'
-        import '../../ssf-dialog.html'
         import '../../user/user-message-send.html'
+        import './manage-user-dialog.html'
         
         const STATUS_NEW = 'new'
         const STATUS_PENDING = 'pending'
@@ -188,7 +189,7 @@
         const STATUS = {
             [STATUS_NEW]: 'Neu',
             [STATUS_PENDING]: 'Zahlung ausstehend',
-            [STATUS_ACCEPTED]: 'Bezahlt',
+            [STATUS_ACCEPTED]: 'Akzeptiert',
             [STATUS_WAITING]: 'Warteliste',
             [STATUS_SIGNEDOFF]: 'Abgemeldet',
             [STATUS_DISMISSED]: 'Verbannt',
@@ -214,6 +215,10 @@
             }
             this.submissionLoading = false
             this.update()
+        }
+
+        showUserManageDialog(event) {
+            this.refs.manageUser.open(event.item.user, this.event)
         }
 
         filterUserByRole(e) {

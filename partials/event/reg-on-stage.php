@@ -1,14 +1,6 @@
-<?php namespace ProcessWire; ?>
-<? foreach($events->getOwnEvents() as $event):?>
-    <?=$event->userCan('event-registration-onstage')?>
-    <?=$event->httpUrl.'reg-on-stage'?>
-<? endforeach; ?>
-<? if($event->userCan('event-registration-onstage')):?>
-    Reg on stage!
-<? endif; ?>
-
-<? foreach($event->getRegistrations() as $registration):?>
-    <?=$registration->profile->username?>
-    <?=$registration->paid?>
-    <?=$registration->items?>
-<? endforeach; ?>
+<?php namespace ProcessWire;
+    if (!$event->userCan('event-user-registration-onstage')) {
+        $session->redirect($pages->get('name=403')->url);
+    }
+?>
+<manage-on-stage event="<?=$event->name?>"></manage-on-stage>
