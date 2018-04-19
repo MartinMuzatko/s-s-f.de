@@ -8,6 +8,13 @@
     min-height: 8em;
     margin: 1em;
     margin-top: 3em;
+    &--clickable {
+        cursor: pointer;
+        transition: all @duration-action ease;
+        &:hover {
+            transform: scale(1.05);
+        }
+    }
     &--club-member {
         background-color: @color-member-light-shadow;
     }
@@ -39,5 +46,6 @@
         border-radius: 100%;
         border: 1px solid @color-primary;
         box-shadow: 0 0 .25em @color-dark-shadow;
+        background-color: @color-light;
     }
 }

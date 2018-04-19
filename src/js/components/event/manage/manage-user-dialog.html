@@ -1,6 +1,6 @@
 <manage-user-dialog>
     <ssf-dialog size="medium" ref="dialog" dialog={dialog}>
-        <div if={parent.user}>
+        <div if={parent.user && !parent.loading}>
             <div layout="row" layout-align="start center">
                 <div>
                     <h2 layout="row">
@@ -11,6 +11,15 @@
                             </span>
                         </span>
                     </h2>
+                    <div>
+                        <strong>Vorname:</strong> {parent.user.profile.firstname}
+                    </div>
+                    <div>
+                        <strong>Nachname:</strong> {parent.user.profile.lastname}
+                    </div>
+                    <div>
+                        <strong>Geburtsdatum:</strong> {parent.user.profile.birthdate}
+                    </div>
                     <div>
                         <strong>Betrag:</strong> {parent.moneyFormat.to(parent.user.paysum)}
                     </div>
@@ -37,7 +46,7 @@
                 </div>
                 <img flex-end class="avatar avatar--big avatar--round" src={parent.user.profile.avatar}>
             </div>
-            <div>
+            <div if={opts.status}>
                 <h3>User Status ändern</h3>
                 <table>
                     <thead>
@@ -62,24 +71,36 @@
                 </table>
             </div>
             <div>
+                <div if={parent.user.comment}>
+                    <h3>Kommentar</h3>
+                    <div>{parent.user.comment}</div>
+                </div>
                 <h3>Items</h3>
+                <div if={!parent.user.items.length}>Keine Items</div>
                 <div class="icon-card icon-card--selectable" each={item in parent.user.items}>
                     <span class="icon-card__title">{item.title}</span>
-                    <img width="100" class="icon-card__image" src="{item.image}">
+                    <img width="50" class="icon-card__image" src="{item.image}">
                 </div>
                 <h3>Rollen</h3>
+                <div if={!parent.user.attendeeRoles.length}>Nur Teilnehmer</div>
                 <div class="icon-card icon-card--selectable" each={item in parent.user.attendeeRoles}>
                     <span class="icon-card__title">{item.title}</span>
-                    <img width="100" class="icon-card__image" src="{item.image}">
+                    <img width="50" class="icon-card__image" src="{item.image}">
                 </div>
             </div>
+        </div>
+        <div if={parent.loading} layout="column" layout-align="center center">
+            <h3>Checking in</h3>
+            <ssf-pawloader />
         </div>
     </ssf-dialog>
     <script>
         import '../../ssf-dialog.html'
+        import '../../ssf-pawloader.html'
         import '../../ssf-toggle.html'
         import { USERSTATUS, STATUS, moneyFormat } from '../../../constants'
         import format from 'date-fns/format'
+        import { updateRegistration } from '../../../api'
        
         this.moneyFormat = moneyFormat
 
@@ -132,12 +153,14 @@
         this.on('open', () => {
             this.dialog.buttons[1].disabled = !this.user.paid
             
-            this.refs.dialog.refs.statusSwitch.map(toggle => {
-                toggle.on('toggle', (status) => {
-                    toggle.opts.user.attendeeStatus = toggle.opts.dataStatus
-                    this.update()
+            if (this.refs.dialog.refs.statusSwitch) {
+                this.refs.dialog.refs.statusSwitch.map(toggle => {
+                    toggle.on('toggle', (status) => {
+                        toggle.opts.user.attendeeStatus = toggle.opts.dataStatus
+                        this.update()
+                    })
                 })
-            })
+            }
             this.refs.dialog.refs.paid.on('toggle', paid => {
                 this.dialog.buttons[1].disabled = false
                 this.update()
@@ -151,7 +174,8 @@
         })
 
         async submit() {
-            this.user.checkedIn = new Date()
+            this.user.attended = new Date().getTime()
+            await updateRegistration(this.event.name, this.user.profile.name, this.user),
             this.trigger('checkin', this.user)
         }
 

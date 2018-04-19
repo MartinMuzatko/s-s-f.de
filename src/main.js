@@ -26,6 +26,7 @@ import './js/components/event/edit/event-update.html'
 import './js/components/event/edit/event-create.html'
 import './js/components/event/event-register.html'
 import './js/components/event/manage/manage-registrations.html'
+import './js/components/event/manage/manage-on-stage.html'
 import './js/components/event/event-list-short.html'
 import './images/logo.png'
 import './images/navigation/menue_events.svg'
@@ -35,7 +36,7 @@ import './images/navigation/menue_home.svg'
 import './images/paw.svg'
 import './images/attendee.svg'
 import './images/navigation/menue_kontakt.svg'
-// import './images/navigation/menue_login.svg'
+import './images/navigation/menue_login.svg'
 
 
 function floatHeaderOnWaypoint () {

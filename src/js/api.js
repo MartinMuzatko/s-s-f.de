@@ -1,3 +1,5 @@
+import queryString from 'query-string'
+
 export const BASEURL = `${window.api.url}api`
 
 // TEST STREAM
@@ -26,8 +28,9 @@ export async function getEventData(eventName) {
     return response.json()
 }
 
-export async function getRegistrations(eventName) {
-    const response = await fetch(`${BASEURL}/events/${eventName}/registrations`, {method: 'GET'})
+export async function getRegistrations(eventName, options = {}) {
+    let query = queryString.stringify(options)
+    const response = await fetch(`${BASEURL}/events/${eventName}/registrations?${query}`, { method: 'GET', credentials: 'same-origin'})
     return response.json()
 }
 
@@ -47,8 +50,15 @@ export async function registerUser(eventName, userName, data) {
 }
 
 export async function updateRegistrations(eventName, data) {
-    const response = await fetch(
+    return fetch(
         `${BASEURL}/events/${eventName}/registrations`,
+        { method: 'PUT', body: JSON.stringify(data), credentials: 'same-origin' }
+    )
+}
+
+export async function updateRegistration(eventName, userName, data) {
+    const response = await fetch(
+        `${BASEURL}/events/${eventName}/registrations/${userName}`,
         { method: 'PUT', body: JSON.stringify(data), credentials: 'same-origin' }
     )
     return response.json()

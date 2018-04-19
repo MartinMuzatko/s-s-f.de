@@ -490,11 +490,9 @@
 
 .actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    &--centered {
-
-    }
 }
 
 .counter {
@@ -652,3 +650,25 @@
     cursor: pointer;
 }
 
+
+
+.user-table {
+    &__user {
+        background-color: @color-info-subtle;
+        cursor: pointer;
+    }
+}
+
+.stars {
+	display: flex;
+	letter-spacing: 0;
+}
+
+.star {
+	display: block;
+	color: @color-primary;
+	text-shadow: 0 0 .2em @color-dark, 0 0 .5em @color-light;
+	&:nth-child(2n) {
+		transform: rotate(20deg);
+	}
+}

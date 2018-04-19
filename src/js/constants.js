@@ -69,3 +69,37 @@ export const DEFAULT_ITEMS = [
         included: false
     }
 ]
+
+export const STATUS_NEW = 'new'
+export const STATUS_PENDING = 'pending'
+export const STATUS_ACCEPTED = 'accepted'
+export const STATUS_WAITING = 'waiting'
+export const STATUS_SIGNEDOFF = 'signedoff'
+export const STATUS_DISMISSED = 'dismissed'
+
+export const PAYMENT_CASH = 'cash'
+export const PAYMENT_DEBIT = 'debit'
+
+export const PAYMENT = {
+    [PAYMENT_CASH]: 'Barzahlung',
+    [PAYMENT_DEBIT]: 'Überweisung',
+}
+
+
+export const USERSTATUS = [
+    STATUS_NEW,
+    STATUS_PENDING,
+    STATUS_ACCEPTED,
+    STATUS_WAITING,
+    STATUS_SIGNEDOFF,
+    STATUS_DISMISSED,
+]
+
+export const STATUS = {
+    [STATUS_NEW]: 'Neu',
+    [STATUS_PENDING]: 'Zahlung ausstehend',
+    [STATUS_ACCEPTED]: 'Akzeptiert',
+    [STATUS_WAITING]: 'Warteliste',
+    [STATUS_SIGNEDOFF]: 'Abgemeldet',
+    [STATUS_DISMISSED]: 'Verbannt',
+}
