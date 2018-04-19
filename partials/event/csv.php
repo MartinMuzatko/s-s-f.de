@@ -23,6 +23,7 @@ $regData = array_map(
             "attendeeRoles" => join($roles, ', '),
             "sponsorlevel" => $event->getSponsorLevelForMoney($registration->donation)->title,
             "conFee" => $event->getAttendeePaymentSum($registration->profile),
+            "comment" => $registration->comment,
         ];
     },
     $registrations->getArray(),
@@ -31,7 +32,15 @@ $regData = array_map(
 
 echo "\xEF\xBB\xBF";
 
-echo join(array_keys($regData[0]), ',').PHP_EOL;
+echo join(
+    array_map(
+        function ($column) {
+            return "\"$column\"";
+        },
+        array_keys($regData[0])
+    ),
+    ','
+).PHP_EOL;
 
 $lines = array_map(
     function ($registration) {

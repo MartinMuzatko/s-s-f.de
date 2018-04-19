@@ -181,19 +181,27 @@ $router = new Router([
                 $registrations = array_map(
                     function($registration) use ($event) {
                         return [
-                            'paid' => $registration->paid,
+                            'paid' => $registration->paid ? $registration->paid.'000' : null,
                             'created' => $registration->created.'000',
                             'modified' => $registration->modified.'000',
                             'modifiedUser' => $registration->modifiedUser->name,
                             'lastWarning' => $registration->warnings->last ? $registration->warnings->last->created.'000' : null,
                             'warningsReceived' => $registration->warnings->count,
                             'donation' => $registration->donation,
+                            'comment' => $registration->comment,
+                            'attended' => $registration->attended ? $registration->attended.'000' : null,
                             'paysum' => $event->getAttendeePaymentSum($registration->profile),
                             'profile' => [
                                 'username' => $registration->profile->username,
+                                'firstname' => $registration->profile->firstname,
+                                'lastname' => $registration->profile->lastname,
+                                'birthdate' => $registration->profile->birthdate,
                                 'name' => $registration->profile->name,
                                 'avatar' => $registration->profile->getAvatar(),
+                                'species' => $registration->profile->species->title,
+                                'created' => $registration->profile->created.'000',
                             ],
+                            'sponsorlevel' => $event->getSponsorLevelForMoney($registration->donation)->title,
                             'items' => array_map(
                                 function($item) {
                                     return [
@@ -228,8 +236,8 @@ $router = new Router([
                 $data = $resource->getPayload();
                 array_map(
                     function($attendee) use ($event) {
-                        $event->setAttendeeState($attendee->profile->name, $attendee->attendeeStatus);
                         $event->changePaymentMethod($attendee->profile->name, $attendee->paymentMethod);
+                        $event->setAttendeeState($attendee->profile->name, $attendee->attendeeStatus);
                     },
                     $data
                 );
@@ -252,11 +260,12 @@ $router = new Router([
 
                 }),
                 new Route('PUT', 'events/([\w-]+)/registrations/([\w-]+)', function($path, $eventName, $userName) {
-                    $user = $this->users->get("name=$user");
-                    if ($user instanceof NullPage) {
-                        return false;
-                    }
-                    //$this->wire->events->get("name=$eventName")->unregisterUser($user);
+                    $event =  $this->events->get("name=$eventName");
+                    $resource = new \API\Resource($path);
+                    $attendee = $resource->getPayload();
+                    $event->changePaymentMethod($attendee->profile->name, $attendee->paymentMethod);                    
+                    $event->setAttendeeState($attendee->profile->name, $attendee->attendeeStatus);
+                    $event->setAttended($attendee->profile->name, $attendee->attended);
                 }),
                 new Route('DELETE', 'events/([\w-]+)/registrations/([\w-]+)', function($path, $eventName, $userName) {
                     $user = $this->users->get("name=$user");

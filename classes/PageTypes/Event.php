@@ -149,6 +149,7 @@ class Event extends Page {
 		
 		$triggerMethod = ucfirst($method);
 		$context = new WireData();
+		$attendee->profile->conFee = $this->getAttendeePaymentSum($attendee->profile);
 		$context->setArray([
 			'event' => $this,
 			'user' => $attendee->profile
@@ -191,6 +192,15 @@ class Event extends Page {
 			}
 		}
 		return false;
+	}
+
+	public function setAttended($user, $status)
+	{
+		if (!$this->isUserRegistered($user)) { return false; }
+		$attendee = $this->getRegisteredUser($user);
+		$attendee->of(false);
+		$attendee->attended = $status ? time() : null;
+		$attendee->save();
 	}
 
 	public function isUserOldEnoughAtEventStartDate($user)
