@@ -35,8 +35,9 @@
                         <h3 class="user-profile-card__name">{registration.profile.username}</h3>
                         <img class="user-profile-card__avatar" src="{registration.profile.avatar}" alt="">
                         <div>
+                            <p>{registration.profile.firstname} {registration.profile.lastname}</p>
                             <div if={registration.paid}>
-                                Hat bezahlt am {getDate(registration.paid)} per {getPaymentMethod(registration.paymentMethod)}.
+                                Hat am {getDate(registration.paid)} per {getPaymentMethod(registration.paymentMethod)} bezahlt.
                             </div>
                             <div if={!registration.paid}>
                                 Hat noch einen Betrag von {moneyFormat.to(registration.paysum)} ausstehend.
@@ -59,7 +60,10 @@
                         <h3 class="user-profile-card__name">{registration.profile.username}</h3>
                         <img class="user-profile-card__avatar" src="{registration.profile.avatar}" alt="">
                         <div>
-                            Ist auf der CattendgetDate(registration.attended)}
+                            <p>{registration.profile.firstname} {registration.profile.lastname}</p>
+                            <p>
+                                Ist auf der Con seit {getFullDate(registration.attended)}
+                            </p>
                             <button onclick={unsign} class="button button--secondary">Austragen</button>
                         </div>
                     </div>
@@ -139,6 +143,11 @@
         getDate(date) {
             date = new Date(parseInt(date))
             return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`
+        }
+
+        getFullDate(date) {
+            date = new Date(parseInt(date))
+            return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
         }
 
         setAllUsersVisible() {

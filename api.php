@@ -12,8 +12,8 @@ function hasPermission($permission = '') {
     $wire = new Resource();
     $isAllowed = $wire->user->hasPermission($permission);
     if (!$isAllowed) {
-        return true;
         http_response_code(403);
+        return false;
     }
     return $isAllowed;
 };
