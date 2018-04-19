@@ -37,7 +37,7 @@ module.exports = {
         rules: [
             //{ test: /\.js$/, loader: 'source-map', enforce: 'pre' },
             { test: /\.html$/, loader: ['riotjs'], enforce: 'pre' },
-            { test: /\.js|\.html$/, loader: 'babel', options: { presets: ['es2015-riot', 'es2017'] }},
+            { test: /\.js|\.html$/, loader: 'babel', options: { presets: ['es2015-riot', 'es2017', 'es2016', 'stage-2'] }},
 			{ test: /\.(jpe?g|png|gif|svg)$/i, loader: 'file', options: {name: 'images/[name].[ext]'}},
             { test: /\.(ttf|woff|eot)$/, loader: `file`, options: {name:'fonts/[name].[ext]'}},
             {
