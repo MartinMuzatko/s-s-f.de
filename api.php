@@ -285,6 +285,13 @@ $router = new Router([
                         $this->wire->events->get("name=$eventName")->warnUser($userName, $data->text, $data->type, $data->title, $data->sendMessage);
                     }),
 
+                    new Route('POST', 'events/([\w-]+)/registrations/([\w-]+)/survey', function($path, $eventName, $userName) {
+                        $resource = new \API\Resource($path);
+                        $data = $resource->getPayload();
+                        // TODO: send bad request if text, type or title is missing
+                        $this->wire->events->get("name=$eventName")->submitSurvey($userName, $data->text, $data->rating);
+                    }),
+
             // ITEMS
             new Route('GET', 'events/([\w-]+)/items', function($path, $eventName) {
 

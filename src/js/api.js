@@ -72,6 +72,14 @@ export async function warnUser(eventName, userName, data) {
     return response.json()
 }
 
+export async function submitSurvey(eventName, userName, data) {
+    const response = await fetch(
+        `${BASEURL}/events/${eventName}/registrations/${userName}/survey`,
+        { method: 'POST', body: JSON.stringify(data), credentials: 'same-origin' }
+    )
+    return response.json()
+}
+
 // PAGE EDITOR
 
 export async function getModules() {

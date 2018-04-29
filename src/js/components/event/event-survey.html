@@ -1,0 +1,38 @@
+<event-survey>
+    <div>
+        <form if={!loading && !submitted} onsubmit={submit}>
+            <yield />
+            <ssf-rating ref="rating"></ssf-rating>
+            <textarea ref="text" maxlength="5000"></textarea>
+            <input type="submit" class="button button--primary" value="Event bewerten">
+        </form>
+        <div if={loading} layout="column" layout-align="center center">
+            <h3>Deine Meinung wird gesendet</h3>
+            <ssf-pawloader></ssf-pawloader>
+        </div>
+        <p if={submitted}>
+            Yay! Danke vielmals für Dein Feedback. Wir freuen uns sehr Dich beim nächsten Event zu sehen.
+        </p>
+    </div>
+    <script>
+        import '../ssf-rating.html'
+        import '../ssf-pawloader.html'
+        import { submitSurvey } from '../../api'
+
+        this.loading = false
+        this.submitted = false
+        
+        async submit(e) {
+            e.preventDefault()
+            let text = this.refs.text.value
+            let rating = this.refs.rating.rating
+            this.loading = true
+            this.update()
+            await submitSurvey(opts.event, opts.user, {text, rating})
+            this.loading = false
+            this.submitted = true
+            this.update()
+        }
+        
+    </script>
+</event-survey>

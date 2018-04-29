@@ -16,10 +16,15 @@
         <? if($event->isUserRegistered($user)): ?>
             <div layout="row" layout-align="center">
                 <div flex="100" flex-gt-sm="80" flex-gt-md="70" flex-gt-lg="60" class="card card--light content--padded">
-                    <h2>Wie hat es dir bei uns gefallen?</h2>
-                    Dem Veranstalter des Events ist es wichtig einen guten Überblick über die Zufriedenheit der Besucher zu erlangen.
-                    <ssf-rating></ssf-rating>
-                    <a href="" class="button button--primary">Meinung Absenden</a>
+                    <? if($event->hasUserRated($user)):?>
+                        Vielen Dank für deine Bewertung.
+                    <? else: ?>
+                        <event-survey event="<?=$event->name?>" user="<?=$user->name?>">
+                            <h2>Wie hat es Dir bei uns gefallen?</h2>
+                            <p>Bewerte Deinen Besuch beim <?=$event->title?>?</p>
+                            <p>Hinterlasse uns eine kleine Nachricht wenn Du uns Lob, Kritik oder Verbesserungsvorschläge zukommen lassen möchtest.</p>
+                        </event-survey>
+                    <? endif; ?>
                 </div>
             </div>
         <? endif ?>
@@ -46,5 +51,7 @@
                 </div>
             </yield>
         </ssf-countdown>
+    <? else: ?>
+        <? require('./partials/event/register.php')?>
     <? endif ?>
 </div>

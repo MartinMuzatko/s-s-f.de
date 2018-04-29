@@ -209,6 +209,23 @@ class Event extends Page {
     	return $user->birthdate < strtotime("-$minAge year", $this->getUnformatted('startDate'));
 	}
 
+	public function submitSurvey($user, $text, $rating)
+	{
+		if (!$this->isUserRegistered($user)) return false;
+		$user = $this->getRegisteredUser($user);
+		$user->of(false);
+		$user->surveyComment = $text;
+		$user->surveyRating = $rating;
+		$user->save();
+	}
+	
+	public function hasUserRated($user)
+	{
+		if (!$this->isUserRegistered($user)) return false;
+		$user = $this->getRegisteredUser($user);
+		return !!strlen($user->surveyRating);
+	}
+
 	public function warnUser($user, $message, $type, $title, $sendMessage = false)
 	{
 		if ($this->isUserRegistered($user)) {

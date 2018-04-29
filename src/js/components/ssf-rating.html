@@ -1,6 +1,6 @@
 <ssf-rating>
     <div layout="row" class="paw-rating">
-        <div onclick={setRating} class="paw" each={paw in paws}>
+        <div onclick={setRating} class="paw {paw <= rating ? 'paw--rated' : ''}" each={paw in paws}>
             <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="26px" height="30px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
                 viewBox="0 0 9 11"
                 xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -17,12 +17,12 @@
         </div>
     </div>
     <script>
-        this.paws = Array.from(Array(5))
+        this.paws = Array.from(Array(5)).map((item, index) => index + 1)
         
         this.rating = 0
         
         setRating(e) {
-            console.log(e.item);
+            this.rating = e.item.paw
         }
     </script>
     <style type="text/less">
@@ -35,13 +35,14 @@
         .paw {
             cursor: pointer;
             padding: .5em;
+            path {
+                fill: @color-dark-shadow;        
+            }
+            
             &--rated path {
                 fill: @color-primary;
             }
             
-            path {
-                fill: @color-dark-shadow;        
-            }
         }
         
         .paw:hover ~ .paw path {
