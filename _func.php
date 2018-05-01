@@ -4,26 +4,53 @@ function setPageModules($page, $data, $contentPage = false) {
 	$page->of(false);
 	$pages = $page->pageModules;
 	//$page->pageModules->removeAll();
-	foreach ($pages as $pageModule) {
-		$pageModule->delete(true);
-	}
+	// foreach ($pages as $pageModule) {
+	// 	if ($pageModule)
+	// 	$pageModule->delete(true);
+	// }
 	// page deletion has to be made as a second call BEFORE creating page with same name again.
-	$page->save();
+	// $page->save();
 	if (!$contentPage) {
 		$contentPage = wire('pages')->get('template=page-contents');
 	}
-	foreach ($data as $moduleData) {
-		$module = new Page();
-		$module->parent = $contentPage;
-		$module->of(false);
-		$validTemplates = [''];
-		$module->template = $moduleData->template;
-		$module->title = $page->title.'_'.$moduleData->template;
-		$module->save();
-		$page->pageModules->add($module);
-		$page->save();
-		setFieldValues($moduleData, $module);
-		$module->save();
+	
+	foreach ($data as $key => $moduleData) {
+		if(isset($moduleData->id)) {
+			$module = wire('pages')->get($moduleData->id);
+			$module->of(false);
+			setFieldValues($moduleData, $module);
+			$module->save();
+		} else {
+			$module = new Page();
+			$module->parent = $contentPage;
+			$module->of(false);
+			$module->template = $moduleData->template;
+			$module->title = $page->title.'_'.$moduleData->template;
+			$module->save();
+			$module->of(false);
+			setFieldValues($moduleData, $module);
+			$module->save();
+			$moduleData->id = $module->id;
+			$page->pageModules->add($module);
+		}
+	}
+	$page->save();
+	$page->of(false);
+	
+	foreach($data as $key => $moduleData) {
+		// TODO: SORTING!
+		// $module = wire('pages')->get($moduleData->id);
+		// $module->sort = $key + 1;
+		// $module->save();
+	}
+	$page->pageModules->save();
+	foreach ($page->pageModules as $module) {
+		$index = array_filter($data, function($item) use ($module) {
+			return $item->id == $module->id;
+		});
+		if (!count($index)) {
+			$module->delete(true);
+		}
 	}
 	$page->save();
 }

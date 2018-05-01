@@ -139,12 +139,12 @@ $router = new Router([
     new Route('PUT', 'pages/([0-9]+)', function($path, $pageId) {
         $data = Request::getPayload();
         if (!is_array($data)) {
-            return 'no data';
             http_response_code(415);
+            return 'no data';
         }
         $page = $this->pages->get("id=$pageId");
         if (!$page instanceof Page) {
-            http_response_code(415);
+            http_response_code(404);
             return 'no page with ID found';
         }
         setPageModules($page, $data, $this->pages->get('template=page-contents'));
