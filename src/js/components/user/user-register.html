@@ -19,7 +19,7 @@
         <ssf-species-select name="species" val={opts.postdata.species}></ssf-species-select>
         <h3>Personendaten</h3>
         <p class="notification notification--warning">
-            Damit Du an Events teilnehmen kannst, benötigen wir deinen Namen, dein Geburtsdatum und deine Adresse.<br>
+            Damit Du an Events teilnehmen kannst, benötigen wir Deinen Namen, Dein Geburtsdatum und Deine Adresse.<br>
             Diese Daten sind <strong>nicht öffentlich zugänglich</strong> und werden ausschließlich für die Registrierung bei Events verwendet.
         </p>
         <div layout="row" layout-align="space-between">
@@ -38,8 +38,13 @@
             <ssf-datepicker class-name="field-group__input" name="birthdate" options={dataInput} required ref="date" value="{opts.postdata.birthdate}"></ssf-datepicker>
         </label>
         <input type="hidden" id="_post_token" name="{CSRFToken}" value="{CSRFValue}"/>
+        <p class="notification notification--warning">
+            Mit der Registrierung auf der Webseite des Südstaatenfurs Vereins stimme ich der Speicherung und automatischen Verarbeitung
+            meiner Daten zu. Zu diesen Daten gehören Name, Vorname, Anschrift, Pseudonym, E-Mail-Adresse und das Geburtsdatum. Erläuterung
+            hierzu in der <a href="{api.url}datenschutz">Datenschutzerklärung</a>.
+        </p>
         <div class="actions">
-            <input type="submit" class="button button--primary" value="Werde Teil der Events">
+            <input type="submit" class="button button--primary" value="Registrieren">
         </div>
     </form>
     <script>
