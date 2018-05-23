@@ -83,6 +83,7 @@ class Users extends Resource
         $newUser->isQueryable = true;
         $newUser->isSubscribedOfficial = false;
         $newUser->isSubscribedAll = true;
+        $newUser->hasReadPrivacyPolicy = true;
         $newUser->save();
 
         // Send notification

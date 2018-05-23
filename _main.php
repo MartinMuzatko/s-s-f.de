@@ -3,6 +3,12 @@ $content = ob_get_clean();
 $documentTitle = isset($documentTitle) ? $documentTitle : $page->title;
 $documentTitle .= $isEvent && !$isEventHome ? ' - '.$event->title : '';
 $documentTitle .= ' | SSF - Die SüdstaatenFurs';
+
+$profileUrl = 'users/'.$user->name;
+if ($user->isLoggedIn() && !$user->hasReadPrivacyPolicy && !strpos($_SERVER['REQUEST_URI'], $profileUrl)) {
+    $session->redirect($pages->get('/')->url.$profileUrl);
+}
+
 ?>
 <!DOCTYPE html>
 <!-- 
@@ -138,15 +144,17 @@ $documentTitle .= ' | SSF - Die SüdstaatenFurs';
     <?php
         $itemPages = $pages->get('/events/resources/items')->children('include=all')->getArray();
         $imageKeys = array_map(function($item) { return $item->name; }, $itemPages);
-        $imageValues = array_map(function($item) { return $item->image->first->url ; }, $itemPages);
+        $imageValues = array_map(function($item) { return $item->image->first ? $item->image->first->url : ''; }, $itemPages);
         $itemImages = array_combine($imageKeys, $imageValues);
         // $user = $pages->find('template=user')->getRandom();
         $api = [
+            "gdprUrl" => $page->get('title=Datenschutz')->url,
             "user" => [
                 "name" => $user->name,
                 "username" => $user->username,
                 "clubMemberID" => $user->clubMemberID,
                 "avatar" => $user->getAvatar(),
+                "editUrl" => $config->urls->root.'users/'.$user->name.'/edit'
             ],
             "url" => $config->urls->root,
             "images" => $itemImages

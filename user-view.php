@@ -8,10 +8,15 @@
         $isMe = $profile->name == $user->name;
         $isAdmin = $user->hasPermission('user-admin');
         $isInvisible = $profile->isInvisible;
-    ?>
+        ?>
     <? if(!$action): ?>
-        <? $documentTitle = $profile->username." Profil" ?>
-        <? require('./partials/user/profile.php'); ?>
+        <? if ($isMe && !$profile->hasReadPrivacyPolicy): ?>
+            <? $documentTitle = 'Datenschutzerklärung' ?>
+            <? require('./partials/user/gdpr.php'); ?>
+        <? else: ?>
+            <? $documentTitle = $profile->username." Profil" ?>
+            <? require('./partials/user/profile.php'); ?>
+        <? endif; ?>
     <? elseif($action == 'messages'): ?>
         <? $documentTitle = 'Nachrichten' ?>
         <? require('./partials/user/messages.php'); ?>
