@@ -5,7 +5,14 @@ $documentTitle .= $isEvent && !$isEventHome ? ' - '.$event->title : '';
 $documentTitle .= ' | SSF - Die SüdstaatenFurs';
 
 $profileUrl = 'users/'.$user->name;
-if ($user->isLoggedIn() && !$user->hasReadPrivacyPolicy && !strpos($_SERVER['REQUEST_URI'], $profileUrl)) {
+if (
+    $user->isLoggedIn() &&
+    !$user->hasReadPrivacyPolicy && 
+    !(
+        strpos($_SERVER['REQUEST_URI'], $profileUrl) ||
+        strpos($_SERVER['REQUEST_URI'], 'datenschutz')
+    )
+) {
     $session->redirect($pages->get('/')->url.$profileUrl);
 }
 
@@ -19,14 +26,14 @@ if ($user->isLoggedIn() && !$user->hasReadPrivacyPolicy && !strpos($_SERVER['REQ
 <html itemscope itemtype="http://schema.org/Website">
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <head>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=<?=$homepage->googleAnalyticsID?>"></script>
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=<?=$homepage->googleAnalyticsID?>"></script>
     <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
 
     gtag('config', '<?=$homepage->googleAnalyticsID?>');
-    </script>
+    </script> -->
     <meta charset="utf-8">
     <link rel="manifest" href="<?=$config->urls->templates?>dist/manifest.json">
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -147,8 +154,9 @@ if ($user->isLoggedIn() && !$user->hasReadPrivacyPolicy && !strpos($_SERVER['REQ
         $imageValues = array_map(function($item) { return $item->image->first ? $item->image->first->url : ''; }, $itemPages);
         $itemImages = array_combine($imageKeys, $imageValues);
         // $user = $pages->find('template=user')->getRandom();
+
         $api = [
-            "gdprUrl" => $page->get('title=Datenschutz')->url,
+            "gdprUrl" => $pages->get('title=Datenschutz')->url,
             "user" => [
                 "name" => $user->name,
                 "username" => $user->username,
